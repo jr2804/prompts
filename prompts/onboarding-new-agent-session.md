@@ -1,8 +1,9 @@
 ---
 agent: agent
 ---
-Please analyze the coding guidelines given in `AGENTS.md` and its referenced sub-documents - use the `mgrep` MCP server to parse documentation/markdown files. Then get familiar with the code structure of this project, including:
+Please analyze the coding guidelines given in `AGENTS.md` and its referenced sub-documents - use the `mgrep` MCP server to parse documentation/markdown files, if available. Then get familiar with the code structure of this project, including:
 
+- use MCP server `ncp` to discover and get suggestions for available tools.
 - the use of the MCP server `memorygraph` for long-term storage of important information and knowledge across projects. 
 - the use of the `bd` tool that is intended to be used by coding agents for issue tracking and improved memory.
 
