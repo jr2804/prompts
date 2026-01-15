@@ -49,33 +49,16 @@ You are a professional Python developer creating `{{project-name}}`, a {{project
 - Implement CLI using typer with rich formatting.
 - Document the implementation thoroughly, including design decisions and trade-offs.
 
-### Comparision to official ITU-T reference implementation
-
-The implementation shall comply with the reference implementation from ITU-T P.862 (references: see Annex A of the present document).
-Conformance criteria and data can be found in PDF-/DOCX-/TXT-files of Annex A.
-For conformance testing of PESQ implementations, it is legally explictily allowed to use the compiled reference code for this purpose.
-
-Generation of ITU-T reference executable:
-- Use the C-code and documentation available in Annex A to compile the reference executable. 
-- `pesqmain.c` is the entry point for the executable, the name of the compiled binary should be simply `pesq` (or `pesq.exe` on Windows).
-- **Important**: The corrigendum `T-REC-P.862-201803-W!Cor2!ZIP-E` contains information on how the original code **must** be patched!
-- Consolidated C-code must to be freshly generated. Use folder ./ref_executable as output for patched reference code.
-- The executable needs to be compiled via standard C/C++ compilers. Use **CMake** framework to generate platform-independent build.
-- A build script must be created that produces the final executable. 
-- A test script needs to be created to check if the reference executable works as expected.
-
 ## Technical Requirements
 
 ## Architecture Guidelines
 
 ### Object-Oriented Design
-- Implement <> using clean OOP patterns
+- Implement using clean OOP patterns
 - Create separate classes for major algorithm components:
-  - `PESQProcessor`: Main algorithm orchestrator
-  - `AudioPreprocessor`: Input conditioning and filtering
-  - `TimeAligner`: Temporal alignment between reference and degraded signals
-  - `DisturbanceCalculator`: Perceptual model and disturbance computation
-  - `QualityMapper`: Mapping from internal scores to MOS-LQO
+  - `...`: Main algorithm 
+  - `...`: 
+  - `...`: 
 - Use composition over inheritance
 - Implement proper data encapsulation with properties
 
@@ -94,40 +77,11 @@ Generation of ITU-T reference executable:
 - Use logging for debugging and operational information
 - Implement graceful degradation where appropriate
 
-## Implementation Strategy
-
-### Clean-Room Development
-1. **Specification Phase**: Create detailed specifications from ITU-T text only
-2. **Independent Implementation**: Code without consulting reference implementation
-3. **Alternative Approaches**: Use different algorithms where multiple valid approaches exist
-4. **Unique Naming**: Develop independent naming conventions for all components
 
 ### Core Algorithm Components
 
-#### Audio Preprocessing
-- Independent filter design for input conditioning
-- Sample rate handling and conversion (use `soxr.resample` to accept common rates like 44.1k → 16k.)
-- Level normalization with custom approach
-- Pre-emphasis filtering with configurable parameters
+...
 
-#### Time Alignment
-- Custom delay estimation algorithm
-- Cross-correlation based alignment with improvements
-- Robust handling of edge cases
-- Support for different signal lengths
-
-#### Perceptual Model
-- Bark scale frequency analysis with modern approach
-- Loudness modeling using contemporary psychoacoustic research
-- Disturbance calculation with enhanced numerical stability
-- Asymmetric disturbance processing
-- Add temporal masking placeholder (leaky integration smoothing over Bark loudness).
-
-#### Quality Mapping
-- MOS-LQO mapping with improved curve fitting
-- Support for narrowband and wideband modes
-- Configurable mapping parameters
-- Statistical validation of outputs
 
 ### CLI Implementation
 ```python
@@ -136,7 +90,7 @@ import typer
 from rich.console import Console
 from pathlib import Path
 
-app = typer.Typer(name="free-pesq", help="Free PESQ implementation")
+app = typer.Typer(name="free-pesq", help="[")
 console = Console()
 
 @app.command()
