@@ -1,18 +1,13 @@
-# LLM Coding Agent Guide for free-pesq
+# LLM Coding Agent Guide for {{project-name}}
 
 ## Project Overview
+
 You are a professional Python developer creating `{{project-name}}`, a {{project-description}}.
 
 ## Core Principles
 
-### Legal Compliance
-- **NEVER** copy, translate, or directly port code from ITU reference implementation
-- Implement functionality based on ITU-T Recommendation text and equations only
-- Use independent naming conventions, data structures, and algorithmic approaches
-- Document that implementation is derived from ITU-T standards, not reference code
-- Maintain clean-room development practices
-
 ### Code Quality Standards
+
 - Write professional, production-ready Python code
 - Follow PEP 8 style guidelines strictly
 - Use type hints for all function signatures and class attributes
@@ -28,6 +23,7 @@ You are a professional Python developer creating `{{project-name}}`, a {{project
 - Include conformance tests against official PESQ test vectors (see below)
 
 ### Performance Considerations
+
 - Optimize for performance using NumPy vectorized operations
 - Avoid Python loops for signal processing tasks
 - Profile and optimize critical code paths, when necessary
@@ -36,33 +32,27 @@ You are a professional Python developer creating `{{project-name}}`, a {{project
 - Consider using numba for performance-critical sections if needed
 
 ### Implementation Steps
-- Generate code for and compile ITU-T reference executable (see next clause).
-- Begin specification transcription:
-    - Bark scale & critical band mapping tables
-    - Standard input filters (NB/WB)
-- Replace disturbance placeholder with frequency-domain psychoacoustic model scaffold.
-- Implement proper delay search bounds and fine alignment (windowed cross-correlation).
-- Introduce a QualityMapper curve consistent with published MOS-LQO equations (still clean-room).
-- Add structured logging and richer result object (component intermediate metrics).
-- Add Hypothesis property tests (e.g., invariance under uniform gain).
-- Create conformance data acquisition script stubs (./scripts/).
-- Implement CLI using typer with rich formatting.
-- Document the implementation thoroughly, including design decisions and trade-offs.
+
+- Step 1
+- Step 2
+- Step 3
 
 ## Technical Requirements
 
 ## Architecture Guidelines
 
 ### Object-Oriented Design
+
 - Implement using clean OOP patterns
 - Create separate classes for major algorithm components:
-  - `...`: Main algorithm 
-  - `...`: 
-  - `...`: 
+  - `...`: Main algorithm
+  - `...`:
+  - `...`:
 - Use composition over inheritance
 - Implement proper data encapsulation with properties
 
 ### Performance Optimization
+
 - Use NumPy vectorized operations wherever possible
 - Avoid Python loops for signal processing operations
 - Implement efficient memory management (avoid unnecessary copies)
@@ -71,12 +61,12 @@ You are a professional Python developer creating `{{project-name}}`, a {{project
 - Consider using numba for performance-critical sections if needed
 
 ### Error Handling
+
 - Define custom exception classes for domain-specific errors
 - Validate all inputs at API boundaries
 - Provide meaningful error messages with context
 - Use logging for debugging and operational information
 - Implement graceful degradation where appropriate
-
 
 ### Core Algorithm Components
 
@@ -84,6 +74,7 @@ You are a professional Python developer creating `{{project-name}}`, a {{project
 
 
 ### CLI Implementation
+
 ```python
 # Use typer for CLI with rich formatting
 import typer
@@ -107,6 +98,7 @@ def evaluate(
 ## Testing Strategy
 
 ### Unit Testing with pytest
+
 - Test all public methods and edge cases
 - Use parametrized tests for different input scenarios
 - Mock external dependencies appropriately
@@ -114,6 +106,7 @@ def evaluate(
 - Include property-based testing with Hypothesis
 
 ### Conformance Testing
+
 ```python
 # Download and test against official conformance samples
 def test_conformance_p862():
@@ -264,7 +257,7 @@ uv run pytest tests/ -v --cov=src/free_pesq
 
 ## Annex A: Reference Implementation, Standard documents & additional material
 The official reference implementation (C-code) is provided in the subdirectory `./itut-p862-ref-docs-data/T-REC-P.862-200511-W!Amd2!SOFT-ZST-E/Software/source`).
- 
+
 Several standard documents are provided along with the source code, which can be used to analyze the PESQ algorithm further in detail.
 
 General information about PESQ algorithm:
