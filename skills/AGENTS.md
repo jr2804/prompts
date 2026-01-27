@@ -13,3 +13,9 @@ Any created or updated skill shall comply with the [Agent Skills Specification](
 ## Skill Creation
 
 When creating a new skill, use the skill provided in `./skill-creator`. This skill is designed to help you scaffold and implement new agent skills efficiently.
+
+To run the helper scripts of the skill creator, always use `uv` to run the scripts. For example:
+
+```bash
+uv run ./skills/skill-creator/scripts/<script-name>.py
+```
