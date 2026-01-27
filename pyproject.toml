@@ -1,0 +1,6 @@
+[project]
+name = "prompts-and-more"
+description = "A collection of useful prompts and utilities for various applications. The Python environment is only required when coding assistants want to run some code, e.g., for initialization/validation of skills."
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = []
