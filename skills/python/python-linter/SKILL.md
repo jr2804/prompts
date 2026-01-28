@@ -199,6 +199,71 @@ from .core import processors
 
 ---
 
+### NPY002: Legacy NumPy Random Generation
+
+**What it means:** Usage of the legacy `numpy.random` functions (like `np.random.seed`, `np.random.normal`) instead of the modern `Generator` API.
+
+**Why it matters:** The legacy `RandomState` methods are frozen and less efficient. The new `Generator` API (introduced in NumPy 1.17) is faster, has better statistical properties, and avoids global state issues.
+
+**How to fix:**
+
+#### Standard Case: Use default_rng()
+
+```python
+# [X] BEFORE (linter error)
+import numpy as np
+
+np.random.seed(1337)
+data = np.random.normal(size=100)
+
+# [OK] AFTER (fixed)
+import numpy as np
+
+# Create a Generator instance
+rng = np.random.default_rng(1337)
+data = rng.normal(size=100)
+```
+
+**Ruff documentation:** https://docs.astral.sh/ruff/rules/numpy-legacy-random/
+
+---
+
+### S311: Suspicious Non-Cryptographic Random Usage
+
+**What it means:** Use of the standard `random` module for generating random numbers in potentially sensitive contexts.
+
+**Why it matters:** Standard pseudo-random number generators (like Python's `random` or NumPy's `random`) are predictable and not cryptographically secure. They should not be used for security tokens, passwords, or authentication.
+
+**How to fix:**
+
+#### Security Context: Use secrets module
+If generating passwords, tokens, or security keys, you **must** use the `secrets` module.
+
+```python
+# [X] BEFORE (security risk)
+import random
+token = random.randrange(1000000)
+
+# [OK] AFTER (secure)
+import secrets
+token = secrets.randbelow(1000000)
+```
+
+#### Non-Security Context (Data Science/Simulation):
+If the usage is purely for simulation, testing, or data analysis (and flagged incorrectly), you can replace with NumPy for better performance or ignore if security is not a concern.
+
+```python
+# [OK] Simulation/Science (not security sensitive)
+# If performance matters, prefer NumPy over standard random
+import numpy as np
+rng = np.random.default_rng()
+data = rng.random(100)
+```
+
+**Ruff documentation:** https://docs.astral.sh/ruff/rules/suspicious-non-cryptographic-random-usage/
+
+---
+
 ## Additional Resources
 
 For more detailed examples and edge cases:
