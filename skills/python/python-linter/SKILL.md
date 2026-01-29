@@ -24,6 +24,28 @@ When you encounter a Ruff linter error:
 
 ## Common Linter Issues
 
+The following issues can often be fixed automatically by linter tools, but when they require manual intervention, the coding assistant should always resolve them as they are straightforward.
+
+### E402: Module Level Import Not at Top of File
+
+**What it means:** An import statement appears after code that is not an import, comment, or docstring.
+
+**Why it matters:** PEP 8 requires all imports to be at the top of the file, before any other code (except for docstrings and comments). This ensures dependencies are clearly visible and avoids potential side effects from code executed before imports.
+
+**How to fix:** Move the import statement to the top of the module, grouping it with other imports.
+
+---
+
+### B007: Loop Control Variable Not Used
+
+**What it means:** A variable defined in a `for` loop is never used within the loop body.
+
+**Why it matters:** It can signal a bug (the variable was intended to be used) or simply clutter the code. Using a specific naming convention for unused variables makes intent clear.
+
+**How to fix:** Prefix the unused variable with an underscore (e.g., `_item` or just `_`).
+
+---
+
 ### B008: Function Call in Default Argument
 
 **What it means:** A function call is being used as a default argument value, which is evaluated only once at function definition time.
