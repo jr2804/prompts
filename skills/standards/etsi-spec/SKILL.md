@@ -14,7 +14,7 @@ Retrieve comprehensive metadata for ETSI (European Telecommunications Standards 
 To get metadata for an ETSI specification:
 
 ```bash
-uv run python scripts/get_etsi_spec.py <spec-number>
+uv run scripts/get_etsi_spec.py <spec-number>
 ```
 
 **Accepted formats:**
@@ -28,17 +28,17 @@ uv run python scripts/get_etsi_spec.py <spec-number>
 **Examples:**
 ```bash
 # TS (Technical Specification)
-uv run python scripts/get_etsi_spec.py 103224
-uv run python scripts/get_etsi_spec.py ETSI TS 103 224
+uv run scripts/get_etsi_spec.py 103224
+uv run scripts/get_etsi_spec.py ETSI TS 103 224
 
 # EG (ETSI Guide)
-uv run python scripts/get_etsi_spec.py EG 202 396-3
+uv run scripts/get_etsi_spec.py EG 202 396-3
 
 # TR (Technical Report)
-uv run python scripts/get_etsi_spec.py TR 103 907
+uv run scripts/get_etsi_spec.py TR 103 907
 
 # ES (ETSI Standard)
-uv run python scripts/get_etsi_spec.py ES 200 381-1
+uv run scripts/get_etsi_spec.py ES 200 381-1
 ```
 
 ## ETSI Document Types
