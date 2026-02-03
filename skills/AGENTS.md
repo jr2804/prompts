@@ -19,3 +19,26 @@ To run the helper scripts of the skill creator, always use `uv` to run the scrip
 ```bash
 uv run ./skills/skill-creator/scripts/<script-name>.py
 ```
+## Creating skill scripts
+
+Minimum/maximum Python version and dependencies beyond standard library for skill scripts must be declared as inline script metadata, see:
+- https://packaging.python.org/en/latest/specifications/inline-script-metadata/#inline-script-metadata
+- https://docs.astral.sh/uv/guides/scripts/#declaring-script-dependencies
+
+Example:
+```python
+# /// script
+# requires-python = ">=3.11"
+# dependencies = [
+#   "requests<3",
+#   "rich",
+# ]
+# ///
+
+import requests
+from rich.pretty import pprint
+
+resp = requests.get("https://peps.python.org/api/peps.json")
+data = resp.json()
+pprint([(k, v["title"]) for k, v in data.items()][:10])
+```
