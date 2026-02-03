@@ -79,6 +79,28 @@ Executable code (Python/Bash/etc.) for tasks that require deterministic reliabil
 - **Benefits**: Token efficient, deterministic, may be executed without loading into context
 - **Note**: Scripts may still need to be read by Claude for patching or environment-specific adjustments
 
+Skill scripts must declare possible additional dependencies as well as required minimum/maximum Python version as inline script metadata, see:
+- https://packaging.python.org/en/latest/specifications/inline-script-metadata/#inline-script-metadata
+- https://docs.astral.sh/uv/guides/scripts/#declaring-script-dependencies
+
+Example:
+```python
+# /// script
+# requires-python = ">=3.11"
+# dependencies = [
+#   "requests<3",
+#   "rich",
+# ]
+# ///
+
+import requests
+from rich.pretty import pprint
+
+resp = requests.get("https://peps.python.org/api/peps.json")
+data = resp.json()
+pprint([(k, v["title"]) for k, v in data.items()][:10])
+```
+
 ##### References (`references/`)
 
 Documentation and reference material intended to be loaded as needed into context to inform Claude's process and thinking.
