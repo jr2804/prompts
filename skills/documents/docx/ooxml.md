@@ -228,7 +228,7 @@ When adding content, update these files:
 </w:hyperlink>
 
 <!-- In word/_rels/document.xml.rels -->
-<Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" 
+<Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
               Target="https://www.example.com/" TargetMode="External"/>
 ```
 
@@ -284,7 +284,7 @@ find /mnt/skills -name "document.py" -path "*/docx/scripts/*" 2>/dev/null | head
 
 **Run your script with PYTHONPATH** set to the docx skill root:
 ```bash
-PYTHONPATH=/mnt/skills/docx python your_script.py
+PYTHONPATH=/mnt/skills/docx uv run your_script.py
 ```
 
 **In your script**, import from the skill root:
