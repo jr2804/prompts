@@ -4,6 +4,11 @@
 
 You are a professional Python developer creating `{{project-name}}`, a {{project-description}}.
 
+- When in doubt about algorithmic choices, choose the more independent approach
+- Focus on clear, readable code over micro-optimizations
+- Use modern Python idioms and best practices throughout
+- Before implementing new helper functions or any new business logic, investigate if such functionality already exists. Duplicate code must be avoided at all costs.
+
 ## Core Principles
 
 ### Code Quality Standards
@@ -22,14 +27,6 @@ You are a professional Python developer creating `{{project-name}}`, a {{project
 - Implement unit tests with pytest to cover all functionality
 - Include conformance tests against official PESQ test vectors (see below)
 
-### Performance Considerations
-
-- Optimize for performance using NumPy vectorized operations
-- Avoid Python loops for signal processing tasks
-- Profile and optimize critical code paths, when necessary
-- Ensure memory efficiency, especially for large audio files
-- Benchmark against the reference implementation for speed comparison
-- Consider using numba for performance-critical sections if needed
 
 ### Implementation Steps
 
@@ -54,10 +51,15 @@ You are a professional Python developer creating `{{project-name}}`, a {{project
 ### Performance Optimization
 
 - Use NumPy vectorized operations wherever possible
-- Avoid Python loops for signal processing operations
 - Implement efficient memory management (avoid unnecessary copies)
 - Use SciPy for optimized FFT and filtering operations
 - Profile critical paths and optimize bottlenecks
+- Consider using numba for performance-critical sections if needed
+- Optimize for performance using NumPy vectorized operations
+- Avoid Python loops for signal processing tasks
+- Profile and optimize critical code paths, when necessary
+- Ensure memory efficiency, especially for large audio files
+- Benchmark against the reference implementation for speed comparison
 - Consider using numba for performance-critical sections if needed
 
 ### Error Handling
@@ -105,174 +107,34 @@ def evaluate(
 - Achieve >95% code coverage
 - Include property-based testing with Hypothesis
 
-### Conformance Testing
-
-```python
-# Download and test against official conformance samples
-def test_conformance_p862():
-    """Test against P.862 conformance samples."""
-    # Download official test vectors
-    # Run reference implementation (patched with corrigenda)
-    # Run free-pesq implementation
-    # Compare results within tolerance
-    pass
-
-def test_conformance_p862_1():
-    """Test against P.862.1 conformance samples."""
-    pass
-
-def test_conformance_p862_2():
-    """Test against P.862.2 conformance samples."""
-    pass
-```
 
 ### Performance Testing
+
 - Use pytest-benchmark for performance regression tests
-- Build conformance harness skeleton: discover WAV pairs, store expected placeholder JSON, add failing (xfail) tests as reminders.
-- Benchmark against reference implementation speed
 - Memory usage profiling
 - Regression testing for performance
 - Load testing with various file sizes
 
-## File Structure
-```
-free-pesq/
-├── pyproject.toml
-├── README.md
-├── AGENTS.md
-├── src/
-│   └── free_pesq/
-│       ├── __init__.py
-│       ├── core/
-│       │   ├── __init__.py
-│       │   ├── processor.py
-│       │   ├── preprocessor.py
-│       │   ├── aligner.py
-│       │   ├── disturbance.py
-│       │   └── mapper.py
-│       ├── cli/
-│       │   ├── __init__.py
-│       │   └── main.py
-│       └── utils/
-│           ├── __init__.py
-│           ├── audio.py
-│           └── validation.py
-├── tests/
-│   ├── __init__.py
-│   ├── conftest.py
-│   ├── test_core/
-│   ├── test_cli/
-│   ├── test_conformance/
-│   └── data/
-├── docs/
-│   ├── api.md
-│   ├── conformance.md
-│   └── examples.md
-└── scripts/
-    ├── download_conformance_data.py
-    ├── build_reference_tool.py
-    └── run_conformance_tests.py
-```
-
-## Documentation Requirements
-
-### README.md Structure
-- Clear project description and legal disclaimer
-- Installation instructions using uv
-- Quick start guide with examples
-- API documentation links
-- Conformance testing information
-- Contributing guidelines
-
-### Code Documentation
-- Google-style docstrings for all public APIs
-- Type hints on all function signatures
-- Inline comments for complex algorithms
-- Examples in docstrings where appropriate
-
-## Development Workflow
-
-### Initial Setup
-```bash
-# Initialize project with uv
-uv init {{project-name}}
-cd free-pesq
-
-# Install dependencies
-uv add numpy scipy typer rich pydantic
-uv add --dev pytest pytest-cov black isort mypy ruff
-
-# Set up pre-commit hooks
-uv add --dev pre-commit
-```
-
-### Code Quality Checks
-```bash
-# Format code
-uv run black src tests
-uv run isort src tests
-
-# Lint code
-uv run ruff check src tests
-uv run ty src
-
-# Run tests
-uv run pytest tests/ -v --cov=src/free_pesq
-```
-
-## Legal and Compliance Notes
-
-### Independence Requirements
-- Never reference ITU source code during development
-- Document all algorithmic choices as independent decisions
-- Use different mathematical formulations where equivalent options exist
-- Maintain development logs showing clean-room practices
-
-### Trademark Considerations
-- Use "implements ITU-T P.862" rather than "PESQ" in product descriptions
-- Include appropriate disclaimers about trademark ownership
-- Avoid suggesting official endorsement or affiliation
-
-### Patent Considerations
-- Verify current patent status in relevant jurisdictions
-- Document that implementation is based on expired or non-applicable patents
-- Include patent disclaimer in documentation
 
 ## Success Criteria
 
 1. **Functional Compliance**: Pass all conformance tests within specified tolerances
 2. **Performance**: Match or exceed reference implementation speed
 3. **Code Quality**: Pass all linting, typing, and testing requirements
-4. **Legal Safety**: Maintain complete independence from reference implementation
-5. **Usability**: Provide clear API and CLI matching reference tool functionality
+4. **Usability**: Provide clear API and CLI matching reference tool functionality
 
-## Notes for LLM Implementation
 
-- Always prioritize legal compliance over code simplicity
-- When in doubt about algorithmic choices, choose the more independent approach
-- Focus on clear, readable code over micro-optimizations
-- Test extensively against conformance data
-- Document all major algorithmic decisions and their independence rationale
-- Use modern Python idioms and best practices throughout
+## Documentation Requirements
 
-## Annex A: Reference Implementation, Standard documents & additional material
-The official reference implementation (C-code) is provided in the subdirectory `./itut-p862-ref-docs-data/T-REC-P.862-200511-W!Amd2!SOFT-ZST-E/Software/source`).
+### README.md Structure
 
-Several standard documents are provided along with the source code, which can be used to analyze the PESQ algorithm further in detail.
+- Clear project description and legal disclaimer/license
+- Installation instructions using uv
+- Quick start guide with examples
+- Links to API documentation and contributing guidelines
 
-General information about PESQ algorithm:
-- [ITU-T P.862 Recommendation](https://www.itu.int/rec/dologin_pub.asp?lang=e&id=T-REC-P.862-200102-W!!SOFT-ZST-E)
-- [ITU-T P.862 Recommendation Corrigendum 1](https://www.itu.int/rec/dologin.asp?lang=e&id=T-REC-P.862-200710-W!Cor1!PDF-E)
-- [ITU-T P.862 Recommendation Corrigendum 2](https://www.itu.int/rec/dologin.asp?lang=e&id=T-REC-P.862-201803-W!Cor2!ZIP-E)
-
-Application Guide:
-- [P.862.3: Application guide for objective quality measurement based on P.862](https://www.itu.int/rec/dologin_pub.asp?lang=e&id=T-REC-P.862.3-200711-W!!PDF-E)
-- [P.862.3 (2007) Corrigendum 1 (11/11)](https://www.itu.int/rec/dologin.asp?lang=e&id=T-REC-P.862.3-201111-W!Cor1!PDF-E)
-
-Narrowband (NB) mode of PESQ:
-- [P.862.1: Mapping function for transforming P.862 raw result scores to MOS-LQO](https://www.itu.int/rec/dologin_pub.asp?lang=e&id=T-REC-P.862.1-200311-W!!PDF-E)
-
-Wideband (WB) mode of PESQ:
-- [P.862: Wideband extension to Recommendation P.862 for the assessment of wideband telephone networks and speech codecs](https://www.itu.int/rec/dologin_pub.asp?lang=e&id=T-REC-P.862.2-200711-W!!PDF-E)
-- [P.862: Recommendation P.862.2 (2007) Corrigendum 1 (10/17)](https://www.itu.int/rec/dologin.asp?lang=e&id=T-REC-P.862.2-201710-W!Cor1!PDF-E)
-- [P.862: Revised Annex A - Reference implementations and conformance testing for ITU-T Recs P.862, P.862.1 and P.862.2](https://www.itu.int/rec/dologin_pub.asp?lang=e&id=T-REC-P.862-200511-W!Amd2!SOFT-ZST-E&type=items)
+### Code Documentation
+- Google-style docstrings for all public APIs
+- Type hints on all function signatures
+- Inline comments for complex algorithms
+- Examples in docstrings where appropriate
