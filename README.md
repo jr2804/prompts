@@ -25,3 +25,8 @@ Run `bunx saddle-cli`, then follow the instructions to install the repository.
 ### Skills
 
 ### Agents
+
+## References
+
+[Writing a Good AGENTS.md](https://www.philschmid.de/writing-good-agents#the-data-says-less-is-more)
+[Evaluating AGENTS.md: Are Repository-Level Context Files Helpful for Coding Agents?](https://arxiv.org/pdf/2602.11988)
