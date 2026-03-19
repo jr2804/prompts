@@ -12,7 +12,7 @@ Generate skills from documentation websites, GitHub repositories, or local paths
 1. **Parse arguments** from `$ARGUMENTS`:
    - `name`: Skill name (required)
    - `source`: URL, GitHub repo, or local path (required)
-   - `output-dir`: Output directory (default: `.agents/skills/<name>`)
+   - `output-dir`: Output directory (default: `.agents/skills/<name>`). Auto-join `name` to directory if not specified.
    - `description`: Skill description (default: "to be updated")
 
 2. **Validate**: Return error if `name` or `source` missing
@@ -23,6 +23,8 @@ Generate skills from documentation websites, GitHub repositories, or local paths
    ```
 
 4. **Enhance**: Apply skill-creator guidelines to improve generated skill
+5. **Update description**: Modify the skill description if necessary based on enhancement results
+6. **Return**: Output success message with skill details or error if creation fails
 
 ## Requirements
 
