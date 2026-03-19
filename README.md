@@ -26,6 +26,18 @@ Run `bunx saddle-cli`, then follow the instructions to install the repository.
 
 ### Agents
 
+## Useful MCP Servers & other tools
+
+A list of MCP servers that are useful for testing and development:
+
+- [CytoScnPy](https://github.com/djinn-soul/CytoScnPy)
+- To be continued...
+
+Related tools:
+
+- [any-cli-mcp-server](https://github.com/eirikb/any-cli-mcp-server)
+- To be continued...
+
 ## References
 
 [Writing a Good AGENTS.md](https://www.philschmid.de/writing-good-agents#the-data-says-less-is-more)
