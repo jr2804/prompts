@@ -15,9 +15,10 @@ Generate skills from documentation websites, GitHub repositories, or local paths
    - `output-dir`: Output directory (default: `.agents/skills/<name>`). Auto-join `name` to directory if not specified.
    - `description`: Skill description (default: "to be updated")
 
-2. **Validate**: Return error if `name` or `source` missing
+2. **Validate**: Return error if `name` or `source` missing. Ensure that `name` is the trailing part of the output directory. Proceed immediately if validation passes, otherwise, if in doubt, ask for user feedback on inputs.
 
 3. **Execute**:
+
    ```shell
    uvx skill-seekers create <source> --name <name> --output "<output-dir>" --description "<description>"
    ```
