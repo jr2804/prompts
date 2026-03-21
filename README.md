@@ -52,6 +52,7 @@ Related tools:
 
 - [Awesome Claude Skills](https://github.com/BehiSecc/awesome-claude-skills)
 - [Awesome Copilot](https://github.com/github/awesome-copilot)
+- [Claude Code Ultimate Guide](https://github.com/FlorianBruniaux/claude-code-ultimate-guide/tree/main/examples/skills)
 - *To be continued...*
 
 ## References
