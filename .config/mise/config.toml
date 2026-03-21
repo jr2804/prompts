@@ -9,6 +9,23 @@ package_manager = "bun"
 [tasks.default]
 run = "mise tasks"
 
+[tasks.upgrade-tools]
+description = "Upgrade all development tools to their latest versions"
+run = ["mise install", "mise up", "mise prune"]
+
+[tasks.env-sync]
+description = "Sync the virtual environment with pyproject.toml dependencies"
+run = "uv sync -U --dev --all-extras --all-groups"
+
+[tasks.format]
+description = "Format source code and markdown files"
+run = [
+    "uv run undersort .",
+    "uv run ruff check --select I --fix", # isort-equivalent sorting of imports
+    "uv run ruff format .",
+    "uv run mdformat .",
+]
+
 
 [tasks.add-skills]
 description = "Add skills to the agent"

@@ -4,5 +4,8 @@ description = "A collection of useful prompts and utilities for various applicat
 version = "0.1.0"
 requires-python = ">=3.14"
 dependencies = [
+    "mdformat>=1.0.0",
     "pyyaml>=6.0.3",
+    "ruff>=0.15.7",
+    "undersort>=0.1.5",
 ]
