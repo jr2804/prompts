@@ -1,12 +1,6 @@
----
-name: cli-cytosnpy
-description: >
-  CLI tool for CytoScnPy - code metrics analysis for Python projects.
-  Use when running code quality scans, calculating cyclomatic complexity,
-  Halstead metrics, maintainability index, or generating project statistics.
-  Triggers on: cytoscnpy commands, code metrics analysis, complexity reports,
-  maintainability scoring, or MCP server setup for LLM integration.
----
+______________________________________________________________________
+
+## name: cli-cytosnpy description: > CLI tool for CytoScnPy - code metrics analysis for Python projects. Use when running code quality scans, calculating cyclomatic complexity, Halstead metrics, maintainability index, or generating project statistics. Triggers on: cytoscnpy commands, code metrics analysis, complexity reports, maintainability scoring, or MCP server setup for LLM integration.
 
 # CytoScnPy CLI
 

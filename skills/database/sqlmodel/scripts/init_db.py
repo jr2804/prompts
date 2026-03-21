@@ -19,8 +19,7 @@ def init_db(database_url: str = None) -> None:
     # Get database URL from environment or parameter
     if database_url is None:
         database_url = os.getenv(
-            "DATABASE_URL",
-            "postgresql://user:password@localhost:5432/dbname"
+            "DATABASE_URL", "postgresql://user:password@localhost:5432/dbname"
         )
 
     print("Connecting to database...")
@@ -45,14 +44,13 @@ def drop_db(database_url: str = None) -> None:
     """Drop all database tables"""
     if database_url is None:
         database_url = os.getenv(
-            "DATABASE_URL",
-            "postgresql://user:password@localhost:5432/dbname"
+            "DATABASE_URL", "postgresql://user:password@localhost:5432/dbname"
         )
 
     print("⚠️  WARNING: This will drop all tables!")
     confirm = input("Type 'yes' to confirm: ")
 
-    if confirm.lower() != 'yes':
+    if confirm.lower() != "yes":
         print("Aborted.")
         return
 
@@ -74,14 +72,10 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Database initialization")
     parser.add_argument(
-        "--drop",
-        action="store_true",
-        help="Drop all tables instead of creating them"
+        "--drop", action="store_true", help="Drop all tables instead of creating them"
     )
     parser.add_argument(
-        "--url",
-        type=str,
-        help="Database URL (overrides DATABASE_URL env var)"
+        "--url", type=str, help="Database URL (overrides DATABASE_URL env var)"
     )
 
     args = parser.parse_args()

@@ -24,7 +24,7 @@ if DATABASE_URL.startswith("postgresql"):
         max_overflow=30,
         pool_pre_ping=True,
         pool_recycle=3600,
-        echo=False
+        echo=False,
     )
 elif DATABASE_URL.startswith("sqlite"):
     # SQLite configuration
@@ -32,16 +32,17 @@ elif DATABASE_URL.startswith("sqlite"):
         DATABASE_URL,
         connect_args={"check_same_thread": False},
         poolclass=StaticPool,
-        echo=False
+        echo=False,
     )
 else:
     # Default to SQLite
     from sqlalchemy.pool import StaticPool
+
     engine = create_engine(
         "sqlite:///./app.db",
         connect_args={"check_same_thread": False},
         poolclass=StaticPool,
-        echo=False
+        echo=False,
     )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -66,6 +67,7 @@ def get_mongo_client():
     Get MongoDB client connection
     """
     from pymongo import MongoClient
+
     mongo_url = os.getenv("MONGO_URL", "mongodb://localhost:27017/")
     return MongoClient(mongo_url)
 

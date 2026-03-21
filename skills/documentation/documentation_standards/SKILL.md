@@ -1,12 +1,6 @@
----
-name: documentation-standards
-description: Universal documentation standards and best practices for software projects
-license: MIT
-compatibility: opencode
-metadata:
-  related_coding_principles: For overall development standards, use skill `coding-principles`
-  related_python_guidelines: For Python-specific documentation, use skill `python-guidelines`
----
+______________________________________________________________________
+
+## name: documentation-standards description: Universal documentation standards and best practices for software projects license: MIT compatibility: opencode metadata: related_coding_principles: For overall development standards, use skill `coding-principles` related_python_guidelines: For Python-specific documentation, use skill `python-guidelines`
 
 # Documentation Standards
 
@@ -36,7 +30,7 @@ docs/
     ├── getting-started.md       # Quick start guide
     ├── tutorials/               # Step-by-step tutorials
     └── reference/               # Detailed reference
-````
+```
 
 ### Documentation Formats
 
@@ -124,7 +118,7 @@ curl -X GET "https://api.example.com/v1/resource?id=123&format=json"
 }
 ````
 
-```
+````
 
 ### Code Documentation
 
@@ -154,7 +148,7 @@ class DataProcessor:
         self.config = config or self._get_default_config()
         self.logger = self._setup_logger()
         self._validate_config()
-```
+````
 
 ### Tutorial Documentation
 
@@ -219,9 +213,9 @@ class DataProcessor:
 ## Best Practices
 
 1. **Consistency**: Apply same documentation standards across projects
-2. **Maintainability**: Keep documentation up-to-date with code
-3. **Accessibility**: Make documentation easy to find and navigate
-4. **Completeness**: Document all public APIs and user-facing features
+1. **Maintainability**: Keep documentation up-to-date with code
+1. **Accessibility**: Make documentation easy to find and navigate
+1. **Completeness**: Document all public APIs and user-facing features
 
 ## Compatibility
 

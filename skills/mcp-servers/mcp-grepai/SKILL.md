@@ -1,7 +1,6 @@
----
-name: mcp-grepai
-description: Semantic code search using grepai MCP server with English queries, intent-based search, and call graph tracing
----
+______________________________________________________________________
+
+## name: mcp-grepai description: Semantic code search using grepai MCP server with English queries, intent-based search, and call graph tracing
 
 # MCP Server: grepai - Semantic Code Search
 
@@ -70,9 +69,9 @@ grepai trace graph "ValidateToken" --depth 3 --json
 ## Workflow
 
 1. Start with `grepai search` to find relevant code
-2. Use `grepai trace` to understand function relationships
-3. Use `Read` tool to examine files from results
-4. Only use Grep for exact string searches if needed
+1. Use `grepai trace` to understand function relationships
+1. Use `Read` tool to examine files from results
+1. Only use Grep for exact string searches if needed
 
 ## References
 

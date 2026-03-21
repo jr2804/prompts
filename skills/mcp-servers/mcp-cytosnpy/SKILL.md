@@ -1,12 +1,6 @@
----
-name: mcp-cytosnpy
-description: >
-  MCP server integration for CytoScnPy code metrics analysis.
-  Use when configuring CytoScnPy MCP server for AI assistants (Claude, Cursor, Copilot),
-  setting up VS Code extension integration, or exposing code quality tools via MCP.
-  Triggers on: mcp-cytosnpy, cytoscnpy mcp-server, MCP server setup, AI assistant
-  code analysis integration, VS Code extension configuration.
----
+______________________________________________________________________
+
+## name: mcp-cytosnpy description: > MCP server integration for CytoScnPy code metrics analysis. Use when configuring CytoScnPy MCP server for AI assistants (Claude, Cursor, Copilot), setting up VS Code extension integration, or exposing code quality tools via MCP. Triggers on: mcp-cytosnpy, cytoscnpy mcp-server, MCP server setup, AI assistant code analysis integration, VS Code extension configuration.
 
 # CytoScnPy MCP Server
 

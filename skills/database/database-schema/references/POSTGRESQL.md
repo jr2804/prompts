@@ -3,6 +3,7 @@
 ## Advanced PostgreSQL Features
 
 ### JSON/JSONB Support
+
 ```python
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy import Column, Integer, String
@@ -20,6 +21,7 @@ class Product(Base):
 ```
 
 ### Array Types
+
 ```python
 from sqlalchemy.dialects.postgresql import ARRAY
 
@@ -32,6 +34,7 @@ class User(Base):
 ```
 
 ### Full-Text Search
+
 ```sql
 -- Create indexes for full-text search
 CREATE INDEX idx_products_search ON products USING gin(to_tsvector('english', name || ' ' || description));
@@ -67,6 +70,7 @@ class Article(Base):
 ## Performance Optimization
 
 ### Indexing Strategies
+
 ```python
 from sqlalchemy import Index
 
@@ -86,6 +90,7 @@ class User(Base):
 ```
 
 ### Partitioning (PostgreSQL 10+)
+
 ```sql
 -- Range partitioning example
 CREATE TABLE measurements (
@@ -122,6 +127,7 @@ def create_postgres_engine():
 ## PostgreSQL Migration Patterns
 
 ### Alembic with PostgreSQL-specific features
+
 ```python
 """Add JSONB and UUID fields
 

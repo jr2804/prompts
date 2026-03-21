@@ -104,9 +104,9 @@ parameter_name: Annotated[
 ### Key Components
 
 1. **`Annotated[...]`** - Python's type hint that includes metadata
-2. **Type hint** - First argument: `str`, `int`, `Path`, `bool`, etc.
-3. **`typer.Option()` / `typer.Argument()`** - Second argument: Typer configuration
-4. **Python default** - After the annotation, standard Python default value
+1. **Type hint** - First argument: `str`, `int`, `Path`, `bool`, etc.
+1. **`typer.Option()` / `typer.Argument()`** - Second argument: Typer configuration
+1. **Python default** - After the annotation, standard Python default value
 
 ## Common Patterns
 
@@ -205,9 +205,9 @@ def process(
 ## Why This Works
 
 1. **Satisfies Ruff:** The actual function parameter default is a simple value (not a function call)
-2. **Satisfies Typer:** The `Annotated` metadata includes all Typer configuration
-3. **Type-safe:** Full type checking support from mypy/pyright
-4. **IDE-friendly:** Autocomplete and inline documentation work correctly
+1. **Satisfies Typer:** The `Annotated` metadata includes all Typer configuration
+1. **Type-safe:** Full type checking support from mypy/pyright
+1. **IDE-friendly:** Autocomplete and inline documentation work correctly
 
 ## References
 

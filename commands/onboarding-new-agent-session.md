@@ -1,7 +1,6 @@
----
-name: "onboarding"
-description: "Onboarding instructions to initialize a new session."
----
+______________________________________________________________________
+
+## name: "onboarding" description: "Onboarding instructions to initialize a new session."
 
 # Session Onboarding
 

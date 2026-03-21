@@ -1,7 +1,6 @@
----
-name: sqlmodel
-description: Comprehensive guide for working with SQLModel, PostgreSQL, and SQLAlchemy in FastAPI projects. Use when working with database operations in FastAPI including: (1) Defining SQLModel models and relationships, (2) Database connection and session management, (3) CRUD operations, (4) Query patterns and filtering, (5) Database migrations with Alembic, (6) Testing with SQLite, (7) Performance optimization and connection pooling, (8) Transaction management and error handling, (9) Advanced features like cascading deletes, soft deletes, and event listeners, (10) FastAPI integration patterns. Covers both basic and advanced database patterns for production-ready FastAPI applications.
----
+______________________________________________________________________
+
+## name: sqlmodel description: Comprehensive guide for working with SQLModel, PostgreSQL, and SQLAlchemy in FastAPI projects. Use when working with database operations in FastAPI including: (1) Defining SQLModel models and relationships, (2) Database connection and session management, (3) CRUD operations, (4) Query patterns and filtering, (5) Database migrations with Alembic, (6) Testing with SQLite, (7) Performance optimization and connection pooling, (8) Transaction management and error handling, (9) Advanced features like cascading deletes, soft deletes, and event listeners, (10) FastAPI integration patterns. Covers both basic and advanced database patterns for production-ready FastAPI applications.
 
 # SQLModel for FastAPI
 
@@ -79,42 +78,42 @@ This skill includes comprehensive reference files organized by topic. Read the r
 ### Creating a New Model
 
 1. Define the model in your models file
-2. Add relationships if needed
-3. Create request/response schemas
-4. Generate migration: `alembic revision --autogenerate -m "Add model"`
-5. Review and apply migration: `alembic upgrade head`
-6. Implement CRUD functions
-7. Create API endpoints
-8. Write tests
+1. Add relationships if needed
+1. Create request/response schemas
+1. Generate migration: `alembic revision --autogenerate -m "Add model"`
+1. Review and apply migration: `alembic upgrade head`
+1. Implement CRUD functions
+1. Create API endpoints
+1. Write tests
 
 ### Setting Up Database
 
 1. Install dependencies: `pip install sqlmodel psycopg2-binary alembic`
-2. Create database configuration in `database.py`
-3. Define models in `models.py`
-4. Initialize Alembic: `alembic init alembic`
-5. Configure Alembic for SQLModel (see [migrations.md](references/migrations.md))
-6. Create initial migration
-7. Set up dependency injection for sessions
+1. Create database configuration in `database.py`
+1. Define models in `models.py`
+1. Initialize Alembic: `alembic init alembic`
+1. Configure Alembic for SQLModel (see [migrations.md](references/migrations.md))
+1. Create initial migration
+1. Set up dependency injection for sessions
 
 ### Optimizing Performance
 
 1. Add indexes on frequently queried columns (see [models.md](references/models.md))
-2. Use eager loading for relationships (see [relationships.md](references/relationships.md))
-3. Configure connection pooling (see [sessions.md](references/sessions.md))
-4. Implement pagination (see [queries.md](references/queries.md))
-5. Use bulk operations for multiple inserts/updates (see [crud.md](references/crud.md))
-6. Add query caching if needed (see [performance.md](references/performance.md))
+1. Use eager loading for relationships (see [relationships.md](references/relationships.md))
+1. Configure connection pooling (see [sessions.md](references/sessions.md))
+1. Implement pagination (see [queries.md](references/queries.md))
+1. Use bulk operations for multiple inserts/updates (see [crud.md](references/crud.md))
+1. Add query caching if needed (see [performance.md](references/performance.md))
 
 ### Adding Relationships
 
 1. Define foreign key in child model
-2. Add `Relationship` field in both models
-3. Use `back_populates` to link them
-4. For many-to-many, create link table
-5. Configure cascade behavior if needed (see [relationships.md](references/relationships.md))
-6. Update migrations
-7. Test relationship loading
+1. Add `Relationship` field in both models
+1. Use `back_populates` to link them
+1. For many-to-many, create link table
+1. Configure cascade behavior if needed (see [relationships.md](references/relationships.md))
+1. Update migrations
+1. Test relationship loading
 
 ## When to Use Each Reference
 
@@ -130,6 +129,7 @@ This skill includes comprehensive reference files organized by topic. Read the r
 ## Best Practices Summary
 
 ### Model Design
+
 - Use `Optional[int]` with `default=None` for auto-increment primary keys
 - Add indexes to foreign keys and frequently queried fields
 - Use enums for status/category fields
@@ -137,36 +137,42 @@ This skill includes comprehensive reference files organized by topic. Read the r
 - Use mixins for common fields (created_at, updated_at)
 
 ### Session Management
+
 - Always use dependency injection in FastAPI endpoints
 - Use context managers (`with Session()`) for manual sessions
 - Configure connection pooling for production
 - Set `pool_pre_ping=True` to handle stale connections
 
 ### Queries
+
 - Use eager loading to avoid N+1 queries
 - Add appropriate indexes before querying large datasets
 - Use cursor-based pagination for large result sets
 - Use `select()` for all queries instead of legacy query API
 
 ### Migrations
+
 - Always review auto-generated migrations before applying
 - Test migrations locally before production
 - Make migrations reversible (implement both upgrade and downgrade)
 - Use separate migrations for schema and data changes
 
 ### Testing
+
 - Use SQLite in-memory database for tests
 - Use fixtures for test data
 - Override FastAPI dependencies in tests
 - Test both success and failure cases
 
 ### Performance
+
 - Index foreign keys and frequently queried columns
 - Use bulk operations for multiple inserts/updates
 - Configure appropriate pool sizes based on load
 - Monitor slow queries and optimize them
 
 ### Security
+
 - Never use string formatting for queries (use parameterized queries)
 - Hash passwords with bcrypt or similar
 - Validate all user input with Pydantic
@@ -210,24 +216,29 @@ pyproject.toml          # Dependencies
 ### Common Issues
 
 **Import errors with SQLModel models:**
+
 - Ensure all models are imported in `alembic/env.py`
 - Import models before calling `SQLModel.metadata.create_all()`
 
 **N+1 query problems:**
+
 - Use `selectinload()` or `joinedload()` for relationships
 - Check query logs with `echo=True` on engine
 
 **Connection pool exhausted:**
+
 - Increase `pool_size` and `max_overflow`
 - Ensure sessions are properly closed (use context managers)
 - Check for long-running transactions
 
 **Migration conflicts:**
+
 - Use `alembic heads` to check for multiple heads
 - Merge branches with `alembic merge`
 - Resolve conflicts manually in migration files
 
 **Slow queries:**
+
 - Add indexes on queried columns
 - Use `EXPLAIN ANALYZE` to check query plan
 - Consider using read replicas for read-heavy workloads

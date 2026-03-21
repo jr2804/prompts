@@ -211,12 +211,12 @@ class ParagraphData:
                     # Try RGB color first
                     if font.color.rgb:
                         self.color = str(font.color.rgb)
-                except (AttributeError, TypeError):
+                except AttributeError, TypeError:
                     # Fall back to theme color
                     try:
                         if font.color.theme_color:
                             self.theme_color = font.color.theme_color.name
-                    except (AttributeError, TypeError):
+                    except AttributeError, TypeError:
                         pass
 
         # Add line spacing if set
@@ -265,125 +265,6 @@ class ParagraphData:
 
 class ShapeData:
     """Data structure for shape properties extracted from a PowerPoint shape."""
-
-    @staticmethod
-    def emu_to_inches(emu: int) -> float:
-        """Convert EMUs (English Metric Units) to inches."""
-        return emu / 914400.0
-
-    @staticmethod
-    def inches_to_pixels(inches: float, dpi: int = 96) -> int:
-        """Convert inches to pixels at given DPI."""
-        return int(inches * dpi)
-
-    @staticmethod
-    def get_font_path(font_name: str) -> Optional[str]:
-        """Get the font file path for a given font name.
-
-        Args:
-            font_name: Name of the font (e.g., 'Arial', 'Calibri')
-
-        Returns:
-            Path to the font file, or None if not found
-        """
-        system = platform.system()
-
-        # Common font file variations to try
-        font_variations = [
-            font_name,
-            font_name.lower(),
-            font_name.replace(" ", ""),
-            font_name.replace(" ", "-"),
-        ]
-
-        # Define font directories and extensions by platform
-        if system == "Darwin":  # macOS
-            font_dirs = [
-                "/System/Library/Fonts/",
-                "/Library/Fonts/",
-                "~/Library/Fonts/",
-            ]
-            extensions = [".ttf", ".otf", ".ttc", ".dfont"]
-        else:  # Linux
-            font_dirs = [
-                "/usr/share/fonts/truetype/",
-                "/usr/local/share/fonts/",
-                "~/.fonts/",
-            ]
-            extensions = [".ttf", ".otf"]
-
-        # Try to find the font file
-        from pathlib import Path
-
-        for font_dir in font_dirs:
-            font_dir_path = Path(font_dir).expanduser()
-            if not font_dir_path.exists():
-                continue
-
-            # First try exact matches
-            for variant in font_variations:
-                for ext in extensions:
-                    font_path = font_dir_path / f"{variant}{ext}"
-                    if font_path.exists():
-                        return str(font_path)
-
-            # Then try fuzzy matching - find files containing the font name
-            try:
-                for file_path in font_dir_path.iterdir():
-                    if file_path.is_file():
-                        file_name_lower = file_path.name.lower()
-                        font_name_lower = font_name.lower().replace(" ", "")
-                        if font_name_lower in file_name_lower and any(
-                            file_name_lower.endswith(ext) for ext in extensions
-                        ):
-                            return str(file_path)
-            except (OSError, PermissionError):
-                continue
-
-        return None
-
-    @staticmethod
-    def get_slide_dimensions(slide: Any) -> tuple[Optional[int], Optional[int]]:
-        """Get slide dimensions from slide object.
-
-        Args:
-            slide: Slide object
-
-        Returns:
-            Tuple of (width_emu, height_emu) or (None, None) if not found
-        """
-        try:
-            prs = slide.part.package.presentation_part.presentation
-            return prs.slide_width, prs.slide_height
-        except (AttributeError, TypeError):
-            return None, None
-
-    @staticmethod
-    def get_default_font_size(shape: BaseShape, slide_layout: Any) -> Optional[float]:
-        """Extract default font size from slide layout for a placeholder shape.
-
-        Args:
-            shape: Placeholder shape
-            slide_layout: Slide layout containing the placeholder definition
-
-        Returns:
-            Default font size in points, or None if not found
-        """
-        try:
-            if not hasattr(shape, "placeholder_format"):
-                return None
-
-            shape_type = shape.placeholder_format.type  # type: ignore
-            for layout_placeholder in slide_layout.placeholders:
-                if layout_placeholder.placeholder_format.type == shape_type:
-                    # Find first defRPr element with sz (size) attribute
-                    for elem in layout_placeholder.element.iter():
-                        if "defRPr" in elem.tag and (sz := elem.get("sz")):
-                            return float(sz) / 100.0  # Convert EMUs to points
-                    break
-        except Exception:
-            pass
-        return None
 
     def __init__(
         self,
@@ -476,6 +357,185 @@ class ShapeData:
             if paragraph.text.strip():
                 paragraphs.append(ParagraphData(paragraph))
         return paragraphs
+
+    @property
+    def has_any_issues(self) -> bool:
+        """Check if shape has any issues (overflow, overlap, or warnings)."""
+        return (
+            self.frame_overflow_bottom is not None
+            or self.slide_overflow_right is not None
+            or self.slide_overflow_bottom is not None
+            or len(self.overlapping_shapes) > 0
+            or len(self.warnings) > 0
+        )
+
+    def to_dict(self) -> ShapeDict:
+        """Convert to dictionary for JSON serialization."""
+        result: ShapeDict = {
+            "left": self.left,
+            "top": self.top,
+            "width": self.width,
+            "height": self.height,
+        }
+
+        # Add optional fields if present
+        if self.placeholder_type:
+            result["placeholder_type"] = self.placeholder_type
+
+        if self.default_font_size:
+            result["default_font_size"] = self.default_font_size
+
+        # Add overflow information only if there is overflow
+        overflow_data = {}
+
+        # Add frame overflow if present
+        if self.frame_overflow_bottom is not None:
+            overflow_data["frame"] = {"overflow_bottom": self.frame_overflow_bottom}
+
+        # Add slide overflow if present
+        slide_overflow = {}
+        if self.slide_overflow_right is not None:
+            slide_overflow["overflow_right"] = self.slide_overflow_right
+        if self.slide_overflow_bottom is not None:
+            slide_overflow["overflow_bottom"] = self.slide_overflow_bottom
+        if slide_overflow:
+            overflow_data["slide"] = slide_overflow
+
+        # Only add overflow field if there is overflow
+        if overflow_data:
+            result["overflow"] = overflow_data
+
+        # Add overlap field if there are overlapping shapes
+        if self.overlapping_shapes:
+            result["overlap"] = {"overlapping_shapes": self.overlapping_shapes}
+
+        # Add warnings field if there are warnings
+        if self.warnings:
+            result["warnings"] = self.warnings
+
+        # Add paragraphs after placeholder_type
+        result["paragraphs"] = [para.to_dict() for para in self.paragraphs]
+
+        return result
+
+    @staticmethod
+    def emu_to_inches(emu: int) -> float:
+        """Convert EMUs (English Metric Units) to inches."""
+        return emu / 914400.0
+
+    @staticmethod
+    def inches_to_pixels(inches: float, dpi: int = 96) -> int:
+        """Convert inches to pixels at given DPI."""
+        return int(inches * dpi)
+
+    @staticmethod
+    def get_font_path(font_name: str) -> Optional[str]:
+        """Get the font file path for a given font name.
+
+        Args:
+            font_name: Name of the font (e.g., 'Arial', 'Calibri')
+
+        Returns:
+            Path to the font file, or None if not found
+        """
+        system = platform.system()
+
+        # Common font file variations to try
+        font_variations = [
+            font_name,
+            font_name.lower(),
+            font_name.replace(" ", ""),
+            font_name.replace(" ", "-"),
+        ]
+
+        # Define font directories and extensions by platform
+        if system == "Darwin":  # macOS
+            font_dirs = [
+                "/System/Library/Fonts/",
+                "/Library/Fonts/",
+                "~/Library/Fonts/",
+            ]
+            extensions = [".ttf", ".otf", ".ttc", ".dfont"]
+        else:  # Linux
+            font_dirs = [
+                "/usr/share/fonts/truetype/",
+                "/usr/local/share/fonts/",
+                "~/.fonts/",
+            ]
+            extensions = [".ttf", ".otf"]
+
+        # Try to find the font file
+        from pathlib import Path
+
+        for font_dir in font_dirs:
+            font_dir_path = Path(font_dir).expanduser()
+            if not font_dir_path.exists():
+                continue
+
+            # First try exact matches
+            for variant in font_variations:
+                for ext in extensions:
+                    font_path = font_dir_path / f"{variant}{ext}"
+                    if font_path.exists():
+                        return str(font_path)
+
+            # Then try fuzzy matching - find files containing the font name
+            try:
+                for file_path in font_dir_path.iterdir():
+                    if file_path.is_file():
+                        file_name_lower = file_path.name.lower()
+                        font_name_lower = font_name.lower().replace(" ", "")
+                        if font_name_lower in file_name_lower and any(
+                            file_name_lower.endswith(ext) for ext in extensions
+                        ):
+                            return str(file_path)
+            except OSError, PermissionError:
+                continue
+
+        return None
+
+    @staticmethod
+    def get_slide_dimensions(slide: Any) -> tuple[Optional[int], Optional[int]]:
+        """Get slide dimensions from slide object.
+
+        Args:
+            slide: Slide object
+
+        Returns:
+            Tuple of (width_emu, height_emu) or (None, None) if not found
+        """
+        try:
+            prs = slide.part.package.presentation_part.presentation
+            return prs.slide_width, prs.slide_height
+        except AttributeError, TypeError:
+            return None, None
+
+    @staticmethod
+    def get_default_font_size(shape: BaseShape, slide_layout: Any) -> Optional[float]:
+        """Extract default font size from slide layout for a placeholder shape.
+
+        Args:
+            shape: Placeholder shape
+            slide_layout: Slide layout containing the placeholder definition
+
+        Returns:
+            Default font size in points, or None if not found
+        """
+        try:
+            if not hasattr(shape, "placeholder_format"):
+                return None
+
+            shape_type = shape.placeholder_format.type  # type: ignore
+            for layout_placeholder in slide_layout.placeholders:
+                if layout_placeholder.placeholder_format.type == shape_type:
+                    # Find first defRPr element with sz (size) attribute
+                    for elem in layout_placeholder.element.iter():
+                        if "defRPr" in elem.tag and (sz := elem.get("sz")):
+                            return float(sz) / 100.0  # Convert EMUs to points
+                    break
+        except Exception:
+            pass
+        return None
 
     def _get_default_font_size(self) -> int:
         """Get default font size from theme text styles or use conservative default."""
@@ -677,66 +737,6 @@ class ShapeData:
                     "manual_bullet_symbol: use proper bullet formatting"
                 )
                 break
-
-    @property
-    def has_any_issues(self) -> bool:
-        """Check if shape has any issues (overflow, overlap, or warnings)."""
-        return (
-            self.frame_overflow_bottom is not None
-            or self.slide_overflow_right is not None
-            or self.slide_overflow_bottom is not None
-            or len(self.overlapping_shapes) > 0
-            or len(self.warnings) > 0
-        )
-
-    def to_dict(self) -> ShapeDict:
-        """Convert to dictionary for JSON serialization."""
-        result: ShapeDict = {
-            "left": self.left,
-            "top": self.top,
-            "width": self.width,
-            "height": self.height,
-        }
-
-        # Add optional fields if present
-        if self.placeholder_type:
-            result["placeholder_type"] = self.placeholder_type
-
-        if self.default_font_size:
-            result["default_font_size"] = self.default_font_size
-
-        # Add overflow information only if there is overflow
-        overflow_data = {}
-
-        # Add frame overflow if present
-        if self.frame_overflow_bottom is not None:
-            overflow_data["frame"] = {"overflow_bottom": self.frame_overflow_bottom}
-
-        # Add slide overflow if present
-        slide_overflow = {}
-        if self.slide_overflow_right is not None:
-            slide_overflow["overflow_right"] = self.slide_overflow_right
-        if self.slide_overflow_bottom is not None:
-            slide_overflow["overflow_bottom"] = self.slide_overflow_bottom
-        if slide_overflow:
-            overflow_data["slide"] = slide_overflow
-
-        # Only add overflow field if there is overflow
-        if overflow_data:
-            result["overflow"] = overflow_data
-
-        # Add overlap field if there are overlapping shapes
-        if self.overlapping_shapes:
-            result["overlap"] = {"overlapping_shapes": self.overlapping_shapes}
-
-        # Add warnings field if there are warnings
-        if self.warnings:
-            result["warnings"] = self.warnings
-
-        # Add paragraphs after placeholder_type
-        result["paragraphs"] = [para.to_dict() for para in self.paragraphs]
-
-        return result
 
 
 def is_valid_shape(shape: BaseShape) -> bool:

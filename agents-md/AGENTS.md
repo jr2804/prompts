@@ -27,7 +27,6 @@ You are a professional Python developer creating `{{project-name}}`, a {{project
 - Implement unit tests with pytest to cover all functionality
 - Include conformance tests against official PESQ test vectors (see below)
 
-
 ### Implementation Steps
 
 - Step 1
@@ -74,7 +73,6 @@ You are a professional Python developer creating `{{project-name}}`, a {{project
 
 ...
 
-
 ### CLI Implementation
 
 ```python
@@ -107,7 +105,6 @@ def evaluate(
 - Achieve >95% code coverage
 - Include property-based testing with Hypothesis
 
-
 ### Performance Testing
 
 - Use pytest-benchmark for performance regression tests
@@ -115,14 +112,12 @@ def evaluate(
 - Regression testing for performance
 - Load testing with various file sizes
 
-
 ## Success Criteria
 
 1. **Functional Compliance**: Pass all conformance tests within specified tolerances
-2. **Performance**: Match or exceed reference implementation speed
-3. **Code Quality**: Pass all linting, typing, and testing requirements
-4. **Usability**: Provide clear API and CLI matching reference tool functionality
-
+1. **Performance**: Match or exceed reference implementation speed
+1. **Code Quality**: Pass all linting, typing, and testing requirements
+1. **Usability**: Provide clear API and CLI matching reference tool functionality
 
 ## Documentation Requirements
 
@@ -134,6 +129,7 @@ def evaluate(
 - Links to API documentation and contributing guidelines
 
 ### Code Documentation
+
 - Google-style docstrings for all public APIs
 - Type hints on all function signatures
 - Inline comments for complex algorithms

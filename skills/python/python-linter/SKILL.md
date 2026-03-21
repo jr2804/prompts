@@ -1,11 +1,6 @@
----
-name: python-linter
-description: Guide coding agents to fix specific Python linter issues from Ruff. Use when encountering Ruff linter errors identified by alpha-numeric codes (e.g., B008, S108, PLC0415). Provides context-aware resolution strategies for common linter issues.
-license: MIT
-metadata:
-  ruff_version: ">=0.12.0"
-  related_python_guidelines: For general Python practices, use skill `python-guidelines`
----
+______________________________________________________________________
+
+## name: python-linter description: Guide coding agents to fix specific Python linter issues from Ruff. Use when encountering Ruff linter errors identified by alpha-numeric codes (e.g., B008, S108, PLC0415). Provides context-aware resolution strategies for common linter issues. license: MIT metadata: ruff_version: ">=0.12.0" related_python_guidelines: For general Python practices, use skill `python-guidelines`
 
 # Python Linter Issue Resolution
 
@@ -18,9 +13,9 @@ Provide specific, context-aware guidance for resolving Python linter issues iden
 When you encounter a Ruff linter error:
 
 1. **Identify the rule code** from the linter output (e.g., `B008`, `S108`, `PLC0415`)
-2. **Look up the rule** in the sections below or reference files
-3. **Apply the context-appropriate fix** based on your code's purpose
-4. **Verify the fix** resolves the issue without introducing new problems
+1. **Look up the rule** in the sections below or reference files
+1. **Apply the context-appropriate fix** based on your code's purpose
+1. **Verify the fix** resolves the issue without introducing new problems
 
 ## Common Linter Issues
 
@@ -34,7 +29,7 @@ The following issues can often be fixed automatically by linter tools, but when 
 
 **How to fix:** Move the import statement to the top of the module, grouping it with other imports.
 
----
+______________________________________________________________________
 
 ### B007: Loop Control Variable Not Used
 
@@ -44,7 +39,7 @@ The following issues can often be fixed automatically by linter tools, but when 
 
 **How to fix:** Prefix the unused variable with an underscore (e.g., `_item` or just `_`).
 
----
+______________________________________________________________________
 
 ### B008: Function Call in Default Argument
 
@@ -100,7 +95,7 @@ def main(
 
 **Ruff documentation:** https://docs.astral.sh/ruff/rules/function-call-in-default-argument/
 
----
+______________________________________________________________________
 
 ### S108: Hardcoded Temp File
 
@@ -147,12 +142,13 @@ def test_file_processing(tmp_path: Path):
 ```
 
 **When to use each approach:**
+
 - **Production code (main codebase):** `tempfile.NamedTemporaryFile()`
 - **Test modules (pytest):** `tmp_path: Path` fixture
 
 **Ruff documentation:** https://docs.astral.sh/ruff/rules/hardcoded-temp-file/
 
----
+______________________________________________________________________
 
 ### PLC0415: Import Outside Top-Level
 
@@ -180,9 +176,9 @@ def print_python_version():
 #### Valid Exceptions (when nested imports are acceptable):
 
 1. **Avoiding circular dependencies**
-2. **Lazy loading expensive modules**
-3. **Optional dependencies** (imports that may not be available)
-4. **Type checking imports** (using `if TYPE_CHECKING:`)
+1. **Lazy loading expensive modules**
+1. **Optional dependencies** (imports that may not be available)
+1. **Type checking imports** (using `if TYPE_CHECKING:`)
 
 ```python
 # [OK] ACCEPTABLE: Type checking imports
@@ -219,7 +215,7 @@ from .core import processors
 
 **Ruff documentation:** https://docs.astral.sh/ruff/rules/import-outside-top-level/
 
----
+______________________________________________________________________
 
 ### NPY002: Legacy NumPy Random Generation
 
@@ -248,7 +244,7 @@ data = rng.normal(size=100)
 
 **Ruff documentation:** https://docs.astral.sh/ruff/rules/numpy-legacy-random/
 
----
+______________________________________________________________________
 
 ### S311: Suspicious Non-Cryptographic Random Usage
 
@@ -259,6 +255,7 @@ data = rng.normal(size=100)
 **How to fix:**
 
 #### Security Context: Use secrets module
+
 If generating passwords, tokens, or security keys, you **must** use the `secrets` module.
 
 ```python
@@ -272,6 +269,7 @@ token = secrets.randbelow(1000000)
 ```
 
 #### Non-Security Context (Data Science/Simulation):
+
 If the usage is purely for simulation, testing, or data analysis (and flagged incorrectly), you can replace with NumPy for better performance or ignore if security is not a concern.
 
 ```python
@@ -284,7 +282,7 @@ data = rng.random(100)
 
 **Ruff documentation:** https://docs.astral.sh/ruff/rules/suspicious-non-cryptographic-random-usage/
 
----
+______________________________________________________________________
 
 ## Additional Resources
 

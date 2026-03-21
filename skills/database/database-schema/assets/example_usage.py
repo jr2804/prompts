@@ -16,6 +16,7 @@ from sqlalchemy.orm import Session
 
 app = FastAPI(title="Database Schema Example API")
 
+
 # Example endpoint using generated models
 @app.post("/users/", response_model=UserResponse)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
@@ -82,15 +83,12 @@ async def startup_event() -> None:
     Create database tables on startup
     """
     from database import engine
+
     Base.metadata.create_all(bind=engine)
     print("Database tables created")
 
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(
-        app,
-        host="0.0.0.0",
-        port=int(os.getenv("PORT", 8000)),
-        reload=True
-    )
+
+    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8000)), reload=True)

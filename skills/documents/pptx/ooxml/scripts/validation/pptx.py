@@ -118,13 +118,6 @@ class PPTXSchemaValidator(BaseSchemaValidator):
                 print("PASSED - All UUID-like IDs contain valid hex values")
             return True
 
-    def _looks_like_uuid(self, value):
-        """Check if a value has the general structure of a UUID."""
-        # Remove common UUID delimiters
-        clean_value = value.strip("{}()").replace("-", "")
-        # Check if it's 32 hex-like characters (could include invalid hex chars)
-        return len(clean_value) == 32 and all(c.isalnum() for c in clean_value)
-
     def validate_slide_layout_ids(self):
         """Validate that sldLayoutId elements in slide masters reference valid slide layouts."""
         import lxml.etree
@@ -309,6 +302,13 @@ class PPTXSchemaValidator(BaseSchemaValidator):
             if self.verbose:
                 print("PASSED - All notes slide references are unique")
             return True
+
+    def _looks_like_uuid(self, value):
+        """Check if a value has the general structure of a UUID."""
+        # Remove common UUID delimiters
+        clean_value = value.strip("{}()").replace("-", "")
+        # Check if it's 32 hex-like characters (could include invalid hex chars)
+        return len(clean_value) == 32 and all(c.isalnum() for c in clean_value)
 
 
 if __name__ == "__main__":

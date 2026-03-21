@@ -3,6 +3,7 @@
 ## Database Connection Management
 
 ### SQLAlchemy with FastAPI
+
 ```python
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -47,6 +48,7 @@ app = FastAPI(lifespan=lifespan)
 ```
 
 ### MongoDB with FastAPI (ODMantic)
+
 ```python
 from fastapi import FastAPI
 from odmantic import AIOEngine
@@ -78,6 +80,7 @@ def get_engine():
 ## Dependency Injection Patterns
 
 ### Database Session Dependency
+
 ```python
 from fastapi import Depends
 from sqlalchemy.orm import Session
@@ -101,6 +104,7 @@ async def get_user(
 ```
 
 ### MongoDB Engine Dependency
+
 ```python
 from odmantic import AIOEngine
 
@@ -121,6 +125,7 @@ async def get_post(
 ## Repository Pattern Implementation
 
 ### SQL Repository Pattern
+
 ```python
 from typing import List, Optional
 from sqlalchemy.orm import Session
@@ -175,6 +180,7 @@ async def create_user(
 ```
 
 ### MongoDB Repository Pattern
+
 ```python
 from typing import List, Optional
 from odmantic import AIOEngine, Field
@@ -219,6 +225,7 @@ async def create_post(
 ## Advanced Integration Patterns
 
 ### Connection Pooling Configuration
+
 ```python
 # PostgreSQL connection pooling
 from sqlalchemy import create_engine
@@ -265,6 +272,7 @@ def create_sqlite_engine(db_path: str = "app.db"):
 ```
 
 ### Transaction Management
+
 ```python
 from contextlib import contextmanager
 from sqlalchemy.exc import SQLAlchemyError
@@ -304,6 +312,7 @@ async def create_order_with_items(order_data: OrderCreate, db: Session = Depends
 ```
 
 ### Async MongoDB Operations
+
 ```python
 from typing import List
 import asyncio
@@ -349,6 +358,7 @@ async def get_users_summary(engine: AIOEngine = Depends(get_engine)):
 ## Error Handling and Validation
 
 ### Database Error Handling
+
 ```python
 from sqlalchemy.exc import IntegrityError, DataError
 from fastapi import HTTPException, status
@@ -379,6 +389,7 @@ async def create_user(
 ```
 
 ### MongoDB Error Handling
+
 ```python
 from odmantic.exceptions import DocumentNotFoundError
 from pymongo.errors import DuplicateKeyError
@@ -410,6 +421,7 @@ async def update_user(
 ## Performance Optimization
 
 ### Query Optimization
+
 ```python
 from sqlalchemy.orm import selectinload, joinedload
 
@@ -443,6 +455,7 @@ async def get_user_analytics(db: Session = Depends(get_db)):
 ```
 
 ### MongoDB Performance Patterns
+
 ```python
 # Use projections to limit returned fields
 @app.get("/posts/summaries")
@@ -472,6 +485,7 @@ async def get_posts_by_category(
 ## Testing Database Integration
 
 ### SQL Testing
+
 ```python
 import pytest
 from fastapi.testclient import TestClient
@@ -515,6 +529,7 @@ def test_create_user(client):
 ```
 
 ### MongoDB Testing
+
 ```python
 import pytest
 from unittest.mock import AsyncMock, patch

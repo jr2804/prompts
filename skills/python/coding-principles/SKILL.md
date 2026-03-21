@@ -1,12 +1,6 @@
----
-name: coding-principles
-description: Universal coding principles and best practices for maintainable software
-license: MIT
-compatibility: opencode
-metadata:
-    related_python_guidelines: For Python-specific implementation, use skill `python-guidelines`
-    related_testing_strategy: For testing approaches, use skill `testing-strategy`
----
+______________________________________________________________________
+
+## name: coding-principles description: Universal coding principles and best practices for maintainable software license: MIT compatibility: opencode metadata: related_python_guidelines: For Python-specific implementation, use skill `python-guidelines` related_testing_strategy: For testing approaches, use skill `testing-strategy`
 
 # Coding Principles
 
@@ -111,9 +105,9 @@ def safe_operation(func, *args, **kwargs):
 ## Best Practices
 
 1. **Consistency**: Apply the same principles across all projects
-2. **Documentation**: Document coding standards clearly
-3. **Automation**: Use linters and formatters to enforce standards
-4. **Review**: Implement code review processes
+1. **Documentation**: Document coding standards clearly
+1. **Automation**: Use linters and formatters to enforce standards
+1. **Review**: Implement code review processes
 
 ## Compatibility
 

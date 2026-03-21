@@ -7,23 +7,16 @@ and ORM/ODM models for PostgreSQL, MongoDB, and SQLite that integrate
 seamlessly with FastAPI applications.
 """
 
-import os
 import argparse
-from pathlib import Path
 import json
+import os
 from datetime import datetime
+from pathlib import Path
 
 
 def create_project_structure(base_path):
     """Create the standard project directory structure."""
-    dirs = [
-        "models",
-        "schemas",
-        "database",
-        "migrations",
-        "api",
-        "core"
-    ]
+    dirs = ["models", "schemas", "database", "migrations", "api", "core"]
 
     for directory in dirs:
         path = Path(base_path) / directory
@@ -36,32 +29,32 @@ def create_project_structure(base_path):
 
 def generate_sqlalchemy_models(entities, db_type, base_path):
     """Generate SQLAlchemy models for SQL databases."""
-    base_content = '''from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text
+    base_content = """from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
 
 Base = declarative_base()
-'''
+"""
 
     base_file = Path(base_path) / "database" / "base.py"
-    with open(base_file, 'w') as f:
+    with open(base_file, "w") as f:
         f.write(base_content)
 
     for entity_name, entity_config in entities.items():
-        model_content = f'''from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, ForeignKey
+        model_content = f"""from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from database.base import Base
-'''
+"""
 
         # Add database-specific imports
         if db_type == "postgresql":
-            model_content += '''from sqlalchemy.dialects.postgresql import JSONB, UUID, ARRAY
+            model_content += """from sqlalchemy.dialects.postgresql import JSONB, UUID, ARRAY
 import uuid
-'''
+"""
         elif db_type == "sqlite":
-            model_content += '''from sqlalchemy.dialects.sqlite import JSON
-'''
+            model_content += """from sqlalchemy.dialects.sqlite import JSON
+"""
 
         model_content += f'''
 
@@ -83,20 +76,20 @@ class {entity_name}(Base):
             index_str = ", index=True" if index else ""
 
             if field_type.lower() == "string":
-                model_content += f'    {field_name} = Column(String, {nullable_str}{unique_str}{index_str})\n'
+                model_content += f"    {field_name} = Column(String, {nullable_str}{unique_str}{index_str})\n"
             elif field_type.lower() == "text":
-                model_content += f'    {field_name} = Column(Text, {nullable_str}{unique_str}{index_str})\n'
+                model_content += f"    {field_name} = Column(Text, {nullable_str}{unique_str}{index_str})\n"
             elif field_type.lower() == "integer":
-                model_content += f'    {field_name} = Column(Integer, {nullable_str}{unique_str}{index_str})\n'
+                model_content += f"    {field_name} = Column(Integer, {nullable_str}{unique_str}{index_str})\n"
             elif field_type.lower() == "boolean":
                 default_val = field_config.get("default", False)
-                model_content += f'    {field_name} = Column(Boolean, default={default_val}{unique_str}{index_str})\n'
+                model_content += f"    {field_name} = Column(Boolean, default={default_val}{unique_str}{index_str})\n"
             elif field_type.lower() == "datetime":
-                model_content += f'    {field_name} = Column(DateTime(timezone=True), server_default=func.now()){unique_str}{index_str}\n'
+                model_content += f"    {field_name} = Column(DateTime(timezone=True), server_default=func.now()){unique_str}{index_str}\n"
             elif field_type.lower() == "json" and db_type == "postgresql":
-                model_content += f'    {field_name} = Column(JSONB, default={{}}, {nullable_str}{unique_str}{index_str})\n'
+                model_content += f"    {field_name} = Column(JSONB, default={{}}, {nullable_str}{unique_str}{index_str})\n"
             elif field_type.lower() == "uuid" and db_type == "postgresql":
-                model_content += f'    {field_name} = Column(UUID(as_uuid=True), default=uuid.uuid4{unique_str}{index_str})\n'
+                model_content += f"    {field_name} = Column(UUID(as_uuid=True), default=uuid.uuid4{unique_str}{index_str})\n"
 
         # Add relationships if specified
         for rel_name, rel_config in entity_config.get("relationships", {}).items():
@@ -112,14 +105,14 @@ class {entity_name}(Base):
                 # Add relationship (back reference in the target entity)
                 model_content += f'    {rel_name} = relationship("{target}", back_populates="{rel_config.get("back_populates", entity_name.lower())}")\n'
 
-        model_content += f'''
+        model_content += f"""
 
     def __repr__(self):
-        return f"<{entity_name}(id={{self.id}}, name={{getattr(self, list({{k: v for k, v in entity_config["fields"].items() if v["type"] == "string"}}, None)[0] if {list(entity_config["fields"].keys())} else "id"}, None)}})>"
-'''
+        return f"<{entity_name}(id={{self.id}})>"
+"""
 
         model_file = Path(base_path) / "models" / f"{entity_name.lower()}.py"
-        with open(model_file, 'w') as f:
+        with open(model_file, "w") as f:
             f.write(model_content)
 
         print(f"Created SQLAlchemy model: {model_file}")
@@ -127,25 +120,25 @@ class {entity_name}(Base):
 
 def generate_odmantic_models(entities, base_path):
     """Generate ODMantic models for MongoDB."""
-    base_content = '''from odmantic import Model, Field, EmbeddedModel
+    base_content = """from odmantic import Model, Field, EmbeddedModel
 from datetime import datetime
 from typing import List, Optional
-'''
+"""
 
     base_file = Path(base_path) / "database" / "base.py"
-    with open(base_file, 'w') as f:
+    with open(base_file, "w") as f:
         f.write(base_content)
 
     for entity_name, entity_config in entities.items():
-        model_content = f'''from odmantic import Model, Field, EmbeddedModel
+        model_content = f"""from odmantic import Model, Field, EmbeddedModel
 from datetime import datetime
 from typing import List, Optional
 
-'''
+"""
 
-        model_content += f'''
+        model_content += f"""
 class {entity_name}(Model):
-'''
+"""
 
         # Add fields
         for field_name, field_config in entity_config.get("fields", {}).items():
@@ -154,24 +147,24 @@ class {entity_name}(Model):
 
             if field_type.lower() == "string":
                 if optional:
-                    model_content += f'    {field_name}: Optional[str] = None\n'
+                    model_content += f"    {field_name}: Optional[str] = None\n"
                 else:
-                    model_content += f'    {field_name}: str\n'
+                    model_content += f"    {field_name}: str\n"
             elif field_type.lower() == "text":
                 if optional:
-                    model_content += f'    {field_name}: Optional[str] = None\n'
+                    model_content += f"    {field_name}: Optional[str] = None\n"
                 else:
-                    model_content += f'    {field_name}: str\n'
+                    model_content += f"    {field_name}: str\n"
             elif field_type.lower() == "integer":
                 if optional:
-                    model_content += f'    {field_name}: Optional[int] = None\n'
+                    model_content += f"    {field_name}: Optional[int] = None\n"
                 else:
-                    model_content += f'    {field_name}: int\n'
+                    model_content += f"    {field_name}: int\n"
             elif field_type.lower() == "boolean":
                 default_val = field_config.get("default", False)
-                model_content += f'    {field_name}: bool = {default_val}\n'
+                model_content += f"    {field_name}: bool = {default_val}\n"
             elif field_type.lower() == "datetime":
-                model_content += f'    {field_name}: datetime = Field(default_factory=datetime.utcnow)\n'
+                model_content += f"    {field_name}: datetime = Field(default_factory=datetime.utcnow)\n"
 
         # Add relationships if specified
         for rel_name, rel_config in entity_config.get("relationships", {}).items():
@@ -179,7 +172,7 @@ class {entity_name}(Model):
             target = rel_config["target"]
 
             if rel_type.lower() == "reference":
-                model_content += f'    {rel_name}_id: str = Field(reference=True)\n'
+                model_content += f"    {rel_name}_id: str = Field(reference=True)\n"
 
         model_content += f'''
 
@@ -188,7 +181,7 @@ class {entity_name}(Model):
 '''
 
         model_file = Path(base_path) / "models" / f"{entity_name.lower()}.py"
-        with open(model_file, 'w') as f:
+        with open(model_file, "w") as f:
             f.write(model_content)
 
         print(f"Created ODMantic model: {model_file}")
@@ -211,11 +204,11 @@ import sqlalchemy as sa
 '''
 
     if db_type == "postgresql":
-        migration_content += '''from sqlalchemy.dialects import postgresql
-'''
+        migration_content += """from sqlalchemy.dialects import postgresql
+"""
     elif db_type == "sqlite":
-        migration_content += '''from sqlalchemy.dialects import sqlite
-'''
+        migration_content += """from sqlalchemy.dialects import sqlite
+"""
 
     migration_content += f'''
 
@@ -231,11 +224,11 @@ def upgrade():
 
     # Add table creation for each entity
     for entity_name, entity_config in entities.items():
-        migration_content += f'''
+        migration_content += f"""
     # Create {entity_name} table
     op.create_table('{entity_name.lower()}s',
         sa.Column('id', sa.Integer(), nullable=False),
-'''
+"""
 
         for field_name, field_config in entity_config.get("fields", {}).items():
             field_type = field_config["type"]
@@ -289,10 +282,15 @@ def downgrade():
         migration_content += f"    op.drop_index('ix_{entity_name.lower()}s_') if op.get_bind().dialect.name != 'sqlite' else None\n"
         migration_content += f"    op.drop_table('{entity_name.lower()}s')\n"
 
-    migration_file = Path(base_path) / "migrations" / f"versions" / f"{revision_id}_initial_schema.py"
+    migration_file = (
+        Path(base_path)
+        / "migrations"
+        / f"versions"
+        / f"{revision_id}_initial_schema.py"
+    )
     migration_file.parent.mkdir(exist_ok=True)
 
-    with open(migration_file, 'w') as f:
+    with open(migration_file, "w") as f:
         f.write(migration_content)
 
     print(f"Created migration script: {migration_file}")
@@ -301,11 +299,11 @@ def downgrade():
 def generate_fastapi_endpoints(entities, db_type, base_path):
     """Generate FastAPI endpoints for the entities."""
     for entity_name, entity_config in entities.items():
-        endpoint_content = f'''from fastapi import APIRouter, Depends, HTTPException
+        endpoint_content = f"""from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 
-'''
+"""
 
         if db_type in ["postgresql", "sqlite"]:
             endpoint_content += f'''from models.{entity_name.lower()} import {entity_name}
@@ -417,19 +415,30 @@ async def delete_{entity_name.lower()}({entity_name.lower()}_id: str, engine: AI
 '''
 
         endpoint_file = Path(base_path) / "api" / f"{entity_name.lower()}.py"
-        with open(endpoint_file, 'w') as f:
+        with open(endpoint_file, "w") as f:
             f.write(endpoint_content)
 
         print(f"Created API endpoints: {endpoint_file}")
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Generate database schema for FastAPI applications")
-    parser.add_argument("--db-type", required=True, choices=["postgresql", "mongodb", "sqlite"],
-                       help="Type of database to generate schema for")
-    parser.add_argument("--entities", required=True,
-                       help="JSON string defining entities and their fields, e.g., '{\"User\": {\"fields\": {\"name\": {\"type\": \"string\", \"nullable\": false}}}}'")
-    parser.add_argument("--output", default=".", help="Output directory for generated files")
+    parser = argparse.ArgumentParser(
+        description="Generate database schema for FastAPI applications"
+    )
+    parser.add_argument(
+        "--db-type",
+        required=True,
+        choices=["postgresql", "mongodb", "sqlite"],
+        help="Type of database to generate schema for",
+    )
+    parser.add_argument(
+        "--entities",
+        required=True,
+        help='JSON string defining entities and their fields, e.g., \'{"User": {"fields": {"name": {"type": "string", "nullable": false}}}}\'',
+    )
+    parser.add_argument(
+        "--output", default=".", help="Output directory for generated files"
+    )
 
     args = parser.parse_args()
 

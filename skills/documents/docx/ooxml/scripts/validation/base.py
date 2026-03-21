@@ -345,7 +345,7 @@ class BaseSchemaValidator:
                                 all_referenced_files.add(target_path)
                             else:
                                 broken_refs.append((target, rel.sourceline))
-                        except (OSError, ValueError):
+                        except OSError, ValueError:
                             broken_refs.append((target, rel.sourceline))
 
                 # Report broken references
@@ -482,42 +482,6 @@ class BaseSchemaValidator:
             if self.verbose:
                 print("PASSED - All relationship ID references are valid")
             return True
-
-    def _get_expected_relationship_type(self, element_name):
-        """
-        Get the expected relationship type for an element.
-        First checks the explicit mapping, then tries pattern detection.
-        """
-        # Normalize element name to lowercase
-        elem_lower = element_name.lower()
-
-        # Check explicit mapping first
-        if elem_lower in self.ELEMENT_RELATIONSHIP_TYPES:
-            return self.ELEMENT_RELATIONSHIP_TYPES[elem_lower]
-
-        # Try pattern detection for common patterns
-        # Pattern 1: Elements ending in "Id" often expect a relationship of the prefix type
-        if elem_lower.endswith("id") and len(elem_lower) > 2:
-            # e.g., "sldId" -> "sld", "sldMasterId" -> "sldMaster"
-            prefix = elem_lower[:-2]  # Remove "id"
-            # Check if this might be a compound like "sldMasterId"
-            if prefix.endswith("master"):
-                return prefix.lower()
-            elif prefix.endswith("layout"):
-                return prefix.lower()
-            else:
-                # Simple case like "sldId" -> "slide"
-                # Common transformations
-                if prefix == "sld":
-                    return "slide"
-                return prefix.lower()
-
-        # Pattern 2: Elements ending in "Reference" expect a relationship of the prefix type
-        if elem_lower.endswith("reference") and len(elem_lower) > 9:
-            prefix = elem_lower[:-9]  # Remove "reference"
-            return prefix.lower()
-
-        return None
 
     def validate_content_types(self):
         """Validate that all content files are properly declared in [Content_Types].xml."""
@@ -737,6 +701,42 @@ class BaseSchemaValidator:
             if self.verbose:
                 print("\nPASSED - No new XSD validation errors introduced")
             return True
+
+    def _get_expected_relationship_type(self, element_name):
+        """
+        Get the expected relationship type for an element.
+        First checks the explicit mapping, then tries pattern detection.
+        """
+        # Normalize element name to lowercase
+        elem_lower = element_name.lower()
+
+        # Check explicit mapping first
+        if elem_lower in self.ELEMENT_RELATIONSHIP_TYPES:
+            return self.ELEMENT_RELATIONSHIP_TYPES[elem_lower]
+
+        # Try pattern detection for common patterns
+        # Pattern 1: Elements ending in "Id" often expect a relationship of the prefix type
+        if elem_lower.endswith("id") and len(elem_lower) > 2:
+            # e.g., "sldId" -> "sld", "sldMasterId" -> "sldMaster"
+            prefix = elem_lower[:-2]  # Remove "id"
+            # Check if this might be a compound like "sldMasterId"
+            if prefix.endswith("master"):
+                return prefix.lower()
+            elif prefix.endswith("layout"):
+                return prefix.lower()
+            else:
+                # Simple case like "sldId" -> "slide"
+                # Common transformations
+                if prefix == "sld":
+                    return "slide"
+                return prefix.lower()
+
+        # Pattern 2: Elements ending in "Reference" expect a relationship of the prefix type
+        if elem_lower.endswith("reference") and len(elem_lower) > 9:
+            prefix = elem_lower[:-9]  # Remove "reference"
+            return prefix.lower()
+
+        return None
 
     def _get_schema_path(self, xml_file):
         """Determine the appropriate schema path for an XML file."""

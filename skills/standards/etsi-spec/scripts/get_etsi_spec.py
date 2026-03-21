@@ -41,13 +41,14 @@ Example output:
     Download URL: https://www.etsi.org/deliver/etsi_ts/103200_103299/103224/01.07.01_60/ts_103224v010701p.pdf
 """
 
-import sys
 import re
-import requests
-from pathlib import Path
+import sys
 from datetime import datetime
-from PyPDF2 import PdfReader
+from pathlib import Path
+
+import requests
 from bs4 import BeautifulSoup
+from PyPDF2 import PdfReader
 
 
 def parse_spec_number(spec_input):
@@ -393,7 +394,9 @@ def main():
 
         # Format spec for display
         if spec_info["part"]:
-            full_spec = f"{spec_info['prefix']}{spec_info['number']}-{spec_info['part']}"
+            full_spec = (
+                f"{spec_info['prefix']}{spec_info['number']}-{spec_info['part']}"
+            )
         else:
             full_spec = f"{spec_info['prefix']}{spec_info['number']}"
 
@@ -408,7 +411,9 @@ def main():
         version_dirs = get_version_directories(directory_url, spec_info)
 
         if not version_dirs:
-            print(f"Error: No versions found for ETSI {spec_info['doc_type']} {full_spec}")
+            print(
+                f"Error: No versions found for ETSI {spec_info['doc_type']} {full_spec}"
+            )
             print()
             print("Possible reasons:")
             print("  - Specification number does not exist")
@@ -457,7 +462,9 @@ def main():
             print("Version history:")
             for version_dir, version_num, release_code in version_dirs:
                 pub_year = version_num.split(".")[0][:2]
-                print(f"  - {format_version(version_num)} (release {release_code}) ~ 20{pub_year}")
+                print(
+                    f"  - {format_version(version_num)} (release {release_code}) ~ 20{pub_year}"
+                )
 
     except ValueError as e:
         print(f"Error: {e}")

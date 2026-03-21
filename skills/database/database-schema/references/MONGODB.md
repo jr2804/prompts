@@ -3,6 +3,7 @@
 ## ODMantic Models
 
 ### Basic Document Model
+
 ```python
 from odmantic import Model, Field, Index
 from datetime import datetime
@@ -27,6 +28,7 @@ class User(Model):
 ```
 
 ### Embedded Documents
+
 ```python
 from odmantic import Model, Field, EmbeddedModel
 from typing import List, Optional
@@ -48,6 +50,7 @@ class User(Model):
 ```
 
 ### References Between Documents
+
 ```python
 from odmantic import Model, Field, Reference
 from typing import List
@@ -72,6 +75,7 @@ class Book(Model):
 ## PyMongo Patterns
 
 ### Basic Operations
+
 ```python
 from pymongo import MongoClient
 from bson import ObjectId
@@ -104,6 +108,7 @@ db.users.delete_one({"_id": ObjectId(user_id)})
 ```
 
 ### Complex Queries
+
 ```python
 # Aggregation pipeline
 pipeline = [
@@ -128,6 +133,7 @@ top_users = list(db.users.aggregate(pipeline))
 ## Schema Design Patterns
 
 ### Document Structure Optimization
+
 ```python
 # Good: Denormalized for read efficiency
 class User(Model):
@@ -154,6 +160,7 @@ class User(Model):
 ```
 
 ### Indexing Strategies
+
 ```python
 class Product(Model):
     name: str
@@ -187,6 +194,7 @@ class Product(Model):
 ## MongoDB Migration Patterns
 
 ### Schema Evolution
+
 ```python
 # Migration script example
 def migrate_user_schema():
@@ -211,6 +219,7 @@ def migrate_user_schema():
 ```
 
 ### Collection Migration
+
 ```python
 def migrate_collection_structure():
     """Migrate from flat to nested structure"""
@@ -245,6 +254,7 @@ def migrate_collection_structure():
 ## FastAPI Integration with MongoDB
 
 ### Connection Management
+
 ```python
 from odmantic import AIOEngine
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -270,6 +280,7 @@ async def get_engine():
 ```
 
 ### Repository Pattern
+
 ```python
 from typing import List, Optional
 from odmantic import AIOEngine, QueryExpression
@@ -305,6 +316,7 @@ class UserRepository:
 ## Performance Optimization
 
 ### Query Optimization
+
 ```python
 # Use projections to limit returned fields
 async def get_user_summary(self, user_id: str):
@@ -325,6 +337,7 @@ async def find_users_by_category(self, category: str):
 ```
 
 ### Connection Pooling
+
 ```python
 # MongoDB connection configuration
 MONGODB_URL = "mongodb://localhost:27017/"
@@ -345,6 +358,7 @@ client = AsyncIOMotorClient(
 ## MongoDB-Specific Considerations
 
 ### Schema Flexibility
+
 ```python
 # Schema validation at database level
 collection = db.create_collection("products")
@@ -366,6 +380,7 @@ collection.command(
 ```
 
 ### Aggregation Pipeline Optimization
+
 ```python
 # Optimized aggregation pipeline
 pipeline = [

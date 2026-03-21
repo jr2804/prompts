@@ -1,7 +1,6 @@
----
-name: mcp-sequential-thinking
-description: A detailed tool for dynamic and reflective problem-solving through thoughts that can adapt and evolve
----
+______________________________________________________________________
+
+## name: mcp-sequential-thinking description: A detailed tool for dynamic and reflective problem-solving through thoughts that can adapt and evolve
 
 # Sequential Thinking
 
@@ -45,16 +44,16 @@ needsMoreThoughts: bool         # If reaching end but realizing more thoughts ne
 ## Workflow
 
 1. **Start with initial estimate**: Begin with an estimate of needed thoughts, but be ready to adjust
-2. **Question and revise**: Feel free to question or revise previous thoughts
-3. **Don't hesitate to add thoughts**: Add more thoughts if needed, even at "end"
-4. **Express uncertainty**: Express uncertainty when present
-5. **Mark revisions clearly**: Mark thoughts that revise previous thinking or branch into new paths
-6. **Ignore irrelevant info**: Ignore information that is irrelevant to current step
-7. **Generate hypothesis**: Generate a solution hypothesis when appropriate
-8. **Verify hypothesis**: Verify hypothesis based on the Chain of Thought steps
-9. **Repeat until satisfied**: Repeat the process until satisfied with a solution
-10. **Provide final answer**: Provide a single, ideally correct answer as final output
-11. **Set nextThoughtNeeded to false**: Only when truly done and a satisfactory answer is reached
+1. **Question and revise**: Feel free to question or revise previous thoughts
+1. **Don't hesitate to add thoughts**: Add more thoughts if needed, even at "end"
+1. **Express uncertainty**: Express uncertainty when present
+1. **Mark revisions clearly**: Mark thoughts that revise previous thinking or branch into new paths
+1. **Ignore irrelevant info**: Ignore information that is irrelevant to current step
+1. **Generate hypothesis**: Generate a solution hypothesis when appropriate
+1. **Verify hypothesis**: Verify hypothesis based on the Chain of Thought steps
+1. **Repeat until satisfied**: Repeat the process until satisfied with a solution
+1. **Provide final answer**: Provide a single, ideally correct answer as final output
+1. **Set nextThoughtNeeded to false**: Only when truly done and a satisfactory answer is reached
 
 ## Example Thought Progression
 

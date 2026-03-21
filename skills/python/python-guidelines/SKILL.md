@@ -1,12 +1,6 @@
----
-name: python-guidelines
-description: Universal Python development guidelines and best practices
-license: MIT
-compatibility: opencode
-metadata:
-    related_coding_principles: For general coding standards, use skill `coding-principles`
-    related_python_cli: For CLI development patterns, use skill `python-cli`
----
+______________________________________________________________________
+
+## name: python-guidelines description: Universal Python development guidelines and best practices license: MIT compatibility: opencode metadata: related_coding_principles: For general coding standards, use skill `coding-principles` related_python_cli: For CLI development patterns, use skill `python-cli`
 
 # Python Guidelines
 
@@ -134,9 +128,9 @@ class TestDataProcessor:
 ## Best Practices
 
 1. **Consistency**: Apply same patterns across all Python projects
-2. **Type Safety**: Use complete type annotations
-3. **Testing**: Implement comprehensive test coverage
-4. **Documentation**: Use Google-style docstrings
+1. **Type Safety**: Use complete type annotations
+1. **Testing**: Implement comprehensive test coverage
+1. **Documentation**: Use Google-style docstrings
 
 ## Compatibility
 

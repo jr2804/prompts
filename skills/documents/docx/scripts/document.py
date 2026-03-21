@@ -61,7 +61,9 @@ class DocxXMLEditor(XMLEditor):
         dom (defusedxml.minidom.Document): The DOM document for direct manipulation
     """
 
-    def __init__(self, xml_path, rsid: str, author: str = "Claude", initials: str = "C"):
+    def __init__(
+        self, xml_path, rsid: str, author: str = "Claude", initials: str = "C"
+    ):
         """Initialize with required RSID and optional author.
 
         Args:
@@ -74,6 +76,359 @@ class DocxXMLEditor(XMLEditor):
         self.rsid = rsid
         self.author = author
         self.initials = initials
+
+    def replace_node(self, elem, new_content):
+        """Replace node with automatic attribute injection."""
+        nodes = super().replace_node(elem, new_content)
+        self._inject_attributes_to_nodes(nodes)
+        return nodes
+
+    def insert_after(self, elem, xml_content):
+        """Insert after with automatic attribute injection."""
+        nodes = super().insert_after(elem, xml_content)
+        self._inject_attributes_to_nodes(nodes)
+        return nodes
+
+    def insert_before(self, elem, xml_content):
+        """Insert before with automatic attribute injection."""
+        nodes = super().insert_before(elem, xml_content)
+        self._inject_attributes_to_nodes(nodes)
+        return nodes
+
+    def append_to(self, elem, xml_content):
+        """Append to with automatic attribute injection."""
+        nodes = super().append_to(elem, xml_content)
+        self._inject_attributes_to_nodes(nodes)
+        return nodes
+
+    def revert_insertion(self, elem):
+        """Reject an insertion by wrapping its content in a deletion.
+
+        Wraps all runs inside w:ins in w:del, converting w:t to w:delText.
+        Can process a single w:ins element or a container element with multiple w:ins.
+
+        Args:
+            elem: Element to process (w:ins, w:p, w:body, etc.)
+
+        Returns:
+            list: List containing the processed element(s)
+
+        Raises:
+            ValueError: If the element contains no w:ins elements
+
+        Example:
+            # Reject a single insertion
+            ins = doc["word/document.xml"].get_node(tag="w:ins", attrs={"w:id": "5"})
+            doc["word/document.xml"].revert_insertion(ins)
+
+            # Reject all insertions in a paragraph
+            para = doc["word/document.xml"].get_node(tag="w:p", line_number=42)
+            doc["word/document.xml"].revert_insertion(para)
+        """
+        # Collect insertions
+        ins_elements = []
+        if elem.tagName == "w:ins":
+            ins_elements.append(elem)
+        else:
+            ins_elements.extend(elem.getElementsByTagName("w:ins"))
+
+        # Validate that there are insertions to reject
+        if not ins_elements:
+            raise ValueError(
+                f"revert_insertion requires w:ins elements. The provided element <{elem.tagName}> contains no insertions. "
+            )
+
+        # Process all insertions - wrap all children in w:del
+        for ins_elem in ins_elements:
+            runs = list(ins_elem.getElementsByTagName("w:r"))
+            if not runs:
+                continue
+
+            # Create deletion wrapper
+            del_wrapper = self.dom.createElement("w:del")
+
+            # Process each run
+            for run in runs:
+                # Convert w:t → w:delText and w:rsidR → w:rsidDel
+                if run.hasAttribute("w:rsidR"):
+                    run.setAttribute("w:rsidDel", run.getAttribute("w:rsidR"))
+                    run.removeAttribute("w:rsidR")
+                elif not run.hasAttribute("w:rsidDel"):
+                    run.setAttribute("w:rsidDel", self.rsid)
+
+                for t_elem in list(run.getElementsByTagName("w:t")):
+                    del_text = self.dom.createElement("w:delText")
+                    # Copy ALL child nodes (not just firstChild) to handle entities
+                    while t_elem.firstChild:
+                        del_text.appendChild(t_elem.firstChild)
+                    for i in range(t_elem.attributes.length):
+                        attr = t_elem.attributes.item(i)
+                        del_text.setAttribute(attr.name, attr.value)
+                    t_elem.parentNode.replaceChild(del_text, t_elem)
+
+            # Move all children from ins to del wrapper
+            while ins_elem.firstChild:
+                del_wrapper.appendChild(ins_elem.firstChild)
+
+            # Add del wrapper back to ins
+            ins_elem.appendChild(del_wrapper)
+
+            # Inject attributes to the deletion wrapper
+            self._inject_attributes_to_nodes([del_wrapper])
+
+        return [elem]
+
+    def revert_deletion(self, elem):
+        """Reject a deletion by re-inserting the deleted content.
+
+        Creates w:ins elements after each w:del, copying deleted content and
+        converting w:delText back to w:t.
+        Can process a single w:del element or a container element with multiple w:del.
+
+        Args:
+            elem: Element to process (w:del, w:p, w:body, etc.)
+
+        Returns:
+            list: If elem is w:del, returns [elem, new_ins]. Otherwise returns [elem].
+
+        Raises:
+            ValueError: If the element contains no w:del elements
+
+        Example:
+            # Reject a single deletion - returns [w:del, w:ins]
+            del_elem = doc["word/document.xml"].get_node(tag="w:del", attrs={"w:id": "3"})
+            nodes = doc["word/document.xml"].revert_deletion(del_elem)
+
+            # Reject all deletions in a paragraph - returns [para]
+            para = doc["word/document.xml"].get_node(tag="w:p", line_number=42)
+            nodes = doc["word/document.xml"].revert_deletion(para)
+        """
+        # Collect deletions FIRST - before we modify the DOM
+        del_elements = []
+        is_single_del = elem.tagName == "w:del"
+
+        if is_single_del:
+            del_elements.append(elem)
+        else:
+            del_elements.extend(elem.getElementsByTagName("w:del"))
+
+        # Validate that there are deletions to reject
+        if not del_elements:
+            raise ValueError(
+                f"revert_deletion requires w:del elements. The provided element <{elem.tagName}> contains no deletions. "
+            )
+
+        # Track created insertion (only relevant if elem is a single w:del)
+        created_insertion = None
+
+        # Process all deletions - create insertions that copy the deleted content
+        for del_elem in del_elements:
+            # Clone the deleted runs and convert them to insertions
+            runs = list(del_elem.getElementsByTagName("w:r"))
+            if not runs:
+                continue
+
+            # Create insertion wrapper
+            ins_elem = self.dom.createElement("w:ins")
+
+            for run in runs:
+                # Clone the run
+                new_run = run.cloneNode(True)
+
+                # Convert w:delText → w:t
+                for del_text in list(new_run.getElementsByTagName("w:delText")):
+                    t_elem = self.dom.createElement("w:t")
+                    # Copy ALL child nodes (not just firstChild) to handle entities
+                    while del_text.firstChild:
+                        t_elem.appendChild(del_text.firstChild)
+                    for i in range(del_text.attributes.length):
+                        attr = del_text.attributes.item(i)
+                        t_elem.setAttribute(attr.name, attr.value)
+                    del_text.parentNode.replaceChild(t_elem, del_text)
+
+                # Update run attributes: w:rsidDel → w:rsidR
+                if new_run.hasAttribute("w:rsidDel"):
+                    new_run.setAttribute("w:rsidR", new_run.getAttribute("w:rsidDel"))
+                    new_run.removeAttribute("w:rsidDel")
+                elif not new_run.hasAttribute("w:rsidR"):
+                    new_run.setAttribute("w:rsidR", self.rsid)
+
+                ins_elem.appendChild(new_run)
+
+            # Insert the new insertion after the deletion
+            nodes = self.insert_after(del_elem, ins_elem.toxml())
+
+            # If processing a single w:del, track the created insertion
+            if is_single_del and nodes:
+                created_insertion = nodes[0]
+
+        # Return based on input type
+        if is_single_del and created_insertion:
+            return [elem, created_insertion]
+        else:
+            return [elem]
+
+    def suggest_deletion(self, elem):
+        """Mark a w:r or w:p element as deleted with tracked changes (in-place DOM manipulation).
+
+        For w:r: wraps in <w:del>, converts <w:t> to <w:delText>, preserves w:rPr
+        For w:p (regular): wraps content in <w:del>, converts <w:t> to <w:delText>
+        For w:p (numbered list): adds <w:del/> to w:rPr in w:pPr, wraps content in <w:del>
+
+        Args:
+            elem: A w:r or w:p DOM element without existing tracked changes
+
+        Returns:
+            Element: The modified element
+
+        Raises:
+            ValueError: If element has existing tracked changes or invalid structure
+        """
+        if elem.nodeName == "w:r":
+            # Check for existing w:delText
+            if elem.getElementsByTagName("w:delText"):
+                raise ValueError("w:r element already contains w:delText")
+
+            # Convert w:t → w:delText
+            for t_elem in list(elem.getElementsByTagName("w:t")):
+                del_text = self.dom.createElement("w:delText")
+                # Copy ALL child nodes (not just firstChild) to handle entities
+                while t_elem.firstChild:
+                    del_text.appendChild(t_elem.firstChild)
+                # Preserve attributes like xml:space
+                for i in range(t_elem.attributes.length):
+                    attr = t_elem.attributes.item(i)
+                    del_text.setAttribute(attr.name, attr.value)
+                t_elem.parentNode.replaceChild(del_text, t_elem)
+
+            # Update run attributes: w:rsidR → w:rsidDel
+            if elem.hasAttribute("w:rsidR"):
+                elem.setAttribute("w:rsidDel", elem.getAttribute("w:rsidR"))
+                elem.removeAttribute("w:rsidR")
+            elif not elem.hasAttribute("w:rsidDel"):
+                elem.setAttribute("w:rsidDel", self.rsid)
+
+            # Wrap in w:del
+            del_wrapper = self.dom.createElement("w:del")
+            parent = elem.parentNode
+            parent.insertBefore(del_wrapper, elem)
+            parent.removeChild(elem)
+            del_wrapper.appendChild(elem)
+
+            # Inject attributes to the deletion wrapper
+            self._inject_attributes_to_nodes([del_wrapper])
+
+            return del_wrapper
+
+        elif elem.nodeName == "w:p":
+            # Check for existing tracked changes
+            if elem.getElementsByTagName("w:ins") or elem.getElementsByTagName("w:del"):
+                raise ValueError("w:p element already contains tracked changes")
+
+            # Check if it's a numbered list item
+            pPr_list = elem.getElementsByTagName("w:pPr")
+            is_numbered = pPr_list and pPr_list[0].getElementsByTagName("w:numPr")
+
+            if is_numbered:
+                # Add <w:del/> to w:rPr in w:pPr
+                pPr = pPr_list[0]
+                rPr_list = pPr.getElementsByTagName("w:rPr")
+
+                if not rPr_list:
+                    rPr = self.dom.createElement("w:rPr")
+                    pPr.appendChild(rPr)
+                else:
+                    rPr = rPr_list[0]
+
+                # Add <w:del/> marker
+                del_marker = self.dom.createElement("w:del")
+                rPr.insertBefore(
+                    del_marker, rPr.firstChild
+                ) if rPr.firstChild else rPr.appendChild(del_marker)
+
+            # Convert w:t → w:delText in all runs
+            for t_elem in list(elem.getElementsByTagName("w:t")):
+                del_text = self.dom.createElement("w:delText")
+                # Copy ALL child nodes (not just firstChild) to handle entities
+                while t_elem.firstChild:
+                    del_text.appendChild(t_elem.firstChild)
+                # Preserve attributes like xml:space
+                for i in range(t_elem.attributes.length):
+                    attr = t_elem.attributes.item(i)
+                    del_text.setAttribute(attr.name, attr.value)
+                t_elem.parentNode.replaceChild(del_text, t_elem)
+
+            # Update run attributes: w:rsidR → w:rsidDel
+            for run in elem.getElementsByTagName("w:r"):
+                if run.hasAttribute("w:rsidR"):
+                    run.setAttribute("w:rsidDel", run.getAttribute("w:rsidR"))
+                    run.removeAttribute("w:rsidR")
+                elif not run.hasAttribute("w:rsidDel"):
+                    run.setAttribute("w:rsidDel", self.rsid)
+
+            # Wrap all non-pPr children in <w:del>
+            del_wrapper = self.dom.createElement("w:del")
+            for child in [c for c in elem.childNodes if c.nodeName != "w:pPr"]:
+                elem.removeChild(child)
+                del_wrapper.appendChild(child)
+            elem.appendChild(del_wrapper)
+
+            # Inject attributes to the deletion wrapper
+            self._inject_attributes_to_nodes([del_wrapper])
+
+            return elem
+
+        else:
+            raise ValueError(f"Element must be w:r or w:p, got {elem.nodeName}")
+
+    @staticmethod
+    def suggest_paragraph(xml_content: str) -> str:
+        """Transform paragraph XML to add tracked change wrapping for insertion.
+
+        Wraps runs in <w:ins> and adds <w:ins/> to w:rPr in w:pPr for numbered lists.
+
+        Args:
+            xml_content: XML string containing a <w:p> element
+
+        Returns:
+            str: Transformed XML with tracked change wrapping
+        """
+        wrapper = f'<root xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">{xml_content}</root>'
+        doc = minidom.parseString(wrapper)
+        para = doc.getElementsByTagName("w:p")[0]
+
+        # Ensure w:pPr exists
+        pPr_list = para.getElementsByTagName("w:pPr")
+        if not pPr_list:
+            pPr = doc.createElement("w:pPr")
+            para.insertBefore(
+                pPr, para.firstChild
+            ) if para.firstChild else para.appendChild(pPr)
+        else:
+            pPr = pPr_list[0]
+
+        # Ensure w:rPr exists in w:pPr
+        rPr_list = pPr.getElementsByTagName("w:rPr")
+        if not rPr_list:
+            rPr = doc.createElement("w:rPr")
+            pPr.appendChild(rPr)
+        else:
+            rPr = rPr_list[0]
+
+        # Add <w:ins/> to w:rPr
+        ins_marker = doc.createElement("w:ins")
+        rPr.insertBefore(
+            ins_marker, rPr.firstChild
+        ) if rPr.firstChild else rPr.appendChild(ins_marker)
+
+        # Wrap all non-pPr children in <w:ins>
+        ins_wrapper = doc.createElement("w:ins")
+        for child in [c for c in para.childNodes if c.nodeName != "w:pPr"]:
+            para.removeChild(child)
+            ins_wrapper.appendChild(child)
+        para.appendChild(ins_wrapper)
+
+        return para.toxml()
 
     def _get_next_change_id(self):
         """Get the next available change ID by checking all tracked change elements."""
@@ -176,7 +531,9 @@ class DocxXMLEditor(XMLEditor):
             if not elem.hasAttribute("w:date"):
                 elem.setAttribute("w:date", timestamp)
             # Add w16du:dateUtc for tracked changes (same as w:date since we generate UTC timestamps)
-            if elem.tagName in ("w:ins", "w:del") and not elem.hasAttribute("w16du:dateUtc"):
+            if elem.tagName in ("w:ins", "w:del") and not elem.hasAttribute(
+                "w16du:dateUtc"
+            ):
                 self._ensure_w16du_namespace()
                 elem.setAttribute("w16du:dateUtc", timestamp)
 
@@ -196,7 +553,10 @@ class DocxXMLEditor(XMLEditor):
 
         def add_xml_space_to_t(elem):
             # Add xml:space="preserve" to w:t if text has leading/trailing whitespace
-            if elem.firstChild and elem.firstChild.nodeType == elem.firstChild.TEXT_NODE:
+            if (
+                elem.firstChild
+                and elem.firstChild.nodeType == elem.firstChild.TEXT_NODE
+            ):
                 text = elem.firstChild.data
                 if text and (text[0].isspace() or text[-1].isspace()):
                     if not elem.hasAttribute("xml:space"):
@@ -234,349 +594,6 @@ class DocxXMLEditor(XMLEditor):
                 add_comment_attrs(elem)
             for elem in node.getElementsByTagName("w16cex:commentExtensible"):
                 add_comment_extensible_date(elem)
-
-    def replace_node(self, elem, new_content):
-        """Replace node with automatic attribute injection."""
-        nodes = super().replace_node(elem, new_content)
-        self._inject_attributes_to_nodes(nodes)
-        return nodes
-
-    def insert_after(self, elem, xml_content):
-        """Insert after with automatic attribute injection."""
-        nodes = super().insert_after(elem, xml_content)
-        self._inject_attributes_to_nodes(nodes)
-        return nodes
-
-    def insert_before(self, elem, xml_content):
-        """Insert before with automatic attribute injection."""
-        nodes = super().insert_before(elem, xml_content)
-        self._inject_attributes_to_nodes(nodes)
-        return nodes
-
-    def append_to(self, elem, xml_content):
-        """Append to with automatic attribute injection."""
-        nodes = super().append_to(elem, xml_content)
-        self._inject_attributes_to_nodes(nodes)
-        return nodes
-
-    def revert_insertion(self, elem):
-        """Reject an insertion by wrapping its content in a deletion.
-
-        Wraps all runs inside w:ins in w:del, converting w:t to w:delText.
-        Can process a single w:ins element or a container element with multiple w:ins.
-
-        Args:
-            elem: Element to process (w:ins, w:p, w:body, etc.)
-
-        Returns:
-            list: List containing the processed element(s)
-
-        Raises:
-            ValueError: If the element contains no w:ins elements
-
-        Example:
-            # Reject a single insertion
-            ins = doc["word/document.xml"].get_node(tag="w:ins", attrs={"w:id": "5"})
-            doc["word/document.xml"].revert_insertion(ins)
-
-            # Reject all insertions in a paragraph
-            para = doc["word/document.xml"].get_node(tag="w:p", line_number=42)
-            doc["word/document.xml"].revert_insertion(para)
-        """
-        # Collect insertions
-        ins_elements = []
-        if elem.tagName == "w:ins":
-            ins_elements.append(elem)
-        else:
-            ins_elements.extend(elem.getElementsByTagName("w:ins"))
-
-        # Validate that there are insertions to reject
-        if not ins_elements:
-            raise ValueError(f"revert_insertion requires w:ins elements. The provided element <{elem.tagName}> contains no insertions. ")
-
-        # Process all insertions - wrap all children in w:del
-        for ins_elem in ins_elements:
-            runs = list(ins_elem.getElementsByTagName("w:r"))
-            if not runs:
-                continue
-
-            # Create deletion wrapper
-            del_wrapper = self.dom.createElement("w:del")
-
-            # Process each run
-            for run in runs:
-                # Convert w:t → w:delText and w:rsidR → w:rsidDel
-                if run.hasAttribute("w:rsidR"):
-                    run.setAttribute("w:rsidDel", run.getAttribute("w:rsidR"))
-                    run.removeAttribute("w:rsidR")
-                elif not run.hasAttribute("w:rsidDel"):
-                    run.setAttribute("w:rsidDel", self.rsid)
-
-                for t_elem in list(run.getElementsByTagName("w:t")):
-                    del_text = self.dom.createElement("w:delText")
-                    # Copy ALL child nodes (not just firstChild) to handle entities
-                    while t_elem.firstChild:
-                        del_text.appendChild(t_elem.firstChild)
-                    for i in range(t_elem.attributes.length):
-                        attr = t_elem.attributes.item(i)
-                        del_text.setAttribute(attr.name, attr.value)
-                    t_elem.parentNode.replaceChild(del_text, t_elem)
-
-            # Move all children from ins to del wrapper
-            while ins_elem.firstChild:
-                del_wrapper.appendChild(ins_elem.firstChild)
-
-            # Add del wrapper back to ins
-            ins_elem.appendChild(del_wrapper)
-
-            # Inject attributes to the deletion wrapper
-            self._inject_attributes_to_nodes([del_wrapper])
-
-        return [elem]
-
-    def revert_deletion(self, elem):
-        """Reject a deletion by re-inserting the deleted content.
-
-        Creates w:ins elements after each w:del, copying deleted content and
-        converting w:delText back to w:t.
-        Can process a single w:del element or a container element with multiple w:del.
-
-        Args:
-            elem: Element to process (w:del, w:p, w:body, etc.)
-
-        Returns:
-            list: If elem is w:del, returns [elem, new_ins]. Otherwise returns [elem].
-
-        Raises:
-            ValueError: If the element contains no w:del elements
-
-        Example:
-            # Reject a single deletion - returns [w:del, w:ins]
-            del_elem = doc["word/document.xml"].get_node(tag="w:del", attrs={"w:id": "3"})
-            nodes = doc["word/document.xml"].revert_deletion(del_elem)
-
-            # Reject all deletions in a paragraph - returns [para]
-            para = doc["word/document.xml"].get_node(tag="w:p", line_number=42)
-            nodes = doc["word/document.xml"].revert_deletion(para)
-        """
-        # Collect deletions FIRST - before we modify the DOM
-        del_elements = []
-        is_single_del = elem.tagName == "w:del"
-
-        if is_single_del:
-            del_elements.append(elem)
-        else:
-            del_elements.extend(elem.getElementsByTagName("w:del"))
-
-        # Validate that there are deletions to reject
-        if not del_elements:
-            raise ValueError(f"revert_deletion requires w:del elements. The provided element <{elem.tagName}> contains no deletions. ")
-
-        # Track created insertion (only relevant if elem is a single w:del)
-        created_insertion = None
-
-        # Process all deletions - create insertions that copy the deleted content
-        for del_elem in del_elements:
-            # Clone the deleted runs and convert them to insertions
-            runs = list(del_elem.getElementsByTagName("w:r"))
-            if not runs:
-                continue
-
-            # Create insertion wrapper
-            ins_elem = self.dom.createElement("w:ins")
-
-            for run in runs:
-                # Clone the run
-                new_run = run.cloneNode(True)
-
-                # Convert w:delText → w:t
-                for del_text in list(new_run.getElementsByTagName("w:delText")):
-                    t_elem = self.dom.createElement("w:t")
-                    # Copy ALL child nodes (not just firstChild) to handle entities
-                    while del_text.firstChild:
-                        t_elem.appendChild(del_text.firstChild)
-                    for i in range(del_text.attributes.length):
-                        attr = del_text.attributes.item(i)
-                        t_elem.setAttribute(attr.name, attr.value)
-                    del_text.parentNode.replaceChild(t_elem, del_text)
-
-                # Update run attributes: w:rsidDel → w:rsidR
-                if new_run.hasAttribute("w:rsidDel"):
-                    new_run.setAttribute("w:rsidR", new_run.getAttribute("w:rsidDel"))
-                    new_run.removeAttribute("w:rsidDel")
-                elif not new_run.hasAttribute("w:rsidR"):
-                    new_run.setAttribute("w:rsidR", self.rsid)
-
-                ins_elem.appendChild(new_run)
-
-            # Insert the new insertion after the deletion
-            nodes = self.insert_after(del_elem, ins_elem.toxml())
-
-            # If processing a single w:del, track the created insertion
-            if is_single_del and nodes:
-                created_insertion = nodes[0]
-
-        # Return based on input type
-        if is_single_del and created_insertion:
-            return [elem, created_insertion]
-        else:
-            return [elem]
-
-    @staticmethod
-    def suggest_paragraph(xml_content: str) -> str:
-        """Transform paragraph XML to add tracked change wrapping for insertion.
-
-        Wraps runs in <w:ins> and adds <w:ins/> to w:rPr in w:pPr for numbered lists.
-
-        Args:
-            xml_content: XML string containing a <w:p> element
-
-        Returns:
-            str: Transformed XML with tracked change wrapping
-        """
-        wrapper = f'<root xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">{xml_content}</root>'
-        doc = minidom.parseString(wrapper)
-        para = doc.getElementsByTagName("w:p")[0]
-
-        # Ensure w:pPr exists
-        pPr_list = para.getElementsByTagName("w:pPr")
-        if not pPr_list:
-            pPr = doc.createElement("w:pPr")
-            para.insertBefore(pPr, para.firstChild) if para.firstChild else para.appendChild(pPr)
-        else:
-            pPr = pPr_list[0]
-
-        # Ensure w:rPr exists in w:pPr
-        rPr_list = pPr.getElementsByTagName("w:rPr")
-        if not rPr_list:
-            rPr = doc.createElement("w:rPr")
-            pPr.appendChild(rPr)
-        else:
-            rPr = rPr_list[0]
-
-        # Add <w:ins/> to w:rPr
-        ins_marker = doc.createElement("w:ins")
-        rPr.insertBefore(ins_marker, rPr.firstChild) if rPr.firstChild else rPr.appendChild(ins_marker)
-
-        # Wrap all non-pPr children in <w:ins>
-        ins_wrapper = doc.createElement("w:ins")
-        for child in [c for c in para.childNodes if c.nodeName != "w:pPr"]:
-            para.removeChild(child)
-            ins_wrapper.appendChild(child)
-        para.appendChild(ins_wrapper)
-
-        return para.toxml()
-
-    def suggest_deletion(self, elem):
-        """Mark a w:r or w:p element as deleted with tracked changes (in-place DOM manipulation).
-
-        For w:r: wraps in <w:del>, converts <w:t> to <w:delText>, preserves w:rPr
-        For w:p (regular): wraps content in <w:del>, converts <w:t> to <w:delText>
-        For w:p (numbered list): adds <w:del/> to w:rPr in w:pPr, wraps content in <w:del>
-
-        Args:
-            elem: A w:r or w:p DOM element without existing tracked changes
-
-        Returns:
-            Element: The modified element
-
-        Raises:
-            ValueError: If element has existing tracked changes or invalid structure
-        """
-        if elem.nodeName == "w:r":
-            # Check for existing w:delText
-            if elem.getElementsByTagName("w:delText"):
-                raise ValueError("w:r element already contains w:delText")
-
-            # Convert w:t → w:delText
-            for t_elem in list(elem.getElementsByTagName("w:t")):
-                del_text = self.dom.createElement("w:delText")
-                # Copy ALL child nodes (not just firstChild) to handle entities
-                while t_elem.firstChild:
-                    del_text.appendChild(t_elem.firstChild)
-                # Preserve attributes like xml:space
-                for i in range(t_elem.attributes.length):
-                    attr = t_elem.attributes.item(i)
-                    del_text.setAttribute(attr.name, attr.value)
-                t_elem.parentNode.replaceChild(del_text, t_elem)
-
-            # Update run attributes: w:rsidR → w:rsidDel
-            if elem.hasAttribute("w:rsidR"):
-                elem.setAttribute("w:rsidDel", elem.getAttribute("w:rsidR"))
-                elem.removeAttribute("w:rsidR")
-            elif not elem.hasAttribute("w:rsidDel"):
-                elem.setAttribute("w:rsidDel", self.rsid)
-
-            # Wrap in w:del
-            del_wrapper = self.dom.createElement("w:del")
-            parent = elem.parentNode
-            parent.insertBefore(del_wrapper, elem)
-            parent.removeChild(elem)
-            del_wrapper.appendChild(elem)
-
-            # Inject attributes to the deletion wrapper
-            self._inject_attributes_to_nodes([del_wrapper])
-
-            return del_wrapper
-
-        elif elem.nodeName == "w:p":
-            # Check for existing tracked changes
-            if elem.getElementsByTagName("w:ins") or elem.getElementsByTagName("w:del"):
-                raise ValueError("w:p element already contains tracked changes")
-
-            # Check if it's a numbered list item
-            pPr_list = elem.getElementsByTagName("w:pPr")
-            is_numbered = pPr_list and pPr_list[0].getElementsByTagName("w:numPr")
-
-            if is_numbered:
-                # Add <w:del/> to w:rPr in w:pPr
-                pPr = pPr_list[0]
-                rPr_list = pPr.getElementsByTagName("w:rPr")
-
-                if not rPr_list:
-                    rPr = self.dom.createElement("w:rPr")
-                    pPr.appendChild(rPr)
-                else:
-                    rPr = rPr_list[0]
-
-                # Add <w:del/> marker
-                del_marker = self.dom.createElement("w:del")
-                rPr.insertBefore(del_marker, rPr.firstChild) if rPr.firstChild else rPr.appendChild(del_marker)
-
-            # Convert w:t → w:delText in all runs
-            for t_elem in list(elem.getElementsByTagName("w:t")):
-                del_text = self.dom.createElement("w:delText")
-                # Copy ALL child nodes (not just firstChild) to handle entities
-                while t_elem.firstChild:
-                    del_text.appendChild(t_elem.firstChild)
-                # Preserve attributes like xml:space
-                for i in range(t_elem.attributes.length):
-                    attr = t_elem.attributes.item(i)
-                    del_text.setAttribute(attr.name, attr.value)
-                t_elem.parentNode.replaceChild(del_text, t_elem)
-
-            # Update run attributes: w:rsidR → w:rsidDel
-            for run in elem.getElementsByTagName("w:r"):
-                if run.hasAttribute("w:rsidR"):
-                    run.setAttribute("w:rsidDel", run.getAttribute("w:rsidR"))
-                    run.removeAttribute("w:rsidR")
-                elif not run.hasAttribute("w:rsidDel"):
-                    run.setAttribute("w:rsidDel", self.rsid)
-
-            # Wrap all non-pPr children in <w:del>
-            del_wrapper = self.dom.createElement("w:del")
-            for child in [c for c in elem.childNodes if c.nodeName != "w:pPr"]:
-                elem.removeChild(child)
-                del_wrapper.appendChild(child)
-            elem.appendChild(del_wrapper)
-
-            # Inject attributes to the deletion wrapper
-            self._inject_attributes_to_nodes([del_wrapper])
-
-            return elem
-
-        else:
-            raise ValueError(f"Element must be w:r or w:p, got {elem.nodeName}")
 
 
 def _generate_hex_id() -> str:
@@ -691,7 +708,9 @@ class Document:
             if not file_path.exists():
                 raise ValueError(f"XML file not found: {xml_path}")
             # Use DocxXMLEditor with RSID, author, and initials for all editors
-            self._editors[xml_path] = DocxXMLEditor(file_path, rsid=self.rsid, author=self.author, initials=self.initials)
+            self._editors[xml_path] = DocxXMLEditor(
+                file_path, rsid=self.rsid, author=self.author, initials=self.initials
+            )
         return self._editors[xml_path]
 
     def add_comment(self, start, end, text: str) -> int:
@@ -727,7 +746,9 @@ class Document:
             self._document.insert_after(end, self._comment_range_end_xml(comment_id))
 
         # Add to comments.xml immediately
-        self._add_to_comments_xml(comment_id, para_id, text, self.author, self.initials, timestamp)
+        self._add_to_comments_xml(
+            comment_id, para_id, text, self.author, self.initials, timestamp
+        )
 
         # Add to commentsExtended.xml immediately
         self._add_to_comments_extended_xml(para_id, parent_para_id=None)
@@ -772,19 +793,33 @@ class Document:
         timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
         # Add comment ranges to document.xml immediately
-        parent_start_elem = self._document.get_node(tag="w:commentRangeStart", attrs={"w:id": str(parent_comment_id)})
-        parent_ref_elem = self._document.get_node(tag="w:commentReference", attrs={"w:id": str(parent_comment_id)})
+        parent_start_elem = self._document.get_node(
+            tag="w:commentRangeStart", attrs={"w:id": str(parent_comment_id)}
+        )
+        parent_ref_elem = self._document.get_node(
+            tag="w:commentReference", attrs={"w:id": str(parent_comment_id)}
+        )
 
-        self._document.insert_after(parent_start_elem, self._comment_range_start_xml(comment_id))
+        self._document.insert_after(
+            parent_start_elem, self._comment_range_start_xml(comment_id)
+        )
         parent_ref_run = parent_ref_elem.parentNode
-        self._document.insert_after(parent_ref_run, f'<w:commentRangeEnd w:id="{comment_id}"/>')
-        self._document.insert_after(parent_ref_run, self._comment_ref_run_xml(comment_id))
+        self._document.insert_after(
+            parent_ref_run, f'<w:commentRangeEnd w:id="{comment_id}"/>'
+        )
+        self._document.insert_after(
+            parent_ref_run, self._comment_ref_run_xml(comment_id)
+        )
 
         # Add to comments.xml immediately
-        self._add_to_comments_xml(comment_id, para_id, text, self.author, self.initials, timestamp)
+        self._add_to_comments_xml(
+            comment_id, para_id, text, self.author, self.initials, timestamp
+        )
 
         # Add to commentsExtended.xml immediately (with parent)
-        self._add_to_comments_extended_xml(para_id, parent_para_id=parent_info["para_id"])
+        self._add_to_comments_extended_xml(
+            para_id, parent_para_id=parent_info["para_id"]
+        )
 
         # Add to commentsIds.xml immediately
         self._add_to_comments_ids_xml(para_id, durable_id)
@@ -811,8 +846,12 @@ class Document:
             ValueError: If validation fails.
         """
         # Create validators with current state
-        schema_validator = DOCXSchemaValidator(self.unpacked_path, self.original_docx, verbose=False)
-        redlining_validator = RedliningValidator(self.unpacked_path, self.original_docx, verbose=False)
+        schema_validator = DOCXSchemaValidator(
+            self.unpacked_path, self.original_docx, verbose=False
+        )
+        redlining_validator = RedliningValidator(
+            self.unpacked_path, self.original_docx, verbose=False
+        )
 
         # Run validations
         if not schema_validator.validate():
@@ -906,10 +945,14 @@ class Document:
 
         # Update XML files
         self._add_content_type_for_people(self.unpacked_path / "[Content_Types].xml")
-        self._add_relationship_for_people(self.word_path / "_rels" / "document.xml.rels")
+        self._add_relationship_for_people(
+            self.word_path / "_rels" / "document.xml.rels"
+        )
 
         # Always add RSID to settings.xml, optionally enable trackRevisions
-        self._update_settings(self.word_path / "settings.xml", track_revisions=track_revisions)
+        self._update_settings(
+            self.word_path / "settings.xml", track_revisions=track_revisions
+        )
 
     def _update_people_xml(self, path):
         """Create people.xml if it doesn't exist."""
@@ -962,7 +1005,10 @@ class Document:
 
         # Conditionally add trackRevisions if requested
         if track_revisions:
-            track_revisions_exists = any(elem.tagName == f"{prefix}:trackRevisions" for elem in editor.dom.getElementsByTagName(f"{prefix}:trackRevisions"))
+            track_revisions_exists = any(
+                elem.tagName == f"{prefix}:trackRevisions"
+                for elem in editor.dom.getElementsByTagName(f"{prefix}:trackRevisions")
+            )
 
             if not track_revisions_exists:
                 track_rev_xml = f"<{prefix}:trackRevisions/>"
@@ -999,7 +1045,9 @@ class Document:
                 inserted = True
 
             if not inserted:
-                clr_elements = editor.dom.getElementsByTagName(f"{prefix}:clrSchemeMapping")
+                clr_elements = editor.dom.getElementsByTagName(
+                    f"{prefix}:clrSchemeMapping"
+                )
                 if clr_elements:
                     editor.insert_before(clr_elements[0], rsids_xml)
                     inserted = True
@@ -1009,7 +1057,10 @@ class Document:
         else:
             # Check if this rsid already exists
             rsids_elem = rsids_elements[0]
-            rsid_exists = any(elem.getAttribute(f"{prefix}:val") == self.rsid for elem in rsids_elem.getElementsByTagName(f"{prefix}:rsid"))
+            rsid_exists = any(
+                elem.getAttribute(f"{prefix}:val") == self.rsid
+                for elem in rsids_elem.getElementsByTagName(f"{prefix}:rsid")
+            )
 
             if not rsid_exists:
                 rsid_xml = f'<{prefix}:rsid {prefix}:val="{self.rsid}"/>'
@@ -1017,7 +1068,9 @@ class Document:
 
     # ==================== Private: XML File Creation ====================
 
-    def _add_to_comments_xml(self, comment_id, para_id, text, author, initials, timestamp):
+    def _add_to_comments_xml(
+        self, comment_id, para_id, text, author, initials, timestamp
+    ):
         """Add a single comment to comments.xml."""
         if not self.comments_path.exists():
             shutil.copy(TEMPLATE_DIR / "comments.xml", self.comments_path)
@@ -1025,7 +1078,9 @@ class Document:
         editor = self["word/comments.xml"]
         root = editor.get_node(tag="w:comments")
 
-        escaped_text = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        escaped_text = (
+            text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        )
         # Note: w:rsidR, w:rsidRDefault, w:rsidP on w:p, w:rsidR on w:r,
         # and w:author, w:date, w:initials on w:comment are automatically added by DocxXMLEditor
         comment_xml = f'''<w:comment w:id="{comment_id}">
@@ -1039,7 +1094,9 @@ class Document:
     def _add_to_comments_extended_xml(self, para_id, parent_para_id):
         """Add a single comment to commentsExtended.xml."""
         if not self.comments_extended_path.exists():
-            shutil.copy(TEMPLATE_DIR / "commentsExtended.xml", self.comments_extended_path)
+            shutil.copy(
+                TEMPLATE_DIR / "commentsExtended.xml", self.comments_extended_path
+            )
 
         editor = self["word/commentsExtended.xml"]
         root = editor.get_node(tag="w15:commentsEx")
@@ -1064,7 +1121,9 @@ class Document:
     def _add_to_comments_extensible_xml(self, durable_id):
         """Add a single comment to commentsExtensible.xml."""
         if not self.comments_extensible_path.exists():
-            shutil.copy(TEMPLATE_DIR / "commentsExtensible.xml", self.comments_extensible_path)
+            shutil.copy(
+                TEMPLATE_DIR / "commentsExtensible.xml", self.comments_extensible_path
+            )
 
         editor = self["word/commentsExtensible.xml"]
         root = editor.get_node(tag="w16cex:commentsExtensible")
@@ -1214,5 +1273,7 @@ class Document:
         ]
 
         for part_name, content_type in overrides:
-            override_xml = f'<Override PartName="{part_name}" ContentType="{content_type}"/>'
+            override_xml = (
+                f'<Override PartName="{part_name}" ContentType="{content_type}"/>'
+            )
             editor.append_to(root, override_xml)

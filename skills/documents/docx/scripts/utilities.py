@@ -131,7 +131,10 @@ class XMLEditor:
 
             # Check attrs filter
             if attrs is not None:
-                if not all(elem.getAttribute(attr_name) == attr_value for attr_name, attr_value in attrs.items()):
+                if not all(
+                    elem.getAttribute(attr_name) == attr_value
+                    for attr_name, attr_value in attrs.items()
+                ):
                     continue
 
             # Check contains filter
@@ -150,7 +153,11 @@ class XMLEditor:
             # Build descriptive error message
             filters = []
             if line_number is not None:
-                line_str = f"lines {line_number.start}-{line_number.stop - 1}" if isinstance(line_number, range) else f"line {line_number}"
+                line_str = (
+                    f"lines {line_number.start}-{line_number.stop - 1}"
+                    if isinstance(line_number, range)
+                    else f"line {line_number}"
+                )
                 filters.append(f"at {line_str}")
             if attrs is not None:
                 filters.append(f"with attributes {attrs}")
@@ -172,31 +179,10 @@ class XMLEditor:
 
             raise ValueError(f"{base_msg}. {hint}")
         if len(matches) > 1:
-            raise ValueError(f"Multiple nodes found: <{tag}>. Add more filters (attrs, line_number, or contains) to narrow the search.")
+            raise ValueError(
+                f"Multiple nodes found: <{tag}>. Add more filters (attrs, line_number, or contains) to narrow the search."
+            )
         return matches[0]
-
-    def _get_element_text(self, elem):
-        """
-        Recursively extract all text content from an element.
-
-        Skips text nodes that contain only whitespace (spaces, tabs, newlines),
-        which typically represent XML formatting rather than document content.
-
-        Args:
-            elem: defusedxml.minidom.Element to extract text from
-
-        Returns:
-            str: Concatenated text from all non-whitespace text nodes within the element
-        """
-        text_parts = []
-        for node in elem.childNodes:
-            if node.nodeType == node.TEXT_NODE:
-                # Skip whitespace-only text nodes (XML formatting)
-                if node.data.strip():
-                    text_parts.append(node.data)
-            elif node.nodeType == node.ELEMENT_NODE:
-                text_parts.append(self._get_element_text(node))
-        return "".join(text_parts)
 
     def replace_node(self, elem, new_content):
         """
@@ -303,6 +289,29 @@ class XMLEditor:
         """
         content = self.dom.toxml(encoding=self.encoding)
         self.xml_path.write_bytes(content)
+
+    def _get_element_text(self, elem):
+        """
+        Recursively extract all text content from an element.
+
+        Skips text nodes that contain only whitespace (spaces, tabs, newlines),
+        which typically represent XML formatting rather than document content.
+
+        Args:
+            elem: defusedxml.minidom.Element to extract text from
+
+        Returns:
+            str: Concatenated text from all non-whitespace text nodes within the element
+        """
+        text_parts = []
+        for node in elem.childNodes:
+            if node.nodeType == node.TEXT_NODE:
+                # Skip whitespace-only text nodes (XML formatting)
+                if node.data.strip():
+                    text_parts.append(node.data)
+            elif node.nodeType == node.ELEMENT_NODE:
+                text_parts.append(self._get_element_text(node))
+        return "".join(text_parts)
 
     def _parse_fragment(self, xml_content):
         """

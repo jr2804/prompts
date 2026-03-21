@@ -64,7 +64,9 @@ def create_backup(file_path: Path) -> Path:
     return backup_path
 
 
-def insert_code(file_path: Path, line_number: int, code: str, create_backup_flag: bool = False) -> None:
+def insert_code(
+    file_path: Path, line_number: int, code: str, create_backup_flag: bool = False
+) -> None:
     """
     Insert code at a specific line number in a file.
 
@@ -119,7 +121,10 @@ def insert_code(file_path: Path, line_number: int, code: str, create_backup_flag
     with open(file_path, "w", encoding="utf-8") as f:
         f.writelines(lines)
 
-    print(f"✅ Inserted {len(code_lines)} line(s) at line {line_number} in {file_path}", file=sys.stderr)
+    print(
+        f"✅ Inserted {len(code_lines)} line(s) at line {line_number} in {file_path}",
+        file=sys.stderr,
+    )
 
 
 def main():
@@ -142,16 +147,29 @@ Examples:
 
     parser.add_argument("file_path", type=Path, help="Path to the target file")
 
-    parser.add_argument("line_number", type=int, help="Line number where code should be inserted (1-based)")
+    parser.add_argument(
+        "line_number",
+        type=int,
+        help="Line number where code should be inserted (1-based)",
+    )
 
     parser.add_argument("code", type=str, help="Code to insert (use \\n for newlines)")
 
-    parser.add_argument("--backup", action="store_true", help="Create a backup before modifying the file")
+    parser.add_argument(
+        "--backup",
+        action="store_true",
+        help="Create a backup before modifying the file",
+    )
 
     args = parser.parse_args()
 
     try:
-        insert_code(file_path=args.file_path, line_number=args.line_number, code=args.code, create_backup_flag=args.backup)
+        insert_code(
+            file_path=args.file_path,
+            line_number=args.line_number,
+            code=args.code,
+            create_backup_flag=args.backup,
+        )
         sys.exit(0)
     except Exception as e:
         print(f"❌ Error: {e}", file=sys.stderr)

@@ -1,12 +1,6 @@
----
-name: testing-strategy
-description: Universal testing strategies and best practices for software projects
-license: MIT
-compatibility: opencode
-metadata:
-    related_python_guidelines: For Python-specific testing, use skill `python-guidelines`
-    related_coding_principles: For overall quality standards, use skill `coding-principles`
----
+______________________________________________________________________
+
+## name: testing-strategy description: Universal testing strategies and best practices for software projects license: MIT compatibility: opencode metadata: related_python_guidelines: For Python-specific testing, use skill `python-guidelines` related_coding_principles: For overall quality standards, use skill `coding-principles`
 
 # Testing Strategy
 
@@ -160,9 +154,9 @@ def test_processing_speed():
 ## Best Practices
 
 1. **Consistency**: Apply same testing patterns across projects
-2. **Automation**: Integrate testing into CI/CD pipelines
-3. **Isolation**: Test components in isolation
-4. **Documentation**: Document testing approaches clearly
+1. **Automation**: Integrate testing into CI/CD pipelines
+1. **Isolation**: Test components in isolation
+1. **Documentation**: Document testing approaches clearly
 
 ## Compatibility
 

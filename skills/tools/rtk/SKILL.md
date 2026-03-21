@@ -1,7 +1,6 @@
----
-name: rtk
-description: RTK (Rust Token Killer) - Token-optimized command wrapper for reducing token usage in Claude Code. Use when running development commands like cargo, git, npm, vitest, docker, kubectl, or any CLI tool where output verbosity matters. Always prefix commands with 'rtk' to automatically filter and compact output.
----
+______________________________________________________________________
+
+## name: rtk description: RTK (Rust Token Killer) - Token-optimized command wrapper for reducing token usage in Claude Code. Use when running development commands like cargo, git, npm, vitest, docker, kubectl, or any CLI tool where output verbosity matters. Always prefix commands with 'rtk' to automatically filter and compact output.
 
 # RTK (Rust Token Killer)
 
@@ -155,7 +154,7 @@ Follow the installation instructions in the repository to set up RTK in your env
 ## Best Practices
 
 1. **Always use `rtk` prefix**: Even for commands not explicitly listed, RTK will pass them through safely
-2. **Chain commands correctly**: Use `rtk` before each command in a chain: `rtk cmd1 && rtk cmd2`
-3. **Use `rtk proxy` for debugging**: When you need to see full unfiltered output
-4. **Run `rtk discover`**: Periodically check for missed RTK optimization opportunities
-5. **Check `rtk gain`**: Monitor your token savings over time
+1. **Chain commands correctly**: Use `rtk` before each command in a chain: `rtk cmd1 && rtk cmd2`
+1. **Use `rtk proxy` for debugging**: When you need to see full unfiltered output
+1. **Run `rtk discover`**: Periodically check for missed RTK optimization opportunities
+1. **Check `rtk gain`**: Monitor your token savings over time

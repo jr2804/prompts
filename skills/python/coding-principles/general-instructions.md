@@ -6,8 +6,8 @@ Always break code up into modules and components so that it can be easily reused
 
 If your response contains code examples, always provide the name of the file it would go in,so the user knows where the code goes.
 
-
 Separate the task to implement the project into sub-tasks/milestones. After each milestone:
+
 - Remember the key features and approaches used via the built-in ´/memory´ command.
 - Clean-up clutter files like e.g., temporary files, ad-hoc test scripts (that are not actual unit tests/pytest scripts).
 - Update documentation and comments to reflect any changes made during the milestone.
@@ -27,7 +27,7 @@ Separate the task to implement the project into sub-tasks/milestones. After each
   - `uvx ...` for running program directly from a PyPI package.
   - `uv add/remove/... ...` for managing environments, installing packages, etc.
   - `uv build ...` for building the project.
-   
+
 # Coding instructions
 
 - All Python code must be PEP 8 compliant.
@@ -37,8 +37,8 @@ Separate the task to implement the project into sub-tasks/milestones. After each
 - Never use ´print´ to debug code. Instead, use logging with appropriate log levels (e.g., debug, info, warning, error).
 - Never use the deprecated idiom ´from __future__ import annotations´.
 - Please apply the following ruff rules / apply recommended style corrections:
-	- I001
-	- SIM108
-	- UP004
-	- UP035
-	- PTH100 to PTH999
+  - I001
+  - SIM108
+  - UP004
+  - UP035
+  - PTH100 to PTH999

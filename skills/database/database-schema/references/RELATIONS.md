@@ -3,6 +3,7 @@
 ## SQL Relationships (SQLAlchemy)
 
 ### One-to-Many Relationship
+
 ```python
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
@@ -37,6 +38,7 @@ class Post(Base):
 ```
 
 ### Many-to-Many Relationship
+
 ```python
 from sqlalchemy import Column, Integer, String, Table, ForeignKey
 from sqlalchemy.orm import relationship
@@ -73,6 +75,7 @@ class Tag(Base):
 ```
 
 ### One-to-One Relationship
+
 ```python
 class User(Base):
     __tablename__ = "users"
@@ -96,6 +99,7 @@ class UserProfile(Base):
 ```
 
 ### Self-Referencing Relationship (Hierarchical Data)
+
 ```python
 class Category(Base):
     __tablename__ = "categories"
@@ -115,6 +119,7 @@ class Category(Base):
 ## Advanced Relationship Patterns
 
 ### Relationship with Additional Data
+
 ```python
 # Association object pattern - when you need additional data on the relationship
 class UserProject(Base):
@@ -152,6 +157,7 @@ class Project(Base):
 ```
 
 ### Polymorphic Relationships
+
 ```python
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -198,6 +204,7 @@ class Product(Base):
 ## MongoDB Relationships
 
 ### Referenced Relationships (Normalization)
+
 ```python
 from odmantic import Model, Field, Reference
 from datetime import datetime
@@ -222,6 +229,7 @@ class Post(Model):
 ```
 
 ### Embedded Relationships (Denormalization)
+
 ```python
 from odmantic import Model, Field, EmbeddedModel
 from datetime import datetime
@@ -244,6 +252,7 @@ class Post(Model):
 ```
 
 ### Hybrid Approach (Mixed Reference and Embedding)
+
 ```python
 from odmantic import Model, Field, EmbeddedModel, Reference
 from datetime import datetime
@@ -281,6 +290,7 @@ class Post(Model):
 ## Relationship Query Patterns
 
 ### SQL Query Patterns
+
 ```python
 # Eager loading to avoid N+1 queries
 from sqlalchemy.orm import joinedload, selectinload
@@ -303,6 +313,7 @@ users_with_published_posts = db.query(User).join(Post).filter(
 ```
 
 ### MongoDB Query Patterns
+
 ```python
 # Using $lookup for joins in aggregation
 pipeline = [
@@ -338,6 +349,7 @@ author = post.author  # This will be the full Author object
 ## FastAPI Integration with Relationships
 
 ### SQL Relationships in FastAPI
+
 ```python
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session, selectinload
@@ -373,6 +385,7 @@ async def get_post_with_author(
 ```
 
 ### MongoDB Relationships in FastAPI
+
 ```python
 from fastapi import FastAPI, HTTPException
 from typing import List
@@ -404,6 +417,7 @@ async def get_author_posts(
 ## Performance Considerations
 
 ### SQL Relationship Optimization
+
 ```python
 # Use proper indexing for foreign keys
 Index('ix_posts_author_id', 'author_id')
@@ -426,6 +440,7 @@ def get_posts_with_authors(db: Session):
 ```
 
 ### MongoDB Relationship Optimization
+
 ```python
 # Use proper indexing for reference fields
 class Post(Model):
@@ -457,6 +472,7 @@ class Post(Model):
 ## Relationship Validation
 
 ### SQL Relationship Constraints
+
 ```python
 class Post(Base):
     __tablename__ = "posts"
@@ -487,6 +503,7 @@ class Post(Base):
 ```
 
 ### MongoDB Validation
+
 ```python
 # Schema validation at database level
 def setup_collection_validation():

@@ -7,8 +7,8 @@ Usage:
     python scripts/generate_crud.py Product --output app/crud/products.py
 """
 
-import sys
 import argparse
+import sys
 from pathlib import Path
 
 
@@ -17,9 +17,9 @@ def to_snake_case(name: str) -> str:
     result = []
     for i, char in enumerate(name):
         if char.isupper() and i > 0:
-            result.append('_')
+            result.append("_")
         result.append(char.lower())
-    return ''.join(result)
+    return "".join(result)
 
 
 def generate_crud_code(model_name: str) -> str:
@@ -130,7 +130,7 @@ def create_{snake_name}(
     return crud.create_{snake_name}(session, {snake_name})
 
 
-@router.get("/{{{{{}}_id}}}}", response_model={model_name}Read)
+@router.get(f"/{{{snake_name}_id}}", response_model={model_name}Read)
 def read_{snake_name}(
     {snake_name}_id: int,
     session: Session = Depends(get_session)
@@ -149,7 +149,7 @@ def read_{plural_name}(
     return crud.get_{plural_name}(session, skip=skip, limit=limit)
 
 
-@router.put("/{{{{{}}_id}}}}", response_model={model_name}Read)
+@router.put(f"/{{{snake_name}_id}}", response_model={model_name}Read)
 def update_{snake_name}(
     {snake_name}_id: int,
     {snake_name}: {model_name}Update,
@@ -159,7 +159,7 @@ def update_{snake_name}(
     return crud.update_{snake_name}(session, {snake_name}_id, {snake_name})
 
 
-@router.delete("/{{{{{}}_id}}}}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(f"/{{{snake_name}_id}}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_{snake_name}(
     {snake_name}_id: int,
     session: Session = Depends(get_session)
@@ -174,27 +174,17 @@ def main():
     parser = argparse.ArgumentParser(
         description="Generate CRUD boilerplate for SQLModel models"
     )
+    parser.add_argument("model", type=str, help="Model name (e.g., User, Product)")
     parser.add_argument(
-        "model",
-        type=str,
-        help="Model name (e.g., User, Product)"
+        "--crud-output", type=str, help="Output file for CRUD functions", default=None
     )
     parser.add_argument(
-        "--crud-output",
-        type=str,
-        help="Output file for CRUD functions",
-        default=None
-    )
-    parser.add_argument(
-        "--router-output",
-        type=str,
-        help="Output file for router",
-        default=None
+        "--router-output", type=str, help="Output file for router", default=None
     )
     parser.add_argument(
         "--print-only",
         action="store_true",
-        help="Print to stdout instead of writing to files"
+        help="Print to stdout instead of writing to files",
     )
 
     args = parser.parse_args()
@@ -234,7 +224,9 @@ def main():
         print(f"✅ Created router: {router_output}")
 
         print(f"\\nNext steps:")
-        print(f"1. Define {model_name}Create, {model_name}Update, {model_name}Read in app/models.py")
+        print(
+            f"1. Define {model_name}Create, {model_name}Update, {model_name}Read in app/models.py"
+        )
         print(f"2. Import router in app/main.py:")
         print(f"   from app.routers import {snake_name}s")
         print(f"   app.include_router({snake_name}s.router)")

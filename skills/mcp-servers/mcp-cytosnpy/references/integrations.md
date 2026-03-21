@@ -46,6 +46,7 @@ cytoscnpy mcp-server
 ### Available Tools
 
 When connected, CytoScnPy exposes:
+
 - Security scanning (secrets, keys, tokens)
 - Dangerous code pattern detection
 - Code quality metrics (complexity, maintainability)
@@ -63,6 +64,7 @@ Tools are configured via VS Code extension settings or CLI flags.
 ## CI/CD Integration
 
 CytoScnPy supports structured output formats:
+
 - JSON
 - GitLab
 - SARIF

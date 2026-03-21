@@ -1,12 +1,6 @@
----
-name: python-cli
-description: Universal Python CLI development patterns and best practices
-license: MIT
-compatibility: opencode
-metadata:
-    related_python_guidelines: For general Python development, use skill `python-guidelines`
-    related_coding_principles: For overall coding standards, use skill `coding-principles`
----
+______________________________________________________________________
+
+## name: python-cli description: Universal Python CLI development patterns and best practices license: MIT compatibility: opencode metadata: related_python_guidelines: For general Python development, use skill `python-guidelines` related_coding_principles: For overall coding standards, use skill `coding-principles`
 
 # Python CLI
 
@@ -147,9 +141,9 @@ def handle_cli_error(error, context="CLI"):
 ## Best Practices
 
 1. **Consistency**: Use same CLI patterns across projects
-2. **User Experience**: Provide clear, helpful error messages
-3. **Documentation**: Include comprehensive help text
-4. **Testing**: Test CLI applications thoroughly
+1. **User Experience**: Provide clear, helpful error messages
+1. **Documentation**: Include comprehensive help text
+1. **Testing**: Test CLI applications thoroughly
 
 ## Compatibility
 

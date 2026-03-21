@@ -4,7 +4,7 @@
 
 *Based on arXiv:2602.11988 "Evaluating AGENTS.md" and industry best practices*
 
----
+______________________________________________________________________
 
 ## Executive Summary
 
@@ -19,7 +19,7 @@ Recent empirical research (arXiv:2602.11988) challenges common assumptions about
 
 **Key Recommendation:** Less is more. Write minimal, high-signal files only when they provide universal value across tasks.
 
----
+______________________________________________________________________
 
 ## Core Principles
 
@@ -28,12 +28,14 @@ Recent empirical research (arXiv:2602.11988) challenges common assumptions about
 **Every line must pass this test:** *"Will this be relevant for MOST tasks the agent performs?"*
 
 **✅ Include:**
+
 - Build/test/run commands used daily
 - Critical architectural constraints
 - Non-obvious import patterns
 - Hard requirements (e.g., "NEVER commit .env")
 
 **❌ Exclude:**
+
 - Feature-specific implementation details
 - One-off troubleshooting steps
 - Auto-generated file trees
@@ -43,7 +45,7 @@ Recent empirical research (arXiv:2602.11988) challenges common assumptions about
 
 Frontier models can follow ~150-200 instructions reliably. Claude Code's system prompt already uses ~50 instructions.
 
-**Target:** AGENTS.md should contain **<50 instructions** (ideally <30)
+**Target:** AGENTS.md should contain **\<50 instructions** (ideally \<30)
 
 **Why it matters:** As instruction count increases, compliance decreases **uniformly across all instructions**—not just new ones.
 
@@ -62,6 +64,7 @@ docs/agent-context/
 Root AGENTS.md references these files; agent reads them only when relevant.
 
 **Example:**
+
 ```markdown
 ## Related Documentation
 
@@ -86,6 +89,7 @@ Root AGENTS.md references these files; agent reads them only when relevant.
 ### 5. No Linters in AGENTS.md
 
 **Don't use AGENTS.md for:**
+
 - Code style rules (use `.editorconfig`, `ruff.toml`)
 - Formatting requirements (use Prettier, Biome)
 - Type checking rules (use `pyrightconfig.json`)
@@ -94,13 +98,13 @@ Root AGENTS.md references these files; agent reads them only when relevant.
 
 **Better approach:** Set up pre-commit hooks or stop-hooks that run formatters automatically.
 
----
+______________________________________________________________________
 
 ## Structure Template
 
-### Minimal Root AGENTS.md (<60 lines)
+### Minimal Root AGENTS.md (\<60 lines)
 
-```markdown
+````markdown
 # Project Name
 
 One-sentence project description.
@@ -112,7 +116,7 @@ One-sentence project description.
 uv run pytest -v          # Run tests
 ruff check src/ tests/    # Lint
 uv run <app>              # Run application
-```
+````
 
 ## Critical Constraints
 
@@ -129,7 +133,8 @@ Brief 2-3 sentence overview of main components.
 - **CLI usage:** `docs/cli.md`
 - **Architecture:** `docs/architecture.md`
 - **Testing:** `tests/AGENTS.md`
-```
+
+````
 
 ### Package-Level AGENTS.md (<150 lines)
 
@@ -147,7 +152,7 @@ One paragraph describing package responsibility.
 from package.submodule import function
 
 # Avoid: circular imports
-```
+````
 
 ## Key Design Patterns
 
@@ -170,8 +175,9 @@ uv run pytest tests/package/ -v
 ## Lessons Learned
 
 1. **Insight from refactoring** - Why it matters
-2. **Common pitfall** - How to avoid
-```
+1. **Common pitfall** - How to avoid
+
+````
 
 ---
 
@@ -259,9 +265,10 @@ This module is responsible for...
 
 ## src/module_c/
 This module manages...
-```
+````
 
 **Better:**
+
 ```markdown
 ## Key Modules
 
@@ -275,6 +282,7 @@ This module manages...
 **Problem:** Each additional instruction reduces compliance with all instructions.
 
 **Before (25 instructions):**
+
 ```markdown
 - Always use type hints
 - Never use Optional, use T | None
@@ -290,6 +298,7 @@ This module manages...
 ```
 
 **After (8 instructions):**
+
 ```markdown
 ## Code Style
 
@@ -299,7 +308,7 @@ Follow project conventions (see `ruff.toml`). Key rules:
 - `logging` over `print()`
 ```
 
----
+______________________________________________________________________
 
 ## Maintenance
 
@@ -316,10 +325,10 @@ Follow project conventions (see `ruff.toml`). Key rules:
 Before adding content, ask:
 
 1. **Universal?** Relevant for 80%+ of tasks?
-2. **Non-obvious?** Would agent discover this from code?
-3. **Stable?** Will this be true in 6 months?
-4. **Actionable?** Can agent act on this immediately?
-5. **Unique?** Already documented elsewhere?
+1. **Non-obvious?** Would agent discover this from code?
+1. **Stable?** Will this be true in 6 months?
+1. **Actionable?** Can agent act on this immediately?
+1. **Unique?** Already documented elsewhere?
 
 **If any answer is "no" → Don't add it.**
 
@@ -332,7 +341,7 @@ Remove content when:
 - Information moved to dedicated docs/
 - Instruction is no longer universally applicable
 
----
+______________________________________________________________________
 
 ## Validation
 
@@ -347,26 +356,28 @@ grep -c "^[*-]" AGENTS.md
 ```
 
 **Targets:**
-- Root AGENTS.md: <100 lines, <30 instructions
-- Package AGENTS.md: <150 lines, <50 instructions
+
+- Root AGENTS.md: \<100 lines, \<30 instructions
+- Package AGENTS.md: \<150 lines, \<50 instructions
 
 ### Agent Feedback Loop
 
 After major changes, observe:
 
 1. Does agent follow the instructions?
-2. Does it improve task completion?
-3. Does it reduce unnecessary exploration?
+1. Does it improve task completion?
+1. Does it reduce unnecessary exploration?
 
 If not → simplify or remove.
 
----
+______________________________________________________________________
 
 ## Examples from This Project
 
 ### ✅ Good Patterns
 
 **Root AGENTS.md (163 lines):**
+
 - Clear command section with `uv run` emphasis
 - Explicit linter prohibitions (PLC0415, ANN001)
 - Git constraints (never commit .env)
@@ -374,6 +385,7 @@ If not → simplify or remove.
 - Package overview table
 
 **Package AGENTS.md (tdoc_crawler, 168 lines):**
+
 - Import patterns with correct/incorrect examples
 - HTTP caching requirement with code example
 - TDoc data sources comparison table
@@ -381,6 +393,7 @@ If not → simplify or remove.
 - Circular import prevention strategy
 
 **CLI Submodule (68 lines):**
+
 - Clear separation: CLI vs library code
 - Classification rules with examples
 - Module responsibility table
@@ -389,17 +402,19 @@ If not → simplify or remove.
 ### ⚠️ Areas for Improvement
 
 **convert-lo AGENTS.md (271 lines):**
+
 - Too long (exceeds 150-line target)
 - Extensive usage examples belong in docs/
 - Performance benchmarks belong in README
 - **Action:** Move usage patterns to `docs/convert-lo-usage.md`, keep only critical constraints
 
 **tdoc-ai AGENTS.md (136 lines):**
+
 - Good length but could be more minimal
 - Factory pattern explanation could reference source
 - **Action:** Replace code examples with file references
 
----
+______________________________________________________________________
 
 ## References
 
@@ -412,10 +427,12 @@ If not → simplify or remove.
 ### Industry Best Practices
 
 - **HumanLayer** - "Writing a good CLAUDE.md"
+
   - [Blog Post](https://www.humanlayer.dev/blog/writing-a-good-claude-md)
-  - Key insight: <60 lines for root file
+  - Key insight: \<60 lines for root file
 
 - **Anthropic** - Claude Code Documentation
+
   - [Official Docs](https://code.claude.com/docs/en/agents)
 
 ### Related Patterns
@@ -424,7 +441,7 @@ If not → simplify or remove.
 - **12-Factor Agents** - Context engineering best practices
 - **Context Compression** - Summarize vs. copy
 
----
+______________________________________________________________________
 
 ## Appendix: Decision Tree
 
@@ -454,7 +471,7 @@ Should I add this to AGENTS.md?
 └─→ ADD TO AGENTS.md
 ```
 
----
+______________________________________________________________________
 
 *Last updated: March 2026*
 *Based on empirical research + project-specific learnings*

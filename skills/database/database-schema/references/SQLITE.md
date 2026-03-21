@@ -3,6 +3,7 @@
 ## SQLite-Specific SQLAlchemy Patterns
 
 ### Basic Model Definition
+
 ```python
 from sqlalchemy import Column, Integer, String, DateTime, Text, Boolean
 from sqlalchemy.sql import func
@@ -23,6 +24,7 @@ class User(Base):
 ```
 
 ### SQLite-Specific Data Types
+
 ```python
 from sqlalchemy import Column, Integer, String, DateTime, Text, Boolean, LargeBinary
 from sqlalchemy.dialects.sqlite import JSON
@@ -44,6 +46,7 @@ class Document(Base):
 ## SQLite Performance Optimization
 
 ### Indexing Strategies
+
 ```python
 from sqlalchemy import Index
 
@@ -63,6 +66,7 @@ class User(Base):
 ```
 
 ### Full-Text Search (FTS5)
+
 ```python
 from sqlalchemy import Column, Integer, String, text
 from sqlalchemy.ext.declarative import declarative_base
@@ -97,6 +101,7 @@ class Article(Base):
 ## SQLite Connection Management
 
 ### Optimized Connection Configuration
+
 ```python
 from sqlalchemy import create_engine
 from sqlalchemy.pool import StaticPool
@@ -131,6 +136,7 @@ def create_sqlite_engine(db_path: str = "app.db"):
 ## SQLite Migration Patterns
 
 ### Alembic Migration with SQLite Considerations
+
 ```python
 """Add user preferences to SQLite database
 
@@ -199,6 +205,7 @@ def downgrade():
 ## SQLite-Specific Limitations and Workarounds
 
 ### Handling ALTER TABLE Limitations
+
 ```python
 # SQLite has limited ALTER TABLE support
 # Use this pattern to add multiple columns
@@ -232,6 +239,7 @@ def upgrade():
 ```
 
 ### JSON Support in SQLite
+
 ```python
 from sqlalchemy.dialects.sqlite import JSON
 import json
@@ -260,6 +268,7 @@ class User(Base):
 ## FastAPI Integration with SQLite
 
 ### Dependency for Database Sessions
+
 ```python
 from fastapi import Depends
 from sqlalchemy.orm import Session
@@ -291,6 +300,7 @@ def get_current_user(
 ```
 
 ### SQLite Session Management
+
 ```python
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -316,6 +326,7 @@ def get_db():
 ## SQLite Testing Considerations
 
 ### In-Memory Database for Testing
+
 ```python
 # For testing, use in-memory SQLite database
 def create_test_engine():
@@ -352,6 +363,7 @@ def test_db():
 ## SQLite Performance Tips
 
 ### Query Optimization
+
 ```python
 # Use LIMIT for pagination
 users = db.query(User).offset(skip).limit(limit).all()
@@ -370,6 +382,7 @@ active_users = db.query(User).filter(
 ```
 
 ### Indexing Best Practices
+
 ```python
 # Create indexes on frequently queried columns
 Index('ix_users_email', 'email', unique=True)

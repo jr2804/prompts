@@ -1,7 +1,6 @@
----
-name: database-schema
-description: Generate comprehensive database schemas with proper relations, migrations, and ORM/ODM models for PostgreSQL, MongoDB, and SQLite. Use when creating database schemas that integrate with FastAPI applications, including SQLAlchemy models for SQL databases, PyMongo/ODMantic models for MongoDB, Alembic migrations, and proper relationship definitions.
----
+______________________________________________________________________
+
+## name: database-schema description: Generate comprehensive database schemas with proper relations, migrations, and ORM/ODM models for PostgreSQL, MongoDB, and SQLite. Use when creating database schemas that integrate with FastAPI applications, including SQLAlchemy models for SQL databases, PyMongo/ODMantic models for MongoDB, Alembic migrations, and proper relationship definitions.
 
 # Database Schema Generator
 
@@ -10,6 +9,7 @@ This skill provides comprehensive tools for generating database schemas with pro
 ## When to Use This Skill
 
 Use this skill when you need to:
+
 - Generate database schemas with proper relationships and constraints
 - Create ORM/ODM models for SQL (SQLAlchemy) or NoSQL (ODMantic/PyMongo) databases
 - Set up database migrations for schema evolution
@@ -20,35 +20,42 @@ Use this skill when you need to:
 ## Supported Database Types
 
 ### SQL Databases
+
 - **PostgreSQL**: Advanced features, JSON support, full-text search
 - **SQLite**: Lightweight, file-based, perfect for development/testing
 - **MySQL**: Traditional SQL with comprehensive feature set (coming soon)
 
 ### NoSQL Databases
+
 - **MongoDB**: Document-based with flexible schema and rich query language
 
 ## Core Workflow
 
 ### 1. Database Type Selection
+
 - Choose between PostgreSQL, MongoDB, or SQLite based on requirements
 - Consider factors: scalability, ACID compliance, document flexibility, deployment complexity
 
 ### 2. Schema Design
+
 - Define entities and their relationships
 - Plan indexes for optimal query performance
 - Consider data normalization vs. denormalization trade-offs
 
 ### 3. Model Generation
+
 - Create appropriate ORM/ODM models based on database type
 - Define proper field types and constraints
 - Implement relationship mappings
 
 ### 4. Migration Strategy
+
 - Generate migration files for schema evolution
 - Plan rollback strategies for safe deployments
 - Consider data migration needs
 
 ### 5. FastAPI Integration
+
 - Set up database connection pools
 - Implement dependency injection for database sessions
 - Create proper error handling for database operations
@@ -214,18 +221,21 @@ async def get_current_user(
 ## Best Practices
 
 ### Performance Optimization
+
 - Use proper indexing strategies
 - Implement connection pooling
 - Use eager loading for related data when needed
 - Consider caching strategies for read-heavy operations
 
 ### Security Considerations
+
 - Sanitize all database inputs
 - Use parameterized queries to prevent injection
 - Implement proper authentication and authorization
 - Encrypt sensitive data at rest
 
 ### Scalability Patterns
+
 - Plan for database sharding if needed
 - Use read replicas for read-heavy operations
 - Implement proper database connection management
@@ -234,18 +244,21 @@ async def get_current_user(
 ## Advanced Features
 
 ### Relationship Handling
+
 - One-to-Many relationships with proper cascading
 - Many-to-Many relationships with join tables
 - One-to-One relationships for specialized use cases
 - Self-referencing relationships for hierarchical data
 
 ### Data Validation
+
 - Database-level constraints
 - Application-level validation through ORM/ODM
 - Custom validation functions
 - Data integrity checks
 
 ## References
+
 - See [POSTGRESQL.md](references/POSTGRESQL.md) for PostgreSQL-specific patterns
 - See [MONGODB.md](references/MONGODB.md) for MongoDB schema design
 - See [SQLITE.md](references/SQLITE.md) for SQLite optimization

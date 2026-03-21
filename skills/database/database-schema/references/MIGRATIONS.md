@@ -3,6 +3,7 @@
 ## Alembic Migration Patterns
 
 ### Basic Migration Structure
+
 ```python
 """Add user profile fields
 
@@ -46,6 +47,7 @@ def downgrade():
 ```
 
 ### Conditional Migrations for Different Databases
+
 ```python
 """Database-specific migration
 
@@ -93,6 +95,7 @@ def downgrade():
 ## Migration Best Practices
 
 ### Safe Migration Patterns
+
 ```python
 """Safe migration with data preservation
 
@@ -125,6 +128,7 @@ def downgrade():
 ```
 
 ### Complex Migration with Data Transformation
+
 ```python
 """Migrate user data structure
 
@@ -232,6 +236,7 @@ def downgrade():
 ## Migration Strategies for Different Database Types
 
 ### PostgreSQL Migration Patterns
+
 ```python
 """PostgreSQL-specific migration with advanced features
 
@@ -285,6 +290,7 @@ def downgrade():
 ```
 
 ### SQLite Migration Patterns (Handling Limitations)
+
 ```python
 """SQLite migration handling ALTER TABLE limitations
 
@@ -356,6 +362,7 @@ def downgrade():
 ## Migration Testing and Validation
 
 ### Testing Migration Scripts
+
 ```python
 import pytest
 from alembic.config import Config
@@ -392,6 +399,7 @@ def test_migration_up_down():
 ```
 
 ### Data Validation in Migrations
+
 ```python
 """Migration with data validation
 
@@ -437,6 +445,7 @@ def downgrade():
 ## Production Migration Strategies
 
 ### Zero-Downtime Migration Pattern
+
 ```python
 """Zero-downtime migration pattern
 
@@ -474,6 +483,7 @@ def step5_remove_old():
 ```
 
 ### Migration Rollback Plan
+
 ```python
 """Migration with comprehensive rollback plan
 
@@ -518,6 +528,7 @@ def downgrade():
 ## Migration Automation Scripts
 
 ### Migration Generation Helper
+
 ```python
 #!/usr/bin/env python3
 """
