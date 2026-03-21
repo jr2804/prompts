@@ -22,21 +22,37 @@ Run `bunx saddle-cli`, then follow the instructions to install the repository.
 
 ### Commands
 
+TODO
+
 ### Skills
+
+TODO
 
 ### Agents
 
-## Useful MCP Servers & other tools
+TODO
 
-A list of MCP servers that are useful for testing and development:
+## Useful MCP Servers & CLI tools
+
+A list of MCP servers and CLI tools with similar functionality that are useful for testing and development:
 
 - [CytoScnPy](https://github.com/djinn-soul/CytoScnPy)
-- To be continued...
+- [Debug Skill + CLI](https://github.com/AlmogBaku/debug-skill)
+- [grepai](https://github.com/yoanbernabeu/grepai)
+- [beads issue tracker](https://github.com/steveyegge/beads)
+- *To be continued...*
 
 Related tools:
 
 - [any-cli-mcp-server](https://github.com/eirikb/any-cli-mcp-server)
-- To be continued...
+- [OpenCLI](https://github.com/jackwener/opencli)
+- *To be continued...*
+
+## Collection of Skills & Agents
+
+- [Awesome Claude Skills](https://github.com/BehiSecc/awesome-claude-skills)
+- [Awesome Copilot](https://github.com/github/awesome-copilot)
+- *To be continued...*
 
 ## References
 
