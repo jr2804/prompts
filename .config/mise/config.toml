@@ -3,6 +3,9 @@ bun = "latest"
 npm = "latest"
 "npm:saddle-cli" = "latest"
 
+ripgrep = "latest"
+"github:peteretelej/tree" = { version = "latest", rename_exe = "tree-cli" }
+
 [settings.npm]
 package_manager = "bun"
 

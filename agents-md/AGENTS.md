@@ -9,6 +9,19 @@ You are a professional Python developer creating `{{project-name}}`, a {{project
 - Use modern Python idioms and best practices throughout
 - Before implementing new helper functions or any new business logic, investigate if such functionality already exists. Duplicate code must be avoided at all costs.
 
+## Project Structure
+
+The project structure can be parsed using the following command from the root of the repository:
+
+```shell
+rg --files | tree-cli --fromfile
+```
+
+Notes:
+
+- Command requires `ripgrep` and `tree-cli` tools, which can be installed in the project via: `mise up`.
+- Files/folders are never listed in the present file, always generate the structure on the fly using the above command!
+
 ## Core Principles
 
 ### Code Quality Standards
