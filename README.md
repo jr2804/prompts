@@ -40,6 +40,7 @@ A list of MCP servers and CLI tools with similar functionality that are useful f
 - [Debug Skill + CLI](https://github.com/AlmogBaku/debug-skill)
 - [grepai](https://github.com/yoanbernabeu/grepai)
 - [beads issue tracker](https://github.com/steveyegge/beads)
+- [SkillKit](https://github.com/rohitg00/skillkit)
 - *To be continued...*
 
 Related tools:
