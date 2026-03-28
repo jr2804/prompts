@@ -1,6 +1,7 @@
-______________________________________________________________________
-
-## name: coding-principles description: Universal coding principles and best practices for maintainable software license: MIT compatibility: opencode metadata: related_python_guidelines: For Python-specific implementation, use skill `python-guidelines` related_testing_strategy: For testing approaches, use skill `testing-strategy`
+---
+name: coding-principles
+description: Universal coding principles and best practices for maintainable software
+---
 
 # Coding Principles
 

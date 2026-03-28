@@ -1,6 +1,7 @@
-______________________________________________________________________
-
-## name: mcp-sequential-thinking description: A detailed tool for dynamic and reflective problem-solving through thoughts that can adapt and evolve
+---
+name: mcp-sequential-thinking
+description: A detailed tool for dynamic and reflective problem-solving through thoughts that can adapt and evolve
+---
 
 # Sequential Thinking
 

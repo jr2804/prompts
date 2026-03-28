@@ -1,6 +1,7 @@
-______________________________________________________________________
-
-## name: ripgrep description: Fast, recursive search tool for pattern matching in files with regex support, ignore handling, and glob filtering. Use when searching codebases for patterns, finding function definitions, filtering by file type, or performing find/replace operations. Triggers: "search for X in files", "find all occurrences of Y", "grep with glob patterns", "recursive search", "find using regex".
+---
+name: ripgrep
+description: "Fast, recursive search tool for pattern matching in files with regex support, ignore handling, and glob filtering. Use when searching codebases for patterns, finding function definitions, filtering by file type, or performing find/replace operations. Triggers: \"search for X in files\", \"find all occurrences of Y\", \"grep with glob patterns\", \"recursive search\", \"find using regex\"."
+---
 
 # ripgrep (rg)
 

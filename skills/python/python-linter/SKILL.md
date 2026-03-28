@@ -1,6 +1,7 @@
-______________________________________________________________________
-
-## name: python-linter description: Guide coding agents to fix specific Python linter issues from Ruff. Use when encountering Ruff linter errors identified by alpha-numeric codes (e.g., B008, S108, PLC0415). Provides context-aware resolution strategies for common linter issues. license: MIT metadata: ruff_version: ">=0.12.0" related_python_guidelines: For general Python practices, use skill `python-guidelines`
+---
+name: python-linter
+description: "Guide coding agents to fix specific Python linter issues from Ruff. Use when encountering Ruff linter errors identified by alpha-numeric codes (e.g., B008, S108, PLC0415). Provides context-aware resolution strategies for common linter issues."
+---
 
 # Python Linter Issue Resolution
 
@@ -171,29 +172,6 @@ import platform
 
 def print_python_version():
     print(platform.python_version())
-```
-
-#### Valid Exceptions (when nested imports are acceptable):
-
-1. **Avoiding circular dependencies**
-1. **Lazy loading expensive modules**
-1. **Optional dependencies** (imports that may not be available)
-1. **Type checking imports** (using `if TYPE_CHECKING:`)
-
-```python
-# [OK] ACCEPTABLE: Type checking imports
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from mypy_extensions import TypedDict
-
-# [OK] ACCEPTABLE: Optional dependency
-def use_optional_feature():
-    try:
-        import optional_package
-        return optional_package.feature()
-    except ImportError:
-        return None  # Graceful fallback
 ```
 
 **Import organization standard:**

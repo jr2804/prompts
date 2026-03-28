@@ -1,6 +1,7 @@
-______________________________________________________________________
-
-## name: etsi-spec description: Retrieving metadata and documentation for ETSI specifications. Use when you need to find latest version, full title, publication date, download URLs, or version history for any ETSI specification (EN, ES, EG, TS, TR, SR, GS, GR, PAS). Supports parts (e.g., -1, -2, -3).
+---
+name: etsi-spec
+description: "Retrieving metadata and documentation for ETSI specifications. Use when you need to find latest version, full title, publication date, download URLs, or version history for any ETSI specification (EN, ES, EG, TS, TR, SR, GS, GR, PAS). Supports parts (e.g., -1, -2, -3)."
+---
 
 # ETSI Specification Retrieval
 

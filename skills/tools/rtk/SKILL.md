@@ -1,6 +1,7 @@
-______________________________________________________________________
-
-## name: rtk description: RTK (Rust Token Killer) - Token-optimized command wrapper for reducing token usage in Claude Code. Use when running development commands like cargo, git, npm, vitest, docker, kubectl, or any CLI tool where output verbosity matters. Always prefix commands with 'rtk' to automatically filter and compact output.
+---
+name: rtk
+description: "RTK (Rust Token Killer) - Token-optimized command wrapper for reducing token usage in Claude Code. Use when running development commands like cargo, git, npm, vitest, docker, kubectl, or any CLI tool where output verbosity matters. Always prefix commands with 'rtk' to automatically filter and compact output."
+---
 
 # RTK (Rust Token Killer)
 

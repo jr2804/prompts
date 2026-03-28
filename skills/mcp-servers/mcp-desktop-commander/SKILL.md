@@ -1,6 +1,7 @@
-______________________________________________________________________
-
-## name: mcp-desktop-commander description: File system operations, process management, terminal interaction, and workspace exploration
+---
+name: mcp-desktop-commander
+description: "File system operations, process management, terminal interaction, and workspace exploration"
+---
 
 # Desktop Commander
 

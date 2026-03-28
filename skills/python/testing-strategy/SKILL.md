@@ -1,6 +1,7 @@
-______________________________________________________________________
-
-## name: testing-strategy description: Universal testing strategies and best practices for software projects license: MIT compatibility: opencode metadata: related_python_guidelines: For Python-specific testing, use skill `python-guidelines` related_coding_principles: For overall quality standards, use skill `coding-principles`
+---
+name: testing-strategy
+description: Universal testing strategies and best practices for software projects
+---
 
 # Testing Strategy
 

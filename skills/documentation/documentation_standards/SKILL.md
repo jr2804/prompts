@@ -1,6 +1,7 @@
-______________________________________________________________________
-
-## name: documentation-standards description: Universal documentation standards and best practices for software projects license: MIT compatibility: opencode metadata: related_coding_principles: For overall development standards, use skill `coding-principles` related_python_guidelines: For Python-specific documentation, use skill `python-guidelines`
+---
+name: documentation-standards
+description: Universal documentation standards and best practices for software projects
+---
 
 # Documentation Standards
 

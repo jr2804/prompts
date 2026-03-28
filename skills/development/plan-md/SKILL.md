@@ -1,6 +1,7 @@
-______________________________________________________________________
-
-## name: plan-md description: Create and maintain a PLAN.md living document for feature implementations that require more than 1-2 prompts but are not full project specs. Use when a feature spans multiple files or components, involves architectural decisions, or needs more than 2 conversation turns to implement. Produces a lightweight markdown planning document placed at PLAN.md in the project root before coding begins, then updated throughout execution with progress, decisions, and discoveries.
+---
+name: plan-md
+description: "Create and maintain a PLAN.md living document for feature implementations that require more than 1-2 prompts but are not full project specs. Use when a feature spans multiple files or components, involves architectural decisions, or needs more than 2 conversation turns to implement. Produces a lightweight markdown planning document placed at PLAN.md in the project root before coding begins, then updated throughout execution with progress, decisions, and discoveries."
+---
 
 # Plan-MD: Feature Implementation Planning
 

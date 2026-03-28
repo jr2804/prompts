@@ -1,6 +1,7 @@
-______________________________________________________________________
-
-## name: python-guidelines description: Universal Python development guidelines and best practices license: MIT compatibility: opencode metadata: related_coding_principles: For general coding standards, use skill `coding-principles` related_python_cli: For CLI development patterns, use skill `python-cli`
+---
+name: python-guidelines
+description: Universal Python development guidelines and best practices
+---
 
 # Python Guidelines
 

@@ -1,6 +1,7 @@
-______________________________________________________________________
-
-## name: sqlmodel description: Comprehensive guide for working with SQLModel, PostgreSQL, and SQLAlchemy in FastAPI projects. Use when working with database operations in FastAPI including: (1) Defining SQLModel models and relationships, (2) Database connection and session management, (3) CRUD operations, (4) Query patterns and filtering, (5) Database migrations with Alembic, (6) Testing with SQLite, (7) Performance optimization and connection pooling, (8) Transaction management and error handling, (9) Advanced features like cascading deletes, soft deletes, and event listeners, (10) FastAPI integration patterns. Covers both basic and advanced database patterns for production-ready FastAPI applications.
+---
+name: sqlmodel
+description: "Comprehensive guide for working with SQLModel, PostgreSQL, and SQLAlchemy in FastAPI projects. Use when working with database operations in FastAPI including: (1) Defining SQLModel models and relationships, (2) Database connection and session management, (3) CRUD operations, (4) Query patterns and filtering, (5) Database migrations with Alembic, (6) Testing with SQLite, (7) Performance optimization and connection pooling, (8) Transaction management and error handling, (9) Advanced features like cascading deletes, soft deletes, and event listeners, (10) FastAPI integration patterns. Covers both basic and advanced database patterns for production-ready FastAPI applications."
+---
 
 # SQLModel for FastAPI
 

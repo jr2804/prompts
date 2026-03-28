@@ -1,6 +1,7 @@
-______________________________________________________________________
-
-## name: mcp-grepai description: Semantic code search using grepai MCP server with English queries, intent-based search, and call graph tracing
+---
+name: mcp-grepai
+description: "Semantic code search using grepai MCP server with English queries, intent-based search, and call graph tracing"
+---
 
 # MCP Server: grepai - Semantic Code Search
 

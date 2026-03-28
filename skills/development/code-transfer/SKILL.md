@@ -1,10 +1,7 @@
-______________________________________________________________________
-
+---
 name: code-transfer
-description: Transfer code between files with line-based precision. Use when users request copying code from one location to another, moving functions or classes between files, extracting code blocks, or inserting code at specific line numbers.
-
-______________________________________________________________________
-
+description: "Transfer code between files with line-based precision. Use when users request copying code from one location to another, moving functions or classes between files, extracting code blocks, or inserting code at specific line numbers."
+---
 # Code Transfer
 
 Transfer code between files with precise line-based control. **Dual-mode operation**: native tools (1-10 files) or execution mode (10+ files, 90% token savings).

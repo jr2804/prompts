@@ -1,10 +1,7 @@
-______________________________________________________________________
-
+---
 name: code-refactor
-description: Perform bulk code refactoring operations like renaming variables/functions across files, replacing patterns, and updating API calls. Use when users request renaming identifiers, replacing deprecated code patterns, updating method calls, or making consistent changes across multiple locations.
-
-______________________________________________________________________
-
+description: "Perform bulk code refactoring operations like renaming variables/functions across files, replacing patterns, and updating API calls. Use when users request renaming identifiers, replacing deprecated code patterns, updating method calls, or making consistent changes across multiple locations."
+---
 # Code Refactor
 
 Systematic code refactoring across files. **Auto-switches to execution mode** for 10+ files (90% token savings).
