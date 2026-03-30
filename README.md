@@ -41,6 +41,7 @@ A list of MCP servers and CLI tools with similar functionality that are useful f
 - [grepai](https://github.com/yoanbernabeu/grepai)
 - [beads issue tracker](https://github.com/steveyegge/beads)
 - [SkillKit](https://github.com/rohitg00/skillkit)
+- [Skillz](https://github.com/intellectronica/skillz)
 - *To be continued...*
 
 Related tools:
