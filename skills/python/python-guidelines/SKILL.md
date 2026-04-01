@@ -1,7 +1,6 @@
----
-name: python-guidelines
-description: Universal Python development guidelines and best practices
----
+______________________________________________________________________
+
+## name: python-guidelines description: Universal Python development guidelines and best practices
 
 # Python Guidelines
 
@@ -40,14 +39,14 @@ uv sync --all-extras -U     # Update all dependencies
 ### Type Hints and Annotations
 
 ```python
-# Universal type hint patterns
-from typing import List, Dict, Optional, Union
+# Universal type hint patterns (Python 3.10+ flavor)
+# Note: | syntax is preferred for union types and Optional over Union/Optional from typing
 
 # Function with complete type annotations
 def process_data(
-    input_data: List[Dict[str, Union[int, str]]],
-    config: Optional[Dict[str, str]] = None
-) -> Dict[str, List[float]]:
+    input_data: list[dict[str, int | str]],
+    config: dict[str, str] | None = None
+) -> dict[str, list[float]]:
     """Process data with type-safe operations"""
     # Implementation with type-checked operations
     return processed_results
@@ -137,7 +136,7 @@ class TestDataProcessor:
 
 Works with:
 
-- Python 3.8+ projects
+- Python 3.10+ projects (mandates modern type hint syntax)
 - Any Python application type
 - Cross-project standardization
 - Organizational Python guidelines
