@@ -1,6 +1,7 @@
-______________________________________________________________________
-
-## name: python-standards description: Python coding standards, type hints, code quality, and best practices for this project. Use when writing, reviewing, or refactoring Python code.
+---
+name: python-standards
+description: Python coding standards, type hints, code quality, and best practices for this project. Use when writing, reviewing, or refactoring Python code.
+---
 
 # Python Standards
 
