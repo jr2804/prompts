@@ -175,7 +175,7 @@ uv run pytest tests/package/ -v
 ## Lessons Learned
 
 1. **Insight from refactoring** - Why it matters
-1. **Common pitfall** - How to avoid
+2. **Common pitfall** - How to avoid
 
 ````
 
@@ -325,10 +325,10 @@ ______________________________________________________________________
 Before adding content, ask:
 
 1. **Universal?** Relevant for 80%+ of tasks?
-1. **Non-obvious?** Would agent discover this from code?
-1. **Stable?** Will this be true in 6 months?
-1. **Actionable?** Can agent act on this immediately?
-1. **Unique?** Already documented elsewhere?
+2. **Non-obvious?** Would agent discover this from code?
+3. **Stable?** Will this be true in 6 months?
+4. **Actionable?** Can agent act on this immediately?
+5. **Unique?** Already documented elsewhere?
 
 **If any answer is "no" → Don't add it.**
 
@@ -365,8 +365,8 @@ grep -c "^[*-]" AGENTS.md
 After major changes, observe:
 
 1. Does agent follow the instructions?
-1. Does it improve task completion?
-1. Does it reduce unnecessary exploration?
+2. Does it improve task completion?
+3. Does it reduce unnecessary exploration?
 
 If not → simplify or remove.
 

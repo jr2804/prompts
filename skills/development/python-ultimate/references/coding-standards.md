@@ -7,20 +7,20 @@ description: Consolidated Python coding standards reference for type hints, stri
 
 ## Table of Contents
 
-1. [Type Hints](#1-type-hints-mandatory)
-2. [String Formatting](#2-string-formatting)
-3. [Data Structures](#3-data-structures)
-4. [Logging](#4-logging)
-5. [Code Size Limits](#5-code-size-limits)
-6. [Docstrings](#6-docstrings)
-7. [Comments](#7-comments)
-8. [Library Preferences](#8-library-preferences)
-9. [Version Control](#9-version-control)
+01. [Type Hints](#1-type-hints-mandatory)
+02. [String Formatting](#2-string-formatting)
+03. [Data Structures](#3-data-structures)
+04. [Logging](#4-logging)
+05. [Code Size Limits](#5-code-size-limits)
+06. [Docstrings](#6-docstrings)
+07. [Comments](#7-comments)
+08. [Library Preferences](#8-library-preferences)
+09. [Version Control](#9-version-control)
 10. [Boolean Flags and Environment Variables](#10-boolean-flags-and-environment-variables)
 11. [Error Handling](#11-error-handling)
 12. [Prohibited Patterns](#12-prohibited-patterns)
 
----
+______________________________________________________________________
 
 ## 1. Type Hints (Mandatory)
 
@@ -42,13 +42,14 @@ def fetch_data(item_id: str | None) -> dict[str, Any] | None:
 ```
 
 **Rules:**
+
 - Use `T | None` instead of `Optional[T]`
 - Use `Any` from `typing` instead of `object`
 - Include type hints in docstrings for parameters and returns
 
 **Null comparisons:** Use `is` and `is not` for `None`, not `==` or `!=`.
 
----
+______________________________________________________________________
 
 ## 2. String Formatting
 
@@ -65,7 +66,7 @@ print("Processing {} from {}".format(name, meeting))
 print("Processing %s from %s" % (name, meeting))
 ```
 
----
+______________________________________________________________________
 
 ## 3. Data Structures
 
@@ -121,7 +122,7 @@ data = json.load(f)
 f.close()
 ```
 
----
+______________________________________________________________________
 
 ## 4. Logging
 
@@ -138,7 +139,7 @@ logger.warning("Retry attempt %d for %s", retry_count, item_id)
 logger.error("Failed to process %s: %s", item_id, exc_info=True)
 ```
 
----
+______________________________________________________________________
 
 ## 5. Code Size Limits
 
@@ -151,11 +152,12 @@ Keep modules and symbols small to preserve maintainability:
 | Classes | < 200 lines |
 
 **Refactor when limits are exceeded:**
+
 - Split large functions into smaller helper functions
 - Extract common logic to separate utilities
 - Split large classes into composition of smaller classes
 
----
+______________________________________________________________________
 
 ## 6. Docstrings
 
@@ -183,7 +185,7 @@ def fetch_item_metadata(item_id: str, source: str) -> dict[str, Any] | None:
     """
 ```
 
----
+______________________________________________________________________
 
 ## 7. Comments
 
@@ -204,13 +206,14 @@ id = item.id
 ```
 
 **DO NOT:**
+
 - Repeat obvious names (variable/function names already describe what they are)
 - Include "what you did" (belongs in commit messages)
 - Use decorative headings (`===== MIGRATION TOOLS =====`)
 - Number steps (`// Step 3: Fetch data`)
 - Use emojis or special Unicode characters
 
----
+______________________________________________________________________
 
 ## 8. Library Preferences
 
@@ -227,7 +230,7 @@ id = item.id
 | Excel writing | xlsxwriter | Excel output |
 | Type checking | ty | Static type checking |
 
----
+______________________________________________________________________
 
 ## 9. Version Control
 
@@ -250,7 +253,7 @@ Documentation: docs/<topic>
 Releases: release/v<version>
 ```
 
----
+______________________________________________________________________
 
 ## 10. Boolean Flags and Environment Variables
 
@@ -284,7 +287,7 @@ def get_env_var(name: str, default: str | None = None) -> str:
     return value
 ```
 
----
+______________________________________________________________________
 
 ## 11. Error Handling
 
@@ -298,7 +301,7 @@ def safe_operation(func, *args, **kwargs):
         return get_fallback_value(func)
 ```
 
----
+______________________________________________________________________
 
 ## 12. Prohibited Patterns
 
@@ -324,6 +327,7 @@ def _resolve_data_id(db_file: Path) -> int:
 Never suppress linter issues with `# noqa`. Fix the underlying issue instead.
 
 Never introduce these rules:
+
 - **PLC0415**, **E402** - Import at top of file
 - **ANN001** - Missing type annotation for function argument
 - **E402** - Module-level import not at top of file
@@ -338,7 +342,7 @@ Use `pathlib.Path` instead of `os.path`.
 
 Use `T | None` instead of `Optional[T]`.
 
----
+______________________________________________________________________
 
 ## Linting and Formatting
 

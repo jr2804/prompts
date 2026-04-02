@@ -1,6 +1,6 @@
 ---
 name: pptx
-description: "Presentation creation, editing, and analysis. When Claude needs to work with presentations (.pptx files) for: (1) Creating new presentations, (2) Modifying or editing content, (3) Working with layouts, (4) Adding comments or speaker notes, or any other presentation tasks"
+description: 'Presentation creation, editing, and analysis. When Claude needs to work with presentations (.pptx files) for: (1) Creating new presentations, (2) Modifying or editing content, (3) Working with layouts, (4) Adding comments or speaker notes, or any other presentation tasks'
 ---
 
 # PPTX creation, editing, and analysis
@@ -46,8 +46,8 @@ You need raw XML access for: comments, speaker notes, slide layouts, animations,
 **When given an example design to emulate**: Always analyze the presentation's typography and colors first using the methods below:
 
 1. **Read theme file**: Check `ppt/theme/theme1.xml` for colors (`<a:clrScheme>`) and fonts (`<a:fontScheme>`)
-1. **Sample slide content**: Examine `ppt/slides/slide1.xml` for actual font usage (`<a:rPr>`) and colors
-1. **Search for patterns**: Use grep to find color (`<a:solidFill>`, `<a:srgbClr>`) and font references across all XML files
+2. **Sample slide content**: Examine `ppt/slides/slide1.xml` for actual font usage (`<a:rPr>`) and colors
+3. **Search for patterns**: Use grep to find color (`<a:solidFill>`, `<a:srgbClr>`) and font references across all XML files
 
 ## Creating a new PowerPoint presentation **without a template**
 
@@ -58,9 +58,9 @@ When creating a new PowerPoint presentation from scratch, use the **html2pptx** 
 **CRITICAL**: Before creating any presentation, analyze the content and choose appropriate design elements:
 
 1. **Consider the subject matter**: What is this presentation about? What tone, industry, or mood does it suggest?
-1. **Check for branding**: If the user mentions a company/organization, consider their brand colors and identity
-1. **Match palette to content**: Select colors that reflect the subject
-1. **State your approach**: Explain your design choices before writing code
+2. **Check for branding**: If the user mentions a company/organization, consider their brand colors and identity
+3. **Match palette to content**: Select colors that reflect the subject
+4. **State your approach**: Explain your design choices before writing code
 
 **Requirements**:
 
@@ -82,24 +82,24 @@ When creating a new PowerPoint presentation from scratch, use the **html2pptx** 
 
 **Example color palettes** (use these to spark creativity - choose one, adapt it, or create your own):
 
-1. **Classic Blue**: Deep navy (#1C2833), slate gray (#2E4053), silver (#AAB7B8), off-white (#F4F6F6)
-1. **Teal & Coral**: Teal (#5EA8A7), deep teal (#277884), coral (#FE4447), white (#FFFFFF)
-1. **Bold Red**: Red (#C0392B), bright red (#E74C3C), orange (#F39C12), yellow (#F1C40F), green (#2ECC71)
-1. **Warm Blush**: Mauve (#A49393), blush (#EED6D3), rose (#E8B4B8), cream (#FAF7F2)
-1. **Burgundy Luxury**: Burgundy (#5D1D2E), crimson (#951233), rust (#C15937), gold (#997929)
-1. **Deep Purple & Emerald**: Purple (#B165FB), dark blue (#181B24), emerald (#40695B), white (#FFFFFF)
-1. **Cream & Forest Green**: Cream (#FFE1C7), forest green (#40695B), white (#FCFCFC)
-1. **Pink & Purple**: Pink (#F8275B), coral (#FF574A), rose (#FF737D), purple (#3D2F68)
-1. **Lime & Plum**: Lime (#C5DE82), plum (#7C3A5F), coral (#FD8C6E), blue-gray (#98ACB5)
-1. **Black & Gold**: Gold (#BF9A4A), black (#000000), cream (#F4F6F6)
-1. **Sage & Terracotta**: Sage (#87A96B), terracotta (#E07A5F), cream (#F4F1DE), charcoal (#2C2C2C)
-1. **Charcoal & Red**: Charcoal (#292929), red (#E33737), light gray (#CCCBCB)
-1. **Vibrant Orange**: Orange (#F96D00), light gray (#F2F2F2), charcoal (#222831)
-1. **Forest Green**: Black (#191A19), green (#4E9F3D), dark green (#1E5128), white (#FFFFFF)
-1. **Retro Rainbow**: Purple (#722880), pink (#D72D51), orange (#EB5C18), amber (#F08800), gold (#DEB600)
-1. **Vintage Earthy**: Mustard (#E3B448), sage (#CBD18F), forest green (#3A6B35), cream (#F4F1DE)
-1. **Coastal Rose**: Old rose (#AD7670), beaver (#B49886), eggshell (#F3ECDC), ash gray (#BFD5BE)
-1. **Orange & Turquoise**: Light orange (#FC993E), grayish turquoise (#667C6F), white (#FCFCFC)
+01. **Classic Blue**: Deep navy (#1C2833), slate gray (#2E4053), silver (#AAB7B8), off-white (#F4F6F6)
+02. **Teal & Coral**: Teal (#5EA8A7), deep teal (#277884), coral (#FE4447), white (#FFFFFF)
+03. **Bold Red**: Red (#C0392B), bright red (#E74C3C), orange (#F39C12), yellow (#F1C40F), green (#2ECC71)
+04. **Warm Blush**: Mauve (#A49393), blush (#EED6D3), rose (#E8B4B8), cream (#FAF7F2)
+05. **Burgundy Luxury**: Burgundy (#5D1D2E), crimson (#951233), rust (#C15937), gold (#997929)
+06. **Deep Purple & Emerald**: Purple (#B165FB), dark blue (#181B24), emerald (#40695B), white (#FFFFFF)
+07. **Cream & Forest Green**: Cream (#FFE1C7), forest green (#40695B), white (#FCFCFC)
+08. **Pink & Purple**: Pink (#F8275B), coral (#FF574A), rose (#FF737D), purple (#3D2F68)
+09. **Lime & Plum**: Lime (#C5DE82), plum (#7C3A5F), coral (#FD8C6E), blue-gray (#98ACB5)
+10. **Black & Gold**: Gold (#BF9A4A), black (#000000), cream (#F4F6F6)
+11. **Sage & Terracotta**: Sage (#87A96B), terracotta (#E07A5F), cream (#F4F1DE), charcoal (#2C2C2C)
+12. **Charcoal & Red**: Charcoal (#292929), red (#E33737), light gray (#CCCBCB)
+13. **Vibrant Orange**: Orange (#F96D00), light gray (#F2F2F2), charcoal (#222831)
+14. **Forest Green**: Black (#191A19), green (#4E9F3D), dark green (#1E5128), white (#FFFFFF)
+15. **Retro Rainbow**: Purple (#722880), pink (#D72D51), orange (#EB5C18), amber (#F08800), gold (#DEB600)
+16. **Vintage Earthy**: Mustard (#E3B448), sage (#CBD18F), forest green (#3A6B35), cream (#F4F1DE)
+17. **Coastal Rose**: Old rose (#AD7670), beaver (#B49886), eggshell (#F3ECDC), ash gray (#BFD5BE)
+18. **Orange & Turquoise**: Light orange (#FC993E), grayish turquoise (#667C6F), white (#FCFCFC)
 
 #### Visual Details Options
 
@@ -166,16 +166,16 @@ When creating a new PowerPoint presentation from scratch, use the **html2pptx** 
 ### Workflow
 
 1. **MANDATORY - READ ENTIRE FILE**: Read [`html2pptx.md`](html2pptx.md) completely from start to finish. **NEVER set any range limits when reading this file.** Read the full file content for detailed syntax, critical formatting rules, and best practices before proceeding with presentation creation.
-1. Create an HTML file for each slide with proper dimensions (e.g., 720pt × 405pt for 16:9)
+2. Create an HTML file for each slide with proper dimensions (e.g., 720pt × 405pt for 16:9)
    - Use `<p>`, `<h1>`-`<h6>`, `<ul>`, `<ol>` for all text content
    - Use `class="placeholder"` for areas where charts/tables will be added (render with gray background for visibility)
    - **CRITICAL**: Rasterize gradients and icons as PNG images FIRST using Sharp, then reference in HTML
    - **LAYOUT**: For slides with charts/tables/images, use either full-slide layout or two-column layout for better readability
-1. Create and run a JavaScript file using the [`html2pptx.js`](scripts/html2pptx.js) library to convert HTML slides to PowerPoint and save the presentation
+3. Create and run a JavaScript file using the [`html2pptx.js`](scripts/html2pptx.js) library to convert HTML slides to PowerPoint and save the presentation
    - Use the `html2pptx()` function to process each HTML file
    - Add charts and tables to placeholder areas using PptxGenJS API
    - Save the presentation using `pptx.writeFile()`
-1. **Visual validation**: Generate thumbnails and inspect for layout issues
+4. **Visual validation**: Generate thumbnails and inspect for layout issues
    - Create thumbnail grid: `python scripts/thumbnail.py output.pptx workspace/thumbnails --cols 4`
    - Read and carefully examine the thumbnail image for:
      - **Text cutoff**: Text being cut off by header bars, shapes, or slide edges
@@ -192,10 +192,10 @@ When edit slides in an existing PowerPoint presentation, you need to work with t
 ### Workflow
 
 1. **MANDATORY - READ ENTIRE FILE**: Read [`ooxml.md`](ooxml.md) (~500 lines) completely from start to finish. **NEVER set any range limits when reading this file.** Read the full file content for detailed guidance on OOXML structure and editing workflows before any presentation editing.
-1. Unpack the presentation: `python ooxml/scripts/unpack.py <office_file> <output_dir>`
-1. Edit the XML files (primarily `ppt/slides/slide{N}.xml` and related files)
-1. **CRITICAL**: Validate immediately after each edit and fix any validation errors before proceeding: `python ooxml/scripts/validate.py <dir> --original <file>`
-1. Pack the final presentation: `python ooxml/scripts/pack.py <input_directory> <office_file>`
+2. Unpack the presentation: `python ooxml/scripts/unpack.py <office_file> <output_dir>`
+3. Edit the XML files (primarily `ppt/slides/slide{N}.xml` and related files)
+4. **CRITICAL**: Validate immediately after each edit and fix any validation errors before proceeding: `python ooxml/scripts/validate.py <dir> --original <file>`
+5. Pack the final presentation: `python ooxml/scripts/pack.py <input_directory> <office_file>`
 
 ## Creating a new PowerPoint presentation **using a template**
 
@@ -210,7 +210,7 @@ When you need to create a presentation that follows an existing template's desig
    - Create thumbnail grids: `python scripts/thumbnail.py template.pptx`
    - See [Creating Thumbnail Grids](#creating-thumbnail-grids) section for more details
 
-1. **Analyze template and save inventory to a file**:
+2. **Analyze template and save inventory to a file**:
 
    - **Visual Analysis**: Review thumbnail grid(s) to understand slide layouts, design patterns, and visual structure
    - Create and save a template inventory file at `template-inventory.md` containing:
@@ -232,7 +232,7 @@ When you need to create a presentation that follows an existing template's desig
      - Visual hierarchy and structure
    - This inventory file is REQUIRED for selecting appropriate templates in the next step
 
-1. **Create presentation outline based on template inventory**:
+3. **Create presentation outline based on template inventory**:
 
    - Review available templates from step 2.
    - Choose an intro or title template for the first slide. This should be one of the first templates.
@@ -264,7 +264,7 @@ When you need to create a presentation that follows an existing template's desig
      ]
      ```
 
-1. **Duplicate, reorder, and delete slides using `rearrange.py`**:
+4. **Duplicate, reorder, and delete slides using `rearrange.py`**:
 
    - Use the `scripts/rearrange.py` script to create a new presentation with slides in the desired order:
      ```bash
@@ -274,7 +274,7 @@ When you need to create a presentation that follows an existing template's desig
    - Slide indices are 0-based (first slide is 0, second is 1, etc.)
    - The same slide index can appear multiple times to duplicate that slide
 
-1. **Extract ALL text using the `inventory.py` script**:
+5. **Extract ALL text using the `inventory.py` script**:
 
    - **Run inventory extraction**:
 
@@ -330,7 +330,7 @@ When you need to create a presentation that follows an existing template's desig
      - **Colors**: `color` for RGB (e.g., "FF0000"), `theme_color` for theme colors (e.g., "DARK_1")
      - **Properties**: Only non-default values are included in the output
 
-1. **Generate replacement text and save the data to a JSON file**
+6. **Generate replacement text and save the data to a JSON file**
    Based on the text inventory from the previous step:
 
    - **CRITICAL**: First verify which shapes exist in the inventory - only reference shapes that are actually present
@@ -411,7 +411,7 @@ When you need to create a presentation that follows an existing template's desig
    - Body text: Usually no special properties needed
    - Quotes: May have special alignment or font properties
 
-1. **Apply replacements using the `replace.py` script**
+7. **Apply replacements using the `replace.py` script**
 
    ```bash
    python scripts/replace.py working.pptx replacement-text.json output.pptx
@@ -485,7 +485,7 @@ To visually analyze PowerPoint slides, convert them to images using a two-step p
    soffice --headless --convert-to pdf template.pptx
    ```
 
-1. **Convert PDF pages to JPEG images**:
+2. **Convert PDF pages to JPEG images**:
 
    ```bash
    pdftoppm -jpeg -r 150 template.pdf slide

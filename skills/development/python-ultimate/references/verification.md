@@ -9,7 +9,7 @@
 5. [Common Verification Commands](#common-verification-commands)
 6. [When Verification Fails](#when-verification-fails)
 
----
+______________________________________________________________________
 
 ## Iron Law
 
@@ -21,7 +21,7 @@ NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE
 
 If you haven't run the verification command, you cannot claim it passes. Skip any step = lying, not verifying.
 
----
+______________________________________________________________________
 
 ## Gate Function
 
@@ -37,7 +37,7 @@ BEFORE claiming any status or expressing satisfaction:
 5. ONLY THEN  → Make the claim
 ```
 
----
+______________________________________________________________________
 
 ## Forbidden Words
 
@@ -50,7 +50,7 @@ Do **not** use these words when stating results:
 
 These words imply assumption without evidence. State actual results with command output instead.
 
----
+______________________________________________________________________
 
 ## Verification Checklist
 
@@ -64,7 +64,7 @@ Before claiming completion, verify:
 - [ ] Regression tests work — Red-green cycle verified
 - [ ] VCS diff shows intended changes — Review actual changes
 
----
+______________________________________________________________________
 
 ## Common Verification Commands
 
@@ -86,7 +86,7 @@ python -m build
 uv build
 ```
 
----
+______________________________________________________________________
 
 ## When Verification Fails
 
@@ -106,6 +106,6 @@ uv build
 | Bug fixed | Original symptom: passes | Code changed |
 | Regression works | Red-green verified | Test passes once |
 
----
+______________________________________________________________________
 
 **Bottom Line:** Run the command. Read the output. THEN claim the result. This is non-negotiable.

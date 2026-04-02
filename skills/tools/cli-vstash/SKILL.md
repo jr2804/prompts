@@ -1,6 +1,6 @@
 ---
 name: cli-vstash
-description: "Local document memory with semantic search for AI-assisted workflows. Use when managing project documentation, codebases, or research papers that need persistent memory across sessions. Triggers on: vstash add/search/ask commands, document ingestion, semantic search, RAG pipelines, local knowledge bases, or configuring vstash for personal projects."
+description: 'Local document memory with semantic search for AI-assisted workflows. Use when managing project documentation, codebases, or research papers that need persistent memory across sessions. Triggers on: vstash add/search/ask commands, document ingestion, semantic search, RAG pipelines, local knowledge bases, or configuring vstash for personal projects.'
 ---
 
 # vstash CLI
@@ -46,6 +46,7 @@ file/URL → parse → chunk → embed → store vectors → index text
 ```
 
 **Parsing:**
+
 - Non-code: markitdown (preserves structure)
 - Code (`code_aware=true`): raw UTF-8 to preserve syntax
 
@@ -65,6 +66,7 @@ query → embed → vector search (top-k×10) → keyword search (top-k×10) →
 **Reciprocal Rank Fusion (RRF):** Merges vector + keyword rankings without comparable scores.
 
 **Relevance signal:** Distance-based confidence tiers:
+
 - ≤ 0.95: high (full confidence)
 - 0.95–0.98: medium (uncertain)
 - > 0.98: low (results may not match)

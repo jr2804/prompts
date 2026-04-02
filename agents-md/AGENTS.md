@@ -128,9 +128,9 @@ def evaluate(
 ## Success Criteria
 
 1. **Functional Compliance**: Pass all conformance tests within specified tolerances
-1. **Performance**: Match or exceed reference implementation speed
-1. **Code Quality**: Pass all linting, typing, and testing requirements
-1. **Usability**: Provide clear API and CLI matching reference tool functionality
+2. **Performance**: Match or exceed reference implementation speed
+3. **Code Quality**: Pass all linting, typing, and testing requirements
+4. **Usability**: Provide clear API and CLI matching reference tool functionality
 
 ## Documentation Requirements
 

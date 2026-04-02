@@ -5,8 +5,8 @@ Convert HTML slides to PowerPoint presentations with accurate positioning using 
 ## Table of Contents
 
 1. [Creating HTML Slides](#creating-html-slides)
-1. [Using the html2pptx Library](#using-the-html2pptx-library)
-1. [Using PptxGenJS](#using-pptxgenjs)
+2. [Using the html2pptx Library](#using-the-html2pptx-library)
+3. [Using PptxGenJS](#using-pptxgenjs)
 
 ______________________________________________________________________
 
@@ -244,9 +244,9 @@ await html2pptx(htmlFile, pres, options)
 The library automatically validates and collects all errors before throwing:
 
 1. **HTML dimensions must match presentation layout** - Reports dimension mismatches
-1. **Content must not overflow body** - Reports overflow with exact measurements
-1. **CSS gradients** - Reports unsupported gradient usage
-1. **Text element styling** - Reports backgrounds/borders/shadows on text elements (only allowed on divs)
+2. **Content must not overflow body** - Reports overflow with exact measurements
+3. **CSS gradients** - Reports unsupported gradient usage
+4. **Text element styling** - Reports backgrounds/borders/shadows on text elements (only allowed on divs)
 
 **All validation errors are collected and reported together** in a single error message, allowing you to fix all issues at once instead of one at a time.
 

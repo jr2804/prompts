@@ -1,6 +1,6 @@
 ---
 name: sqlmodel
-description: "Comprehensive guide for working with SQLModel, PostgreSQL, and SQLAlchemy in FastAPI projects. Use when working with database operations in FastAPI including: (1) Defining SQLModel models and relationships, (2) Database connection and session management, (3) CRUD operations, (4) Query patterns and filtering, (5) Database migrations with Alembic, (6) Testing with SQLite, (7) Performance optimization and connection pooling, (8) Transaction management and error handling, (9) Advanced features like cascading deletes, soft deletes, and event listeners, (10) FastAPI integration patterns. Covers both basic and advanced database patterns for production-ready FastAPI applications."
+description: 'Comprehensive guide for working with SQLModel, PostgreSQL, and SQLAlchemy in FastAPI projects. Use when working with database operations in FastAPI including: (1) Defining SQLModel models and relationships, (2) Database connection and session management, (3) CRUD operations, (4) Query patterns and filtering, (5) Database migrations with Alembic, (6) Testing with SQLite, (7) Performance optimization and connection pooling, (8) Transaction management and error handling, (9) Advanced features like cascading deletes, soft deletes, and event listeners, (10) FastAPI integration patterns. Covers both basic and advanced database patterns for production-ready FastAPI applications.'
 ---
 
 # SQLModel for FastAPI
@@ -79,42 +79,42 @@ This skill includes comprehensive reference files organized by topic. Read the r
 ### Creating a New Model
 
 1. Define the model in your models file
-1. Add relationships if needed
-1. Create request/response schemas
-1. Generate migration: `alembic revision --autogenerate -m "Add model"`
-1. Review and apply migration: `alembic upgrade head`
-1. Implement CRUD functions
-1. Create API endpoints
-1. Write tests
+2. Add relationships if needed
+3. Create request/response schemas
+4. Generate migration: `alembic revision --autogenerate -m "Add model"`
+5. Review and apply migration: `alembic upgrade head`
+6. Implement CRUD functions
+7. Create API endpoints
+8. Write tests
 
 ### Setting Up Database
 
 1. Install dependencies: `pip install sqlmodel psycopg2-binary alembic`
-1. Create database configuration in `database.py`
-1. Define models in `models.py`
-1. Initialize Alembic: `alembic init alembic`
-1. Configure Alembic for SQLModel (see [migrations.md](references/migrations.md))
-1. Create initial migration
-1. Set up dependency injection for sessions
+2. Create database configuration in `database.py`
+3. Define models in `models.py`
+4. Initialize Alembic: `alembic init alembic`
+5. Configure Alembic for SQLModel (see [migrations.md](references/migrations.md))
+6. Create initial migration
+7. Set up dependency injection for sessions
 
 ### Optimizing Performance
 
 1. Add indexes on frequently queried columns (see [models.md](references/models.md))
-1. Use eager loading for relationships (see [relationships.md](references/relationships.md))
-1. Configure connection pooling (see [sessions.md](references/sessions.md))
-1. Implement pagination (see [queries.md](references/queries.md))
-1. Use bulk operations for multiple inserts/updates (see [crud.md](references/crud.md))
-1. Add query caching if needed (see [performance.md](references/performance.md))
+2. Use eager loading for relationships (see [relationships.md](references/relationships.md))
+3. Configure connection pooling (see [sessions.md](references/sessions.md))
+4. Implement pagination (see [queries.md](references/queries.md))
+5. Use bulk operations for multiple inserts/updates (see [crud.md](references/crud.md))
+6. Add query caching if needed (see [performance.md](references/performance.md))
 
 ### Adding Relationships
 
 1. Define foreign key in child model
-1. Add `Relationship` field in both models
-1. Use `back_populates` to link them
-1. For many-to-many, create link table
-1. Configure cascade behavior if needed (see [relationships.md](references/relationships.md))
-1. Update migrations
-1. Test relationship loading
+2. Add `Relationship` field in both models
+3. Use `back_populates` to link them
+4. For many-to-many, create link table
+5. Configure cascade behavior if needed (see [relationships.md](references/relationships.md))
+6. Update migrations
+7. Test relationship loading
 
 ## When to Use Each Reference
 

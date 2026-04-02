@@ -1,6 +1,6 @@
 ---
 name: docx
-description: "Comprehensive document creation, editing, and analysis with support for tracked changes, comments, formatting preservation, and text extraction. When Claude needs to work with professional documents (.docx files) for: (1) Creating new documents, (2) Modifying or editing content, (3) Working with tracked changes, (4) Adding comments, or any other document tasks"
+description: 'Comprehensive document creation, editing, and analysis with support for tracked changes, comments, formatting preservation, and text extraction. When Claude needs to work with professional documents (.docx files) for: (1) Creating new documents, (2) Modifying or editing content, (3) Working with tracked changes, (4) Adding comments, or any other document tasks'
 ---
 
 # DOCX creation, editing, and analysis
@@ -64,8 +64,8 @@ When creating a new Word document from scratch, use **docx-js**, which allows yo
 ### Workflow
 
 1. **MANDATORY - READ ENTIRE FILE**: Read [`docx-js.md`](docx-js.md) (~500 lines) completely from start to finish. **NEVER set any range limits when reading this file.** Read the full file content for detailed syntax, critical formatting rules, and best practices before proceeding with document creation.
-1. Create a JavaScript/TypeScript file using Document, Paragraph, TextRun components (You can assume all dependencies are installed, but if not, refer to the dependencies section below)
-1. Export as .docx using Packer.toBuffer()
+2. Create a JavaScript/TypeScript file using Document, Paragraph, TextRun components (You can assume all dependencies are installed, but if not, refer to the dependencies section below)
+3. Export as .docx using Packer.toBuffer()
 
 ## Editing an existing Word document
 
@@ -74,9 +74,9 @@ When editing an existing Word document, use the **Document library** (a Python l
 ### Workflow
 
 1. **MANDATORY - READ ENTIRE FILE**: Read [`ooxml.md`](ooxml.md) (~600 lines) completely from start to finish. **NEVER set any range limits when reading this file.** Read the full file content for the Document library API and XML patterns for directly editing document files.
-1. Unpack the document: `uv run ooxml/scripts/unpack.py <office_file> <output_directory>`
-1. Create and run a Python script using the Document library (see "Document Library" section in ooxml.md)
-1. Pack the final document: `uv run ooxml/scripts/pack.py <input_directory> <office_file>`
+2. Unpack the document: `uv run ooxml/scripts/unpack.py <office_file> <output_directory>`
+3. Create and run a Python script using the Document library (see "Document Library" section in ooxml.md)
+4. Pack the final document: `uv run ooxml/scripts/pack.py <input_directory> <office_file>`
 
 The Document library provides both high-level methods for common operations and direct DOM access for complex scenarios.
 
@@ -107,7 +107,7 @@ Example - Changing "30 days" to "60 days" in a sentence:
    pandoc --track-changes=all path-to-file.docx -o current.md
    ```
 
-1. **Identify and group changes**: Review the document and identify ALL changes needed, organizing them into logical batches:
+2. **Identify and group changes**: Review the document and identify ALL changes needed, organizing them into logical batches:
 
    **Location methods** (for finding changes in XML):
 
@@ -124,13 +124,13 @@ Example - Changing "30 days" to "60 days" in a sentence:
    - By complexity: Start with simple text replacements, then tackle complex structural changes
    - Sequential: "Batch 1: Pages 1-3", "Batch 2: Pages 4-6"
 
-1. **Read documentation and unpack**:
+3. **Read documentation and unpack**:
 
    - **MANDATORY - READ ENTIRE FILE**: Read [`ooxml.md`](ooxml.md) (~600 lines) completely from start to finish. **NEVER set any range limits when reading this file.** Pay special attention to the "Document Library" and "Tracked Change Patterns" sections.
    - **Unpack the document**: `uv run ooxml/scripts/unpack.py <file.docx> <dir>`
    - **Note the suggested RSID**: The unpack script will suggest an RSID to use for your tracked changes. Copy this RSID for use in step 4b.
 
-1. **Implement changes in batches**: Group changes logically (by section, by type, or by proximity) and implement them together in a single script. This approach:
+4. **Implement changes in batches**: Group changes logically (by section, by type, or by proximity) and implement them together in a single script. This approach:
 
    - Makes debugging easier (smaller batch = easier to isolate errors)
    - Allows incremental progress
@@ -150,13 +150,13 @@ Example - Changing "30 days" to "60 days" in a sentence:
 
    **Note**: Always grep `word/document.xml` immediately before writing a script to get current line numbers and verify text content. Line numbers change after each script run.
 
-1. **Pack the document**: After all batches are complete, convert the unpacked directory back to .docx:
+5. **Pack the document**: After all batches are complete, convert the unpacked directory back to .docx:
 
    ```bash
    uv run ooxml/scripts/pack.py unpacked reviewed-document.docx
    ```
 
-1. **Final verification**: Do a comprehensive check of the complete document:
+6. **Final verification**: Do a comprehensive check of the complete document:
 
    - Convert final document to markdown:
      ```bash
@@ -179,7 +179,7 @@ To visually analyze Word documents, convert them to images using a two-step proc
    soffice --headless --convert-to pdf document.docx
    ```
 
-1. **Convert PDF pages to JPEG images**:
+2. **Convert PDF pages to JPEG images**:
 
    ```bash
    pdftoppm -jpeg -r 150 document.pdf page

@@ -13,7 +13,7 @@
 5. [Debugging Tools and Techniques](#debugging-tools-and-techniques)
 6. [When to Stop and Reassess](#when-to-stop-and-reassess)
 
----
+______________________________________________________________________
 
 ## Iron Law
 
@@ -25,7 +25,7 @@ NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST
 
 If you haven't completed Phase 1, you cannot propose fixes.
 
----
+______________________________________________________________________
 
 ## 4-Phase Process
 
@@ -36,22 +36,26 @@ Complete each phase before proceeding to the next.
 **Before attempting ANY fix:**
 
 1. **Read Error Messages Carefully**
+
    - Don't skip past errors or warnings
    - Read stack traces completely
    - Note line numbers, file paths, error codes
 
 2. **Reproduce Consistently**
+
    - Can you trigger it reliably?
    - What are the exact steps?
    - Does it happen every time?
    - If not reproducible → gather more data, don't guess
 
 3. **Check Recent Changes**
+
    - What changed that could cause this?
    - Git diff, recent commits
    - New dependencies, config changes
 
 4. **Trace Data Flow** (for errors deep in call stack)
+
    - Where does bad value originate?
    - What called this with bad value?
    - Trace up until you find the source
@@ -59,6 +63,7 @@ Complete each phase before proceeding to the next.
 
 5. **Gather Evidence in Multi-Component Systems**
    For each component boundary:
+
    - Log what data enters component
    - Log what data exits component
    - Verify environment/config propagation
@@ -67,19 +72,23 @@ Complete each phase before proceeding to the next.
 ### Phase 2: Pattern Analysis
 
 1. **Find Working Examples**
+
    - Locate similar working code in same codebase
    - What works that's similar to what's broken?
 
 2. **Compare Against References**
+
    - If implementing a pattern, read reference implementation COMPLETELY
    - Don't skim - read every line
 
 3. **Identify Differences**
+
    - What's different between working and broken?
    - List every difference, however small
    - Don't assume "that can't matter"
 
 4. **Understand Dependencies**
+
    - What other components does this need?
    - What settings, config, environment?
 
@@ -88,16 +97,19 @@ Complete each phase before proceeding to the next.
 **Apply the scientific method:**
 
 1. **Form Single Hypothesis**
+
    - State clearly: "I think X is the root cause because Y"
    - Write it down
    - Be specific, not vague
 
 2. **Test Minimally**
+
    - Make the SMALLEST possible change to test hypothesis
    - One variable at a time
    - Don't fix multiple things at once
 
 3. **Verify Before Continuing**
+
    - Did it work? Yes → Phase 4
    - Didn't work? Form NEW hypothesis
    - DON'T add more fixes on top
@@ -105,21 +117,24 @@ Complete each phase before proceeding to the next.
 ### Phase 4: Implementation
 
 1. **Create Failing Test Case First**
+
    - Simplest possible reproduction
    - Automated test if possible
    - MUST exist before fixing
 
 2. **Implement Single Fix**
+
    - Address the root cause identified
    - ONE change at a time
    - No "while I'm here" improvements
 
 3. **Verify Fix**
+
    - Test passes now?
    - No other tests broken?
    - Issue actually resolved?
 
----
+______________________________________________________________________
 
 ## Red Flags
 
@@ -135,7 +150,7 @@ Complete each phase before proceeding to the next.
 - **"One more fix attempt" (when already tried 2+)**
 - **Each fix reveals new problem in different place**
 
----
+______________________________________________________________________
 
 ## Common Rationalizations to Avoid
 
@@ -150,47 +165,54 @@ Complete each phase before proceeding to the next.
 | "I see the problem, let me fix it" | Seeing symptoms ≠ understanding root cause |
 | "One more fix attempt" (after 2+ failures) | 3+ failures = architectural problem |
 
----
+______________________________________________________________________
 
 ## Debugging Tools and Techniques
 
 1. **Instrumentation at Boundaries**
+
    - Log data entering and exiting each component
    - Verify environment/config propagation
    - Check state at each layer
 
 2. **Backward Tracing**
+
    - Start from where error manifests
    - Trace data flow backward to origin
    - Fix at source, not symptom
 
 3. **Minimal Test Cases**
+
    - Isolate the smallest possible reproduction
    - One variable at a time
 
 4. **Compare Against Working State**
+
    - Git diff between known good state
    - Compare configurations
    - Check environmental differences
 
----
+______________________________________________________________________
 
 ## When to Stop and Reassess
 
 **If 3+ fixes failed, question the architecture:**
 
 Signs of architectural problems:
+
 - Each fix reveals new shared state/coupling/problem in different place
 - Fixes require "massive refactoring" to implement
 - Each fix creates new symptoms elsewhere
 
 **STOP and question fundamentals:**
+
 - Is this pattern fundamentally sound?
 - Should we refactor architecture vs. continue fixing symptoms?
 - Discuss with your human partner before attempting more fixes
 
 **When process reveals "no root cause":**
 If systematic investigation reveals issue is truly environmental, timing-dependent, or external:
+
 1. Document what you investigated
 2. Implement appropriate handling (retry, timeout, error message)
 3. Add monitoring/logging for future investigation

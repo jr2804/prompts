@@ -1,6 +1,6 @@
 ---
 name: database-schema
-description: "Generate comprehensive database schemas with proper relations, migrations, and ORM/ODM models for PostgreSQL, MongoDB, and SQLite. Use when creating database schemas that integrate with FastAPI applications, including SQLAlchemy models for SQL databases, PyMongo/ODMantic models for MongoDB, Alembic migrations, and proper relationship definitions."
+description: Generate comprehensive database schemas with proper relations, migrations, and ORM/ODM models for PostgreSQL, MongoDB, and SQLite. Use when creating database schemas that integrate with FastAPI applications, including SQLAlchemy models for SQL databases, PyMongo/ODMantic models for MongoDB, Alembic migrations, and proper relationship definitions.
 ---
 
 # Database Schema Generator

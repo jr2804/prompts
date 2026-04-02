@@ -13,7 +13,7 @@
 - [Typer CLI Exception for B008](#typer-cli-exception-for-b008)
 - [General Fix Strategy](#general-fix-strategy)
 
----
+______________________________________________________________________
 
 ## Overview
 
@@ -25,7 +25,7 @@ When fixing linter errors:
 2. Select the appropriate fix pattern based on your code's context
 3. Apply the fix and verify it resolves the issue without introducing new problems
 
----
+______________________________________________________________________
 
 ## E402: Module Level Import Not at Top of File
 
@@ -52,7 +52,7 @@ def get_platform():
     return platform.system()
 ```
 
----
+______________________________________________________________________
 
 ## B007: Loop Control Variable Not Used
 
@@ -76,7 +76,7 @@ for _ in items:
     process_items()
 ```
 
----
+______________________________________________________________________
 
 ## B008: Function Call in Default Argument
 
@@ -107,7 +107,7 @@ def process_data(items: list[int] | None = None):
     return items
 ```
 
----
+______________________________________________________________________
 
 ## S108: Hardcoded Temp File
 
@@ -151,7 +151,7 @@ def test_file_processing(tmp_path: Path):
     test_file.write_text("test")
 ```
 
----
+______________________________________________________________________
 
 ## PLC0415: Import Outside Top-Level
 
@@ -195,7 +195,7 @@ from .utils import helpers
 from .core import processors
 ```
 
----
+______________________________________________________________________
 
 ## NPY002: Legacy NumPy Random Generation
 
@@ -223,7 +223,7 @@ rng = np.random.default_rng(1337)
 data = rng.normal(size=100)
 ```
 
----
+______________________________________________________________________
 
 ## S311: Suspicious Non-Cryptographic Random Usage
 
@@ -233,7 +233,7 @@ data = rng.normal(size=100)
 
 **Problem Pattern:** Using predictable pseudo-random generators for security-sensitive values.
 
-**Fix Pattern (Security Context):** Use `secrets` module for tokens, passwords, or authentication.  
+**Fix Pattern (Security Context):** Use `secrets` module for tokens, passwords, or authentication.\
 **Fix Pattern (Non-Security Context):** Use NumPy's `default_rng()` for better performance.
 
 **Example - Security Context:**
@@ -257,7 +257,7 @@ rng = np.random.default_rng()
 data = rng.random(100)
 ```
 
----
+______________________________________________________________________
 
 ## Typer CLI Exception for B008
 
@@ -279,7 +279,7 @@ def main(
 
 **Key Pattern:** Use `Annotated` with `typer.Option`/`typer.Argument`, keeping the default value on the parameter itself.
 
----
+______________________________________________________________________
 
 ## General Fix Strategy
 

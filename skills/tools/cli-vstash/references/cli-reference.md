@@ -27,6 +27,7 @@ vstash add <path> [path ...] [OPTIONS]
 | `--dry-run` | Preview without ingesting |
 
 **Examples:**
+
 ```bash
 vstash add paper.pdf
 vstash add ./docs --collection research --project ml-survey --tags "attention,transformers"
@@ -49,6 +50,7 @@ vstash search "<query>" [OPTIONS]
 | `--format <json\|pretty>` | Output format |
 
 **Examples:**
+
 ```bash
 vstash search "what's the main argument?"
 vstash search "deployment strategy" --top-k 10
@@ -69,6 +71,7 @@ vstash ask "<question>" [OPTIONS]
 | `--collection <name>` | Filter by collection |
 
 **Examples:**
+
 ```bash
 vstash ask "summarize the key findings"
 vstash ask "what architectures were compared?" --project ml-survey
@@ -120,6 +123,7 @@ vstash forget <source>
 ```
 
 **Example:**
+
 ```bash
 vstash forget paper.pdf
 ```

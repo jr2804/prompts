@@ -1,6 +1,6 @@
 ---
 name: xlsx
-description: "Comprehensive spreadsheet creation, editing, and analysis with support for formulas, formatting, data analysis, and visualization. When Claude needs to work with spreadsheets (.xlsx, .xlsm, .csv, .tsv, etc) for: (1) Creating new spreadsheets with formulas and formatting, (2) Reading or analyzing data, (3) Modify existing spreadsheets while preserving formulas, (4) Data analysis and visualization in spreadsheets, or (5) Recalculating formulas"
+description: 'Comprehensive spreadsheet creation, editing, and analysis with support for formulas, formatting, data analysis, and visualization. When Claude needs to work with spreadsheets (.xlsx, .xlsm, .csv, .tsv, etc) for: (1) Creating new spreadsheets with formulas and formatting, (2) Reading or analyzing data, (3) Modify existing spreadsheets while preserving formulas, (4) Data analysis and visualization in spreadsheets, or (5) Recalculating formulas'
 ---
 
 # Requirements for Outputs
@@ -139,14 +139,14 @@ This applies to ALL calculations - totals, percentages, ratios, differences, etc
 ## Common Workflow
 
 1. **Choose tool**: pandas for data, openpyxl for formulas/formatting
-1. **Create/Load**: Create new workbook or load existing file
-1. **Modify**: Add/edit data, formulas, and formatting
-1. **Save**: Write to file
-1. **Recalculate formulas (MANDATORY IF USING FORMULAS)**: Use the recalc.py script
+2. **Create/Load**: Create new workbook or load existing file
+3. **Modify**: Add/edit data, formulas, and formatting
+4. **Save**: Write to file
+5. **Recalculate formulas (MANDATORY IF USING FORMULAS)**: Use the recalc.py script
    ```bash
    python recalc.py output.xlsx
    ```
-1. **Verify and fix any errors**:
+6. **Verify and fix any errors**:
    - The script returns JSON with error details
    - If `status` is `errors_found`, check `error_summary` for specific error types and locations
    - Fix the identified errors and recalculate again

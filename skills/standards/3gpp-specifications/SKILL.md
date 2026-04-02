@@ -1,6 +1,6 @@
 ---
 name: 3gpp-specifications
-description: "TS and TR numbering, spec file formats, FTP directory structure, and accessing 3GPP specifications. Use when working with 3GPP specification numbering, finding spec files, or understanding spec directory organization."
+description: TS and TR numbering, spec file formats, FTP directory structure, and accessing 3GPP specifications. Use when working with 3GPP specification numbering, finding spec files, or understanding spec directory organization.
 ---
 
 # 3GPP Specifications
@@ -133,8 +133,8 @@ Each TSG round directory contains:
 **When a new spec is created:**
 
 1. Allocated next sequential spec number
-1. Example: If last spec in series 21 is 21.456, next is 21.457
-1. Continues until end of series or major release change
+2. Example: If last spec in series 21 is 21.456, next is 21.457
+3. Continues until end of series or major release change
 
 **Example:**
 

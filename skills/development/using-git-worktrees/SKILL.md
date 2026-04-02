@@ -2,6 +2,7 @@
 name: using-git-worktrees
 description: Use when starting feature work that needs isolation from current workspace or before executing implementation plans - creates isolated git worktrees with smart directory selection and safety verification
 ---
+
 # Using Git Worktrees
 
 ## Overview
@@ -63,8 +64,8 @@ git check-ignore -q .worktrees 2>/dev/null || git check-ignore -q worktrees 2>/d
 Per Jesse's rule "Fix broken things immediately":
 
 1. Add appropriate line to .gitignore
-1. Commit the change
-1. Proceed with worktree creation
+2. Commit the change
+3. Proceed with worktree creation
 
 **Why critical:** Prevents accidentally committing worktree contents to repository.
 

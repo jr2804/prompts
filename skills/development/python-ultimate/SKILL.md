@@ -1,6 +1,6 @@
 ---
 name: python-ultimate
-description: >
+description: >-
   Comprehensive Python development skill covering coding standards, CLI development,
   linting, testing, debugging, refactoring, code review, auditing, documentation,
   and project planning. Use when writing, reviewing, refactoring, debugging, or
@@ -26,7 +26,7 @@ Complete Python development reference. Covers standards, tooling, workflows, and
 **Documenting?** → Go to [Documentation](#documentation)
 **Planning a feature?** → Go to [Planning](#planning)
 
----
+______________________________________________________________________
 
 ## Coding Standards
 
@@ -66,7 +66,7 @@ Google style. Required for public functions and classes.
 - `# noqa` comments
 - `sys.path` manipulation
 
----
+______________________________________________________________________
 
 ## CLI Development
 
@@ -83,7 +83,7 @@ Use **Typer** for new projects (type-hint driven, less boilerplate). Use **Click
 - Environment variable integration
 - Exit codes for error states
 
----
+______________________________________________________________________
 
 ## Linter Rules
 
@@ -105,7 +105,7 @@ Context-aware fixes for Ruff linter rules. See [references/linter-rules.md](refe
 
 B008 is allowed for Typer `Annotated` parameters. See [references/linter-rules.md](references/linter-rules.md#typer-cli-exception-for-b008).
 
----
+______________________________________________________________________
 
 ## Testing
 
@@ -130,7 +130,7 @@ uv run pytest --cov=src --cov-report=term-missing
 
 Red → Green → Refactor. No production code without a failing test first. See [references/testing.md](references/testing.md#test-driven-development).
 
----
+______________________________________________________________________
 
 ## Debugging
 
@@ -153,7 +153,7 @@ Systematic 4-phase debugging process. See [references/debugging.md](references/d
 - Fixing symptoms without understanding cause
 - Multiple failed fix attempts
 
----
+______________________________________________________________________
 
 ## Refactoring
 
@@ -169,7 +169,7 @@ Find → Replace → Verify workflow. See [references/refactoring.md](references
 
 Line-based code movement between files. See [references/refactoring.md](references/refactoring.md#code-transfer).
 
----
+______________________________________________________________________
 
 ## Code Review
 
@@ -186,7 +186,7 @@ Read → Understand → Verify → Evaluate → Respond → Implement
 - Verify feedback before implementing
 - Evaluate: is the suggestion correct?
 
----
+______________________________________________________________________
 
 ## Auditing
 
@@ -205,7 +205,7 @@ Read → Understand → Verify → Evaluate → Respond → Implement
 
 Critical → High → Medium → Low
 
----
+______________________________________________________________________
 
 ## Documentation
 
@@ -223,7 +223,7 @@ Project Overview, Architecture, Key Components, Data Flow, API Reference, Config
 
 Use for architecture, sequence, and flowchart visualizations.
 
----
+______________________________________________________________________
 
 ## Planning
 
@@ -237,7 +237,7 @@ Features spanning 3-15 prompts. Self-contained for fresh sessions.
 
 Goal → Context → Phases → Validation → Progress → Decisions → Notes
 
----
+______________________________________________________________________
 
 ## Project Setup
 
@@ -255,7 +255,7 @@ Project structure, dependencies, and imports. See [references/project-setup.md](
 2. Third-party
 3. Local (absolute imports)
 
----
+______________________________________________________________________
 
 ## File Analysis
 
@@ -268,7 +268,7 @@ Non-destructive file and codebase analysis. See [references/file-analysis.md](re
 - Grep for pattern searching
 - Glob for file discovery
 
----
+______________________________________________________________________
 
 ## Type Checking Alternatives
 
@@ -281,7 +281,7 @@ Never use `TYPE_CHECKING` guards. See [references/type-checking.md](references/t
 3. Forward references (string literals)
 4. Local imports (last resort)
 
----
+______________________________________________________________________
 
 ## Reference Files
 

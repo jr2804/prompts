@@ -586,7 +586,7 @@ The validator checks that the document text matches the original after reverting
 **CRITICAL RULES**:
 
 1. Never modify the content inside another author's tracked changes. Always use nested deletions.
-1. **XML Structure**: Always place `<w:del>` and `<w:ins>` at paragraph level containing complete `<w:r>` elements. Never nest inside `<w:r>` elements - this creates invalid XML that breaks document processing.
+2. **XML Structure**: Always place `<w:del>` and `<w:ins>` at paragraph level containing complete `<w:r>` elements. Never nest inside `<w:r>` elements - this creates invalid XML that breaks document processing.
 
 **Text Insertion:**
 

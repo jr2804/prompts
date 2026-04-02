@@ -7,6 +7,7 @@
 **Overall:** Content-organized knowledge repository following the [Agent Skills Specification](https://agentskills.io/specification).
 
 **Key Characteristics:**
+
 - Domain-driven skill organization (`skills/` directory tree)
 - Dual-location skill model: canonical (`skills/`) and installed (`.agents/skills/`)
 - Markdown-first content with YAML frontmatter metadata
@@ -16,6 +17,7 @@
 ## Layers
 
 **Skills Layer (`skills/`):**
+
 - Purpose: Canonical skill definitions organized by domain
 - Location: `skills/`
 - Contains: SKILL.md files, optional scripts/, references/, assets/, LICENSE.txt
@@ -23,6 +25,7 @@
 - Used by: saddle-cli, coding assistants (Claude, etc.)
 
 **Installed Skills Layer (`.agents/skills/`):**
+
 - Purpose: Local copies of skills installed/enabled for the workspace
 - Location: `.agents/skills/`
 - Contains: SKILL.md + optional support files (mirrors skills/ structure)
@@ -30,6 +33,7 @@
 - Used by: Coding assistants during agent sessions
 
 **Commands Layer (`commands/`):**
+
 - Purpose: Reusable slash-command definitions for coding assistants
 - Location: `commands/`
 - Contains: Markdown files with command definitions
@@ -37,6 +41,7 @@
 - Used by: Coding assistants (Claude Code, etc.)
 
 **Instructions Layer (`instructions/`):**
+
 - Purpose: Persistent instruction files for coding assistants
 - Location: `instructions/`
 - Contains: Markdown instruction files
@@ -44,6 +49,7 @@
 - Used by: Coding assistants
 
 **Agents Layer (`agents-md/`):**
+
 - Purpose: AGENTS.md templates and guidelines
 - Location: `agents-md/`
 - Contains: Template AGENTS.md files, guidelines documentation
@@ -51,6 +57,7 @@
 - Used by: Projects adopting AGENTS.md patterns
 
 **Infrastructure Layer (`.config/`):**
+
 - Purpose: Tool configuration (mise, etc.)
 - Location: `.config/mise/config.toml`
 - Contains: Tool versions, task definitions
@@ -84,21 +91,25 @@
 ## Key Abstractions
 
 **Skill (SKILL.md):**
+
 - Purpose: Self-contained capability package for coding assistants
 - Examples: `skills/python/coding-principles/SKILL.md`, `skills/documents/pdf/SKILL.md`
 - Pattern: YAML frontmatter (name, description) + Markdown instructions + optional bundled resources
 
-**Command (commands/*.md):**
+**Command (commands/\*.md):**
+
 - Purpose: Slash-command definition for coding assistants
 - Examples: `commands/create-skill-from-url.md`, `commands/py-lint.md`
 - Pattern: Markdown file with workflow steps, triggered by name
 
 **Agent Guide (agents-md/AGENTS.md):**
+
 - Purpose: Template for repository-level agent configuration
 - Examples: `agents-md/AGENTS.md` (template with placeholders)
 - Pattern: Markdown with `{{variable}}` template placeholders
 
 **Skill Lock (skills-lock.json):**
+
 - Purpose: Tracks installed skill versions and sources
 - Examples: Root `skills-lock.json`
 - Pattern: JSON with skill name → {source, ref, sourceType, computedHash}
@@ -106,16 +117,19 @@
 ## Entry Points
 
 **Primary Entry Point - saddle-cli:**
+
 - Location: Installed via `bunx saddle-cli`
 - Triggers: `bunx saddle-cli` at project root
 - Responsibilities: Install skills from this repository to target projects
 
 **Skill Validation:**
+
 - Location: `skills/skill-tools/skill-creator/scripts/quick_validate.py`
 - Triggers: `uv run skills/skill-tools/skill-creator/scripts/quick_validate.py`
 - Responsibilities: Validate skill structure compliance
 
 **Task Runner - mise:**
+
 - Location: `.config/mise/config.toml`
 - Triggers: `mise run <task>`
 - Responsibilities: Format code, sync environment, manage tools
@@ -125,6 +139,7 @@
 **Strategy:** Validation-first with clear error messages
 
 **Patterns:**
+
 - `quick_validate.py` checks skill structure before submission
 - `init_skill.py` scaffolds correct structure to prevent errors
 - `package_skill.py` bundles skills for distribution
@@ -136,6 +151,6 @@
 **Version Control:** Git with .gitignore for uv.lock and __pycache__
 **Installation:** saddle-cli for skill distribution to target projects
 
----
+______________________________________________________________________
 
 *Architecture analysis: 2026-04-02*

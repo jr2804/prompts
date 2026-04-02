@@ -4,18 +4,18 @@ Comprehensive guide for creating codebase documentation.
 
 ## Table of Contents
 
-1. [Project Overview](#1-project-overview)
-2. [Architecture](#2-architecture)
-3. [Key Components](#3-key-components)
-4. [Data Flow](#4-data-flow)
-5. [API Reference](#5-api-reference)
-6. [Configuration](#6-configuration)
-7. [Setup Guide](#7-setup-guide)
-8. [Development Guide](#8-development-guide)
-9. [Testing](#9-testing)
+01. [Project Overview](#1-project-overview)
+02. [Architecture](#2-architecture)
+03. [Key Components](#3-key-components)
+04. [Data Flow](#4-data-flow)
+05. [API Reference](#5-api-reference)
+06. [Configuration](#6-configuration)
+07. [Setup Guide](#7-setup-guide)
+08. [Development Guide](#8-development-guide)
+09. [Testing](#9-testing)
 10. [Deployment](#10-deployment)
 
----
+______________________________________________________________________
 
 ## Documentation Workflow
 
@@ -34,26 +34,28 @@ Follow this process to document a codebase:
 | Standard | 30-60 min | Comprehensive coverage |
 | Deep | 60+ min | Exhaustive with examples |
 
----
+______________________________________________________________________
 
 ## 1. Project Overview
 
 **Purpose**: Explain what the project does and why it exists.
 
 Include:
+
 - Purpose & vision
 - Target users
 - Key features
 - Technology stack
 - Project status
 
----
+______________________________________________________________________
 
 ## 2. Architecture
 
 **Purpose**: Explain how components interact at a high level.
 
 Include:
+
 - High-level structure
 - Design patterns
 - Control flow
@@ -80,13 +82,14 @@ graph LR
     C --> D
 ```
 
----
+______________________________________________________________________
 
 ## 3. Key Components
 
 **Purpose**: Document major modules, classes, and functions.
 
 Include:
+
 - Major modules and their responsibilities
 - Classes & functions with purpose
 - Interactions between components
@@ -95,7 +98,7 @@ Include:
 
 ### Component Template
 
-```markdown
+````markdown
 ### Module: `<name>`
 
 **Purpose**: What this module does
@@ -110,8 +113,9 @@ Include:
 ```python
 from module import function_name
 result = function_name(arg1, arg2)
-```
-```
+````
+
+````
 
 ---
 
@@ -127,7 +131,7 @@ flowchart LR
     B --> C[Transformation]
     C --> D[Storage]
     D --> E[Output]
-```
+````
 
 ### Sequence Diagram
 
@@ -146,13 +150,14 @@ sequenceDiagram
     API-->>Client: Output
 ```
 
----
+______________________________________________________________________
 
 ## 5. API Reference
 
 **Purpose**: Document external and internal APIs.
 
 Include:
+
 - Endpoints with request/response formats
 - Authentication requirements
 - Error codes and handling
@@ -160,7 +165,7 @@ Include:
 
 ### Endpoint Template
 
-```markdown
+````markdown
 ### `POST /endpoint`
 
 **Description**: What the endpoint does
@@ -170,15 +175,17 @@ Include:
 {
   "field": "type"
 }
-```
+````
 
 **Response**:
+
 ```json
 {
   "result": "type"
 }
 ```
-```
+
+````
 
 ---
 
@@ -226,15 +233,16 @@ cp .env.example .env
 
 # Run application
 uv run python src/main.py
-```
+````
 
----
+______________________________________________________________________
 
 ## 8. Development Guide
 
 **Purpose**: Standards for contributing code.
 
 Include:
+
 - Coding conventions
 - Testing approach
 - Error handling patterns
@@ -259,13 +267,14 @@ except SpecificError as e:
     raise CustomError("Meaningful message") from e
 ```
 
----
+______________________________________________________________________
 
 ## 9. Testing
 
 **Purpose**: Document testing requirements and patterns.
 
 Include:
+
 - Test categories (unit, integration, e2e)
 - Running tests
 - Writing new tests
@@ -298,13 +307,14 @@ uv run pytest --cov=src --cov-report=html
 uv run pytest tests/unit/
 ```
 
----
+______________________________________________________________________
 
 ## 10. Deployment
 
 **Purpose**: Document deployment process.
 
 Include:
+
 - Build process
 - Deployment steps
 - Environments (dev, staging, prod)
@@ -323,7 +333,7 @@ flowchart LR
     E -->|Failure| F[Rollback]
 ```
 
----
+______________________________________________________________________
 
 ## When to Document
 
@@ -336,7 +346,7 @@ Use this skill when you hear:
 - "generate codebase overview"
 - "create onboarding docs"
 
----
+______________________________________________________________________
 
 ## Output Structure
 
@@ -354,7 +364,7 @@ docs/
 
 Or a single comprehensive document if preferred.
 
----
+______________________________________________________________________
 
 ## Visual Elements
 
@@ -366,7 +376,7 @@ Include these for clarity:
 - **Tables** — Structured information
 - **Lists** — Guidelines and requirements
 
----
+______________________________________________________________________
 
 ## Success Criteria
 

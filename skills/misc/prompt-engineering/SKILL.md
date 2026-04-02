@@ -1,7 +1,8 @@
 ---
 name: prompt-engineering
-description: "Use this skill when you writing commands, hooks, skills for Agent, or prompts for sub agents or any other LLM interaction, including optimizing prompts, improving LLM outputs, or designing production prompt templates."
+description: Use this skill when you writing commands, hooks, skills for Agent, or prompts for sub agents or any other LLM interaction, including optimizing prompts, improving LLM outputs, or designing production prompt templates.
 ---
+
 # Prompt Engineering Patterns
 
 Advanced prompt engineering techniques to maximize LLM performance, reliability, and controllability.
@@ -122,15 +123,15 @@ Start with simple prompts, add complexity only when needed:
 
    - "Summarize this article"
 
-1. **Level 2**: Add constraints
+2. **Level 2**: Add constraints
 
    - "Summarize this article in 3 bullet points, focusing on key findings"
 
-1. **Level 3**: Add reasoning
+3. **Level 3**: Add reasoning
 
    - "Read this article, identify the main findings, then summarize in 3 bullet points"
 
-1. **Level 4**: Add examples
+4. **Level 4**: Add examples
 
    - Include 2-3 example summaries with input-output pairs
 
@@ -152,12 +153,12 @@ Build prompts that gracefully handle failures:
 ## Best Practices
 
 1. **Be Specific**: Vague prompts produce inconsistent results
-1. **Show, Don't Tell**: Examples are more effective than descriptions
-1. **Test Extensively**: Evaluate on diverse, representative inputs
-1. **Iterate Rapidly**: Small changes can have large impacts
-1. **Monitor Performance**: Track metrics in production
-1. **Version Control**: Treat prompts as code with proper versioning
-1. **Document Intent**: Explain why prompts are structured as they are
+2. **Show, Don't Tell**: Examples are more effective than descriptions
+3. **Test Extensively**: Evaluate on diverse, representative inputs
+4. **Iterate Rapidly**: Small changes can have large impacts
+5. **Monitor Performance**: Track metrics in production
+6. **Version Control**: Treat prompts as code with proper versioning
+7. **Document Intent**: Explain why prompts are structured as they are
 
 ## Common Pitfalls
 
@@ -556,7 +557,7 @@ LLMs respond to the same persuasion principles as humans. Understanding this psy
 When designing a prompt, ask:
 
 1. **What type is it?** (Discipline vs. guidance vs. reference)
-1. **What behavior am I trying to change?**
-1. **Which principle(s) apply?** (Usually authority + commitment for discipline)
-1. **Am I combining too many?** (Don't use all seven)
-1. **Is this ethical?** (Serves user's genuine interests?)
+2. **What behavior am I trying to change?**
+3. **Which principle(s) apply?** (Usually authority + commitment for discipline)
+4. **Am I combining too many?** (Don't use all seven)
+5. **Is this ethical?** (Serves user's genuine interests?)

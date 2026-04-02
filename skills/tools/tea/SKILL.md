@@ -25,6 +25,7 @@ A productivity helper for Gitea. Manages most entities on one or multiple Gitea 
 ### Authentication
 
 tea uses a login system to manage Gitea server connections. Each login stores:
+
 - Server URL
 - Authentication method (token, OAuth, SSH key, or basic auth)
 - Optional: client ID, scopes, OTP token
@@ -368,5 +369,6 @@ Configuration is stored in `$XDG_CONFIG_HOME/tea` (typically `~/.config/tea`).
 ## Integration
 
 Related skills in this collection:
+
 - skill-creator - For creating and updating skills
 - git - For git operations that work well with tea

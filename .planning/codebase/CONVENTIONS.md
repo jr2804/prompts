@@ -5,30 +5,35 @@
 ## Naming Patterns
 
 **Files:**
+
 - Python scripts: `snake_case.py` (e.g., `get_etsi_spec.py`, `quick_validate.py`, `init_skill.py`)
 - Skill directories: `hyphen-case` (e.g., `etsi-spec`, `skill-creator`, `code-execution`)
 - Markdown files: `UPPER_SNAKE_CASE.md` for top-level docs (e.g., `SKILL.md`, `README.md`), `hyphen-case.md` for references
 - YAML/JSON: `snake_case` (e.g., `skills-lock.json`, `pyproject.toml`)
 
 **Functions:**
+
 - `snake_case` throughout (e.g., `extract_text_inventory`, `get_bounding_box_messages`, `validate_skill`)
 - Class methods: `snake_case` (e.g., `to_dict`, `_estimate_frame_overflow`, `get_default_font_size`)
 - Private/internal methods: prefix with `_` (e.g., `_calculate_slide_overflow`, `_wrap_text_line`, `_detect_bullet_issues`)
 - Factory functions: `verb_noun` pattern (e.g., `collect_shapes_with_absolute_positions`, `extract_pdf_metadata`)
 
 **Variables:**
+
 - `snake_case` for all variables (e.g., `skill_dir`, `font_path`, `total_height_px`)
 - Constants: `UPPER_SNAKE_CASE` (e.g., `SKILL_TEMPLATE`, `ALLOWED_PROPERTIES`, `TEMPLATE_DIR`, `DOCUMENT_TYPE_ALIASES`)
 - Type aliases: `PascalCase` (e.g., `JsonValue`, `ParagraphDict`, `InventoryData`, `ShapeDict`)
 - Module-level typed constants remain `UPPER_SNAKE_CASE`
 
 **Types:**
+
 - Dataclasses: `PascalCase` (e.g., `ShapeWithPosition`, `ParagraphData`, `ShapeData`)
 - Type aliases: defined at module level using `type` or assignment (e.g., `JsonValue = Union[str, int, float, bool, None]`)
 
 ## Code Style
 
 **Formatting:**
+
 - Ruff formatter (`ruff format .`)
 - Undersort for import ordering (`undersort .`)
 - Ruff isort-style sorting (`ruff check --select I --fix`)
@@ -37,6 +42,7 @@
 - No custom ruff.toml or .ruff.toml found -- defaults from ruff apply
 
 **Linting:**
+
 - Tool: `ruff check`
 - Run command: `ruff check src/ tests/ --fix`
 - Formatting command: `ruff format .`
@@ -52,17 +58,20 @@
 ## Import Organization
 
 **Order:**
+
 1. Standard library imports
 2. Third-party imports
 3. Local/project imports
 
 **Style:**
+
 - Absolute imports preferred
 - `from X import Y` for specific names
 - Sort via `ruff check --select I --fix` (isort equivalent)
 - Undersort for additional import organization
 
 **Script Dependencies:**
+
 - Skill scripts declare dependencies as inline script metadata:
   ```python
   # /// script
@@ -78,6 +87,7 @@
 ## Type Hints
 
 **Required everywhere:**
+
 - All function parameters and return values must have type hints
 - Use `T | None` instead of `Optional[T]` (pipe syntax)
 - Use `Any` from `typing` instead of `object`
@@ -85,6 +95,7 @@
 - Never use `from typing import TYPE_CHECKING` / `if TYPE_CHECKING:` guards
 
 **Examples from codebase:**
+
 ```python
 def extract_text_inventory(
     pptx_path: Path, prs: Any | None = None, issues_only: bool = False
@@ -111,6 +122,7 @@ print("Processing {} from {}".format(name, meeting))
 ## Error Handling
 
 **Patterns:**
+
 - Use specific exception types (`ValueError`, `requests.RequestException`, etc.)
 - Catch broad `Exception` only at top-level `main()` with traceback printing
 - Validate inputs early (e.g., file existence, correct extension)
@@ -134,6 +146,7 @@ except Exception as e:
 ```
 
 **Return values:**
+
 - Functions return `None` for missing/optional results
 - Raise exceptions for actual errors (not missing data)
 - Use `Optional` return for "not found" cases
@@ -153,11 +166,13 @@ logger.debug("Processing item: %s", item_id)
 ## Comments
 
 **When to Comment:**
+
 - Explain WHY, not WHAT
 - Document subtle constraints, rate limits, algorithm choices
 - Avoid decorative headings, numbered steps, emojis, or special Unicode
 
 **Docstrings:**
+
 - Google-style docstrings for all public classes, methods, and functions
 - Include Args, Returns, Raises, and Examples sections
 
@@ -179,6 +194,7 @@ def parse_spec_number(spec_input: str) -> dict[str, str | None]:
 ## Function Design
 
 **Size limits (from python-standards):**
+
 - Modules (.py): < 250 lines (exception: CLI registration files)
 - Functions: < 75 lines
 - Classes: < 200 lines
@@ -190,29 +206,34 @@ def parse_spec_number(spec_input: str) -> dict[str, str | None]:
 ## Module Design
 
 **Entry points:**
+
 - Use `if __name__ == "__main__":` pattern
 - Use `argparse` or `typer` for CLI argument parsing
 - Exit with `sys.exit(0)` on success, `sys.exit(1)` on error
 
 **Exports:**
+
 - No barrel files or `__init__.py` re-exports observed
 - Scripts are standalone with inline dependency declarations
 
 ## Data Structures
 
 **Prefer built-in comprehensions:**
+
 ```python
 ids = [i.id for i in items if i.active]
 item_map = {i.id: i for i in items}
 ```
 
 **Prefer `pathlib.Path` over `os.path`:**
+
 ```python
 from pathlib import Path
 cache_dir = Path.home() / ".project-cache" / "data"
 ```
 
 **Prefer `enumerate()` over manual index tracking:**
+
 ```python
 for i, item in enumerate(items):
     print(f"{i}: {item.id}")
@@ -229,6 +250,6 @@ for i, item in enumerate(items):
 - **Classes**: < 200 lines
 - Split large modules/functions/classes when limits exceeded
 
----
+______________________________________________________________________
 
 *Convention analysis: 2026-04-02*

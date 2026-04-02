@@ -9,7 +9,7 @@
 5. [When to Implement vs When to Push Back](#when-to-implement-vs-when-to-push-back)
 6. [Responding to Unclear Feedback](#responding-to-unclear-feedback)
 
----
+______________________________________________________________________
 
 ## Workflow
 
@@ -25,21 +25,24 @@ READ → UNDERSTAND → VERIFY → EVALUATE → RESPOND → IMPLEMENT
 6. **IMPLEMENT** – One item at a time, test each
 
 **Implementation order for multi-item feedback:**
+
 - Blocking issues (breaks, security)
 - Simple fixes (typos, imports)
 - Complex fixes (refactoring, logic)
 
----
+______________________________________________________________________
 
 ## No Performative Agreement
 
 **NEVER:**
+
 - "You're absolutely right!"
 - "Great point!" / "Excellent feedback!"
 - "Thanks for catching that!"
 - Any gratitude expression
 
 **INSTEAD:**
+
 - Restate the technical requirement
 - Ask clarifying questions
 - Push back with technical reasoning if wrong
@@ -47,11 +50,12 @@ READ → UNDERSTAND → VERIFY → EVALUATE → RESPOND → IMPLEMENT
 
 **Why:** Actions speak. Just fix it. The code itself shows you heard the feedback.
 
----
+______________________________________________________________________
 
 ## Push Back with Technical Reasoning
 
 Push back when:
+
 - Suggestion breaks existing functionality
 - Reviewer lacks full context
 - Violates YAGNI (unused feature)
@@ -60,6 +64,7 @@ Push back when:
 - Conflicts with architectural decisions
 
 **How to push back:**
+
 - Use technical reasoning, not defensiveness
 - Ask specific questions
 - Reference working tests/code
@@ -67,7 +72,7 @@ Push back when:
 
 **Signal if uncomfortable pushing back:** "Strange things are afoot at the Circle K"
 
----
+______________________________________________________________________
 
 ## Evaluating Feedback Quality
 
@@ -80,13 +85,14 @@ Before implementing external feedback:
 5. Does reviewer understand full context?
 
 **YAGNI Check:**
+
 ```
 IF reviewer suggests unused feature:
   grep codebase for actual usage
   IF unused: "This endpoint isn't called. Remove it (YAGNI)?"
 ```
 
----
+______________________________________________________________________
 
 ## When to Implement vs When to Push Back
 
@@ -99,6 +105,7 @@ IF reviewer suggests unused feature:
 | Can't verify suggestion | State limitation, ask for direction |
 
 **Acknowledging correct feedback:**
+
 ```
 ✅ "Fixed. [Brief description]"
 ✅ "Good catch - [specific issue]. Fixed in [location]."
@@ -106,12 +113,13 @@ IF reviewer suggests unused feature:
 ```
 
 **If you were wrong:**
+
 ```
 ✅ "You were right - I checked [X] and it does [Y]. Implementing now."
 ✅ "Verified, you're correct. My initial understanding was wrong because [reason]. Fixing."
 ```
 
----
+______________________________________________________________________
 
 ## Responding to Unclear Feedback
 
@@ -124,6 +132,7 @@ IF any item is unclear:
 **Why:** Items may be related. Partial understanding = wrong implementation.
 
 **Example:**
+
 ```
 Partner: "Fix items 1-6"
 You understand 1,2,3,6. Unclear on 4,5.
@@ -133,17 +142,18 @@ You understand 1,2,3,6. Unclear on 4,5.
 ```
 
 **When can't verify:**
+
 ```
 "I can't verify this without [X]. Should I [investigate/ask/proceed]?"
 ```
 
----
+______________________________________________________________________
 
 ## GitHub Thread Replies
 
 Reply in the comment thread (`gh api repos/{owner}/{repo}/pulls/{pr}/comments/{id}/replies`), not as a top-level PR comment.
 
----
+______________________________________________________________________
 
 ## The Bottom Line
 

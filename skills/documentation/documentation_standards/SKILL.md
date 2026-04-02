@@ -214,9 +214,9 @@ class DataProcessor:
 ## Best Practices
 
 1. **Consistency**: Apply same documentation standards across projects
-1. **Maintainability**: Keep documentation up-to-date with code
-1. **Accessibility**: Make documentation easy to find and navigate
-1. **Completeness**: Document all public APIs and user-facing features
+2. **Maintainability**: Keep documentation up-to-date with code
+3. **Accessibility**: Make documentation easy to find and navigate
+4. **Completeness**: Document all public APIs and user-facing features
 
 ## Compatibility
 

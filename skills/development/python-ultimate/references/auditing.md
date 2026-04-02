@@ -15,7 +15,7 @@ Comprehensive 6-dimension code audit methodology for codebase analysis.
 3. [Audit Report Format](#audit-report-format)
 4. [When to Audit](#when-to-audit)
 
----
+______________________________________________________________________
 
 ## Audit Dimensions
 
@@ -24,6 +24,7 @@ Comprehensive 6-dimension code audit methodology for codebase analysis.
 Analyze overall structure and design decisions.
 
 **Check:**
+
 - Overall structure and organization
 - Design patterns in use
 - Module boundaries and separation of concerns
@@ -32,18 +33,20 @@ Analyze overall structure and design decisions.
 - Inter-module communication patterns
 
 **Red Flags:**
+
 - God modules with many responsibilities
 - Circular dependencies between modules
 - Unclear boundaries between layers
 - Hidden coupling through global state
 
----
+______________________________________________________________________
 
 ### 2. Code Quality
 
 Assess readability, complexity, and duplication.
 
 **Check:**
+
 - Cyclomatic complexity hotspots
 - Code duplication (DRY violations)
 - Naming conventions and consistency
@@ -52,19 +55,21 @@ Assess readability, complexity, and duplication.
 - Dead code and unused imports
 
 **Red Flags:**
+
 - Functions exceeding 50 lines
 - Repeated switch/if-else chains
 - Inconsistent naming schemes
 - Magic numbers or hardcoded values
 - Missing docstrings on public APIs
 
----
+______________________________________________________________________
 
 ### 3. Security
 
 Identify vulnerabilities and protection gaps.
 
 **Check:**
+
 - Input validation and sanitization
 - Authentication and authorization patterns
 - Secrets management (no hardcoded credentials)
@@ -73,19 +78,21 @@ Identify vulnerabilities and protection gaps.
 - OWASP Top 10 issues
 
 **Red Flags:**
+
 - User input used in queries or commands without validation
 - API keys or passwords in source code
 - Missing access control checks
 - Unvalidated file paths or content
 - Insecure deserialization
 
----
+______________________________________________________________________
 
 ### 4. Performance
 
 Find bottlenecks and resource inefficiencies.
 
 **Check:**
+
 - Algorithmic complexity issues (O(n²) or worse in hot paths)
 - Database query optimization (N+1 queries, missing indexes)
 - Memory usage patterns (leaks, excessive allocation)
@@ -94,19 +101,21 @@ Find bottlenecks and resource inefficiencies.
 - Unnecessary iterations or copies
 
 **Red Flags:**
+
 - Nested loops processing large datasets
 - Loading entire datasets into memory
 - Missing pagination or streaming
 - Unnecessary object creation in hot paths
 - Unclosed resources in error paths
 
----
+______________________________________________________________________
 
 ### 5. Testing
 
 Evaluate test coverage and quality.
 
 **Check:**
+
 - Test coverage percentage and trends
 - Test quality and effectiveness
 - Missing test scenarios (happy path, edge cases, error paths)
@@ -115,19 +124,21 @@ Evaluate test coverage and quality.
 - Mock and fixture practices
 
 **Red Flags:**
+
 - Coverage below 70%
 - Tests that only assert one thing
 - Shared mutable state between tests
 - Tests depending on execution order
 - Missing error condition tests
 
----
+______________________________________________________________________
 
 ### 6. Maintainability
 
 Assess technical debt and long-term health.
 
 **Check:**
+
 - Technical debt assessment
 - Module coupling and cohesion
 - Ease of future changes
@@ -136,13 +147,14 @@ Assess technical debt and long-term health.
 - Configuration complexity
 
 **Red Flags:**
+
 - Duplicate code across modules
 - Complex conditional logic without explanation
 - Missing or outdated documentation
 - Over-engineered abstractions
 - Tight coupling preventing independent changes
 
----
+______________________________________________________________________
 
 ## Severity Ratings
 
@@ -153,7 +165,7 @@ Assess technical debt and long-term health.
 | **Medium** | Code quality or maintainability concern | Schedule fix |
 | **Low** | Improvement opportunity | Address when convenient |
 
----
+______________________________________________________________________
 
 ## Audit Report Format
 
@@ -202,11 +214,12 @@ Assess technical debt and long-term health.
 - Complexity hotspots: N
 ```
 
----
+______________________________________________________________________
 
 ## When to Audit
 
 **Trigger an audit when:**
+
 - Starting a major refactoring effort
 - Investigating recurring bugs or incidents
 - Onboarding to unfamiliar codebase
@@ -216,11 +229,12 @@ Assess technical debt and long-term health.
 - Post-mortem after production issues
 
 **Audit depth levels:**
+
 - **Quick** (15-30 min): Critical issues only, high-level scan
 - **Standard** (30-60 min): Full 6-dimension analysis
 - **Deep** (60+ min): Exhaustive with line-by-line review
 
----
+______________________________________________________________________
 
 ## Audit Workflow
 
@@ -231,6 +245,7 @@ Assess technical debt and long-term health.
 5. **Synthesize findings** into actionable report
 
 **Tools:**
+
 - `grep` / `rg` — Pattern matching for code smells
 - `glob` — Find files by type or pattern
 - `read` — Detailed file analysis

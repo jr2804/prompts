@@ -11,7 +11,7 @@ Universal Python project structure and dependency management guidelines.
 5. [Python Version](#python-version)
 6. [Package Configuration](#package-configuration)
 
----
+______________________________________________________________________
 
 ## Project Structure
 
@@ -28,11 +28,12 @@ project/
 ```
 
 **Key principles:**
+
 - Place all importable code under `src/`
 - Keep tests alongside source or in dedicated `tests/` directory
 - Use `pyproject.toml` for all project metadata
 
----
+______________________________________________________________________
 
 ## Dependency Management
 
@@ -63,7 +64,7 @@ dev = [
 ]
 ```
 
----
+______________________________________________________________________
 
 ## Import Organization
 
@@ -87,11 +88,12 @@ from .core import processors
 ```
 
 **Rules:**
+
 - Never use relative imports beyond a single level (prefer `from .module` over `from ..module`)
 - Avoid `import *`
 - Sort alphabetically within each block
 
----
+______________________________________________________________________
 
 ## Virtual Environments
 
@@ -109,7 +111,7 @@ source .venv/bin/activate
 uv sync
 ```
 
----
+______________________________________________________________________
 
 ## Python Version
 
@@ -126,7 +128,7 @@ def process_data(
     ...
 ```
 
----
+______________________________________________________________________
 
 ## Package Configuration
 

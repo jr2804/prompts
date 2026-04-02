@@ -103,12 +103,14 @@ prompts/
 ## Directory Purposes
 
 **`skills/`:**
+
 - Purpose: Canonical source of all skill definitions, organized by domain
 - Contains: SKILL.md files with YAML frontmatter + Markdown instructions, optional scripts/, references/, assets/, LICENSE.txt
 - Key structure: `skills/<domain>/<skill-name>/SKILL.md`
 - Each skill is self-contained and modular
 
 **`.agents/skills/`:**
+
 - Purpose: Workspace-local copies of installed/enabled skills
 - Contains: Mirrored skill directories from `skills/`
 - Key files: `skills-lock.json` at root tracks versions
@@ -116,26 +118,31 @@ prompts/
 - Committed: Yes (contents tracked)
 
 **`commands/`:**
+
 - Purpose: Slash-command definitions for coding assistants
 - Contains: Markdown files with workflow definitions
 - Key files: `create-skill-from-url.md`, `py-lint.md`, `py-run-tests.md`
 
 **`instructions/`:**
+
 - Purpose: Persistent instruction files loaded by coding assistants
 - Contains: Markdown instruction files
 - Key files: `commit-instructions.md`
 
 **`agents-md/`:**
+
 - Purpose: AGENTS.md templates and writing guidelines
 - Contains: Template AGENTS.md with `{{variable}}` placeholders, guidelines doc
 - Key files: `AGENTS.md` (template), `AGENTS-MD-GUIDELINES.md`
 
 **`.config/`:**
+
 - Purpose: Development tool configuration
 - Contains: mise config with tool versions and task definitions
 - Key files: `mise/config.toml`
 
 **`.planning/`:**
+
 - Purpose: Planning and analysis artifacts
 - Contains: Codebase analysis documents
 - Committed: Depends on workflow
@@ -143,33 +150,39 @@ prompts/
 ## Key File Locations
 
 **Entry Points:**
+
 - `pyproject.toml`: Python project definition (requires-python >=3.14, dependencies for dev tooling)
 - `.config/mise/config.toml`: Tool versions (bun, npm, ripgrep, tree-cli) and tasks (format, env-sync)
 - `skills-lock.json`: Skill version tracking for installed skills
 
 **Configuration:**
+
 - `pyproject.toml`: Python deps — mdformat, pyyaml, ruff, undersort
 - `.config/mise/config.toml`: mise tools and tasks
 - `skills-lock.json`: Installed skill hashes and sources
 
 **Core Logic:**
+
 - `skills/skill-tools/skill-creator/SKILL.md`: Skill anatomy and creation guide (379 lines, comprehensive)
 - `skills/skill-tools/skill-creator/scripts/`: Scaffolding, validation, packaging scripts
 - `skills/AGENTS.md`: Skill creation/update guidelines
 
 **Documentation:**
+
 - `README.md`: Project overview, install instructions, references
 - `agents-md/AGENTS-MD-GUIDELINES.md`: How to write effective AGENTS.md files
 
 ## Naming Conventions
 
 **Files:**
+
 - Skill definition: `SKILL.md` (always uppercase, always in skill root)
 - Support docs: `lowercase-with-hyphens.md` (e.g., `forms.md`, `reference.md`)
 - Scripts: `snake_case.py` (e.g., `init_skill.py`, `quick_validate.py`)
 - Commands: `lowercase-with-hyphens.md` (e.g., `create-skill-from-url.md`)
 
 **Directories:**
+
 - Skill directories: `lowercase-with-hyphens/` (e.g., `coding-principles/`, `code-execution/`)
 - Domain directories: `lowercase/` (e.g., `python/`, `development/`, `documents/`)
 - MCP skills: `mcp-<name>/` prefix (e.g., `mcp-cytosnpy/`, `mcp-vstash/`)
@@ -178,24 +191,29 @@ prompts/
 ## Where to Add New Code
 
 **New Skill:**
+
 - Primary location: `skills/<domain>/<skill-name>/SKILL.md`
 - Use `skills/skill-tools/skill-creator/scripts/init_skill.py` for scaffolding
 - Follow the skill anatomy: SKILL.md (frontmatter + body) + optional scripts/, references/, assets/
 - Add to `.agents/skills/` if it should be enabled for this workspace
 
 **New Command:**
+
 - Location: `commands/<command-name>.md`
 - Pattern: Markdown file with name, description, workflow steps
 
 **New Instruction:**
+
 - Location: `instructions/<topic>.md`
 - Pattern: Markdown file with persistent instructions
 
 **New Skill Domain:**
+
 - Location: `skills/<new-domain>/`
 - Create domain directory, then add skill subdirectories within it
 
 **Skill Scripts:**
+
 - Location: `skills/<domain>/<skill-name>/scripts/<script_name>.py`
 - Use inline script metadata for dependencies (PEP 723)
 - Run via `uv run` (never directly with system Python)
@@ -203,25 +221,29 @@ prompts/
 ## Special Directories
 
 **`.agents/`:**
+
 - Purpose: Workspace-installed skills
 - Generated: Partially (copied from `skills/`, but content may be customized)
 - Committed: Yes
 
 **`.planning/`:**
+
 - Purpose: Planning artifacts (codebase analysis, etc.)
 - Generated: Yes
 - Committed: Depends on workflow
 
 **`.config/`:**
+
 - Purpose: Tool configuration
 - Generated: No (manually maintained)
 - Committed: Yes
 
 **`skills/skill-tools/skill-creator/references/`:**
+
 - Purpose: Reference documentation for skill creation
 - Generated: No
 - Committed: Yes
 
----
+______________________________________________________________________
 
 *Structure analysis: 2026-04-02*

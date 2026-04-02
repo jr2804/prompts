@@ -1,6 +1,6 @@
 ---
 name: 3gpp-working-groups
-description: "Working group nomenclature, tbid/SubTB identifiers, subgroup hierarchy, and TSG structure. Use when working with 3GPP working groups, parsing meeting codes, or understanding TBID mappings."
+description: Working group nomenclature, tbid/SubTB identifiers, subgroup hierarchy, and TSG structure. Use when working with 3GPP working groups, parsing meeting codes, or understanding TBID mappings.
 ---
 
 # 3GPP Working Groups
@@ -204,12 +204,12 @@ When parsing CLI arguments or user input:
    - `SP` → `SA` Plenary
    - `CP` → `CT` Plenary
 
-1. **Subgroup Codes**:
+2. **Subgroup Codes**:
 
    - Use canonical codes: `R1`, `S4`, `C1`, etc. (not `RAN1`, `SA4`, `C1`)
    - For CLI parameters, normalize `SA4` → `S4`, `RAN1` → `R1`, `CT1` → `C1`
 
-1. **TBID Mappings** (used in database):
+3. **TBID Mappings** (used in database):
 
    - RAN groups: tbid=373, SubTB: 373-389
    - SA groups: tbid=375, SubTB: 375-388
@@ -244,9 +244,9 @@ def get_tbid_from_wg(wg: WorkingGroup) -> int:
 When resolving portal meeting names to database meeting IDs:
 
 1. Try exact match (case-insensitive)
-1. Try normalized name match
-1. Try prefix/suffix matching (handle "3GPPSA4" vs "SA4")
-1. Use Levenshtein distance for minor typos
+2. Try normalized name match
+3. Try prefix/suffix matching (handle "3GPPSA4" vs "SA4")
+4. Use Levenshtein distance for minor typos
 
 **Avoid**: Substring matching (`%SA4%`) which matches fragments
 

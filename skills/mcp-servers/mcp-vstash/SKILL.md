@@ -1,6 +1,6 @@
 ---
 name: mcp-vstash
-description: "MCP server integration for vstash document memory. Use when configuring Claude Desktop or other MCP-compatible AI assistants with persistent document memory, setting up vstash MCP tools for semantic search and Q&A, or integrating vstash with AI assistant workflows via Model Context Protocol."
+description: MCP server integration for vstash document memory. Use when configuring Claude Desktop or other MCP-compatible AI assistants with persistent document memory, setting up vstash MCP tools for semantic search and Q&A, or integrating vstash with AI assistant workflows via Model Context Protocol.
 ---
 
 # vstash MCP Server

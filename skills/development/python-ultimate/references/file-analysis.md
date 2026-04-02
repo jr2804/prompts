@@ -11,7 +11,7 @@ Comprehensive guide for non-destructive file analysis using read-only operations
 5. [Content Statistics](#content-statistics)
 6. [Codebase Analysis Patterns](#codebase-analysis-patterns)
 
----
+______________________________________________________________________
 
 ## Non-Destructive Principle
 
@@ -33,7 +33,7 @@ Comprehensive guide for non-destructive file analysis using read-only operations
 - `echo > file` or output redirection for writing
 - Any tool that modifies file content
 
----
+______________________________________________________________________
 
 ## File Metadata
 
@@ -66,7 +66,7 @@ stat [file_path]                               # Full stat output
 ls -l [file_path]                              # Modification time
 ```
 
----
+______________________________________________________________________
 
 ## Line Counting
 
@@ -97,7 +97,7 @@ find . -name "test_*.py" | xargs wc -l          # Test files only
 find . -path ./node_modules -prune -o -type f -print | xargs wc -l  # Exclude directories
 ```
 
----
+______________________________________________________________________
 
 ## Pattern Searching
 
@@ -141,7 +141,7 @@ Grep(pattern="class", include="*.ts", path=".")
 | `console\.log` | Debug statements |
 | `print\(` | Print statements |
 
----
+______________________________________________________________________
 
 ## Content Statistics
 
@@ -175,7 +175,7 @@ find . -type f -not -path "./node_modules/*" -not -path "./.git/*" \
   -exec du -h {} + | sort -rh | head -20
 ```
 
----
+______________________________________________________________________
 
 ## Codebase Analysis Patterns
 
@@ -206,7 +206,7 @@ find . -type f -not -path "./node_modules/*" -not -path "./.git/*" \
 - **code-transfer**: Analyze large files before transfer decisions
 - **codebase-documenter**: Use stats to understand file purposes
 
----
+______________________________________________________________________
 
 ## Best Practices
 

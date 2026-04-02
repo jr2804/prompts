@@ -11,7 +11,7 @@
    - [Local Imports (Last Resort)](#34-local-imports-last-resort)
 4. [Handling Existing Code with TYPE_CHECKING](#4-handling-existing-code-with-type_checking)
 
----
+______________________________________________________________________
 
 ## 1. Rule: Never Use TYPE_CHECKING Guards
 
@@ -39,7 +39,7 @@ class Service:
 
 **Prefer normal, top-level imports.** Only use local imports inside functions for genuine runtime concerns (e.g., heavy optional dependencies), never solely for type hints.
 
----
+______________________________________________________________________
 
 ## 2. Why TYPE_CHECKING is Problematic
 
@@ -59,7 +59,7 @@ Even when used correctly, `TYPE_CHECKING` requires importing the `typing` module
 
 Forward references via `"MyClass"` or `from __future__ import annotations` (and default lazy evaluation of annotations in Python 3.10+) drastically reduce the need for type-only imports.
 
----
+______________________________________________________________________
 
 ## 3. Alternative Patterns
 
@@ -119,7 +119,7 @@ class Order(Order):
 - Group closely related domain entities, enums, and dataclasses in one or a few small modules.
 - Let feature modules depend on these shared domain modules instead of on each other.
 
----
+______________________________________________________________________
 
 ### 3.2 Use Protocols for Structural Typing
 
@@ -157,7 +157,7 @@ class Service:
 - Type checkers verify correctness via protocol definitions.
 - Follows clean architecture / hexagonal architecture principles.
 
----
+______________________________________________________________________
 
 ### 3.3 Forward References (String Literals)
 
@@ -181,7 +181,7 @@ class Node:
 
 With `from __future__ import annotations`, annotations are not evaluated at function definition time, so they do not force additional imports at definition time.
 
----
+______________________________________________________________________
 
 ### 3.4 Local Imports (Last Resort)
 
@@ -208,7 +208,7 @@ def render_report(data: ReportData) -> str:
 - Document clearly *why* the local import exists.
 - Prefer forward references for types and keep imports runtime-accurate.
 
----
+______________________________________________________________________
 
 ## 4. Handling Existing Code with TYPE_CHECKING
 
@@ -223,6 +223,7 @@ When tasked with improving module structure:
 1. **Identify why each `TYPE_CHECKING` block exists.** Common reasons: type-only imports to avoid cycles, heavy imports used only in annotations.
 
 2. **Apply the structural patterns above:**
+
    - Extract shared types into neutral modules (§3.1).
    - Replace concrete cross-dependencies with protocols (§3.2).
    - Use forward references instead of type-only imports (§3.3).

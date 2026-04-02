@@ -2,7 +2,7 @@
 
 Consolidated reference for creating and maintaining `PLAN.md` — a lightweight living planning document for medium-complexity feature implementations.
 
----
+______________________________________________________________________
 
 ## Table of Contents
 
@@ -12,7 +12,7 @@ Consolidated reference for creating and maintaining `PLAN.md` — a lightweight 
 4. [Template](#template)
 5. [Example: Rate Limiting Feature](#example-rate-limiting-feature)
 
----
+______________________________________________________________________
 
 ## When to Use PLAN.md
 
@@ -31,7 +31,7 @@ Skip PLAN.md when:
 - A full spec already exists
 - You can see the complete solution in your head right now
 
----
+______________________________________________________________________
 
 ## PLAN.md Structure
 
@@ -76,7 +76,7 @@ Record key non-obvious choices as they are made. Include rationale and date. Fut
 
 Surprises, blockers, discoveries. Add immediately when encountered. Include evidence (test output, error messages, file paths).
 
----
+______________________________________________________________________
 
 ## Self-Contained for Fresh Sessions
 
@@ -99,11 +99,11 @@ Ensure Validation includes:
 - Exact commands to run
 - Expected output or behavior
 
----
+______________________________________________________________________
 
 ## Template
 
-```markdown
+````markdown
 # PLAN: <Short action-oriented feature title>
 
 ## Goal
@@ -170,13 +170,13 @@ Ensure Validation includes:
 ## Notes
 
 <!-- Add notes during implementation as things are discovered. -->
-```
+````
 
----
+______________________________________________________________________
 
 ## Example: Rate Limiting Feature
 
-```markdown
+````markdown
 # PLAN: Rate Limiting for REST API Endpoints
 
 ## Goal
@@ -272,4 +272,4 @@ tests cover the limit behavior.
 ## Notes
 
 <!-- Add surprises, blockers, discoveries during implementation. -->
-```
+````

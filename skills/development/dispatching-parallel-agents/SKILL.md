@@ -2,6 +2,7 @@
 name: dispatching-parallel-agents
 description: Use when facing 2+ independent tasks that can be worked on without shared state or sequential dependencies
 ---
+
 # Dispatching Parallel Agents
 
 ## Overview
@@ -88,8 +89,8 @@ When agents return:
 Good agent prompts are:
 
 1. **Focused** - One clear problem domain
-1. **Self-contained** - All context needed to understand the problem
-1. **Specific about output** - What should the agent return?
+2. **Self-contained** - All context needed to understand the problem
+3. **Specific about output** - What should the agent return?
 
 ```markdown
 Fix the 3 failing tests in src/agents/agent-tool-abort.test.ts:
@@ -166,18 +167,18 @@ Agent 3 → Fix tool-approval-race-conditions.test.ts
 ## Key Benefits
 
 1. **Parallelization** - Multiple investigations happen simultaneously
-1. **Focus** - Each agent has narrow scope, less context to track
-1. **Independence** - Agents don't interfere with each other
-1. **Speed** - 3 problems solved in time of 1
+2. **Focus** - Each agent has narrow scope, less context to track
+3. **Independence** - Agents don't interfere with each other
+4. **Speed** - 3 problems solved in time of 1
 
 ## Verification
 
 After agents return:
 
 1. **Review each summary** - Understand what changed
-1. **Check for conflicts** - Did agents edit same code?
-1. **Run full suite** - Verify all fixes work together
-1. **Spot check** - Agents can make systematic errors
+2. **Check for conflicts** - Did agents edit same code?
+3. **Run full suite** - Verify all fixes work together
+4. **Spot check** - Agents can make systematic errors
 
 ## Real-World Impact
 

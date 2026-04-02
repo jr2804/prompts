@@ -39,5 +39,5 @@
 ## Known Issues and Workarounds
 
 1. **EG specs with different extensions**: Some EG specs use `.m.pdf` instead of `.p.pdf` for PDF files
-1. **Directory structure variations**: Not all specs follow the `<prefix>00_<prefix>99/` directory pattern
-1. **Spec number mismatches**: Some spec numbers listed in ETSI search results may not exist in delivery directory
+2. **Directory structure variations**: Not all specs follow the `<prefix>00_<prefix>99/` directory pattern
+3. **Spec number mismatches**: Some spec numbers listed in ETSI search results may not exist in delivery directory

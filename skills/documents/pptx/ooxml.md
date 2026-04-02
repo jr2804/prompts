@@ -370,25 +370,25 @@ When adding content, update these files:
 When adding a slide to the end of the presentation:
 
 1. **Create the slide file** (`ppt/slides/slideN.xml`)
-1. **Update `[Content_Types].xml`**: Add Override for the new slide
-1. **Update `ppt/_rels/presentation.xml.rels`**: Add relationship for the new slide
-1. **Update `ppt/presentation.xml`**: Add slide ID to `<p:sldIdLst>`
-1. **Create slide relationships** (`ppt/slides/_rels/slideN.xml.rels`) if needed
-1. **Update `docProps/app.xml`**: Increment slide count and update statistics (if present)
+2. **Update `[Content_Types].xml`**: Add Override for the new slide
+3. **Update `ppt/_rels/presentation.xml.rels`**: Add relationship for the new slide
+4. **Update `ppt/presentation.xml`**: Add slide ID to `<p:sldIdLst>`
+5. **Create slide relationships** (`ppt/slides/_rels/slideN.xml.rels`) if needed
+6. **Update `docProps/app.xml`**: Increment slide count and update statistics (if present)
 
 ### Duplicating a Slide
 
 1. Copy the source slide XML file with a new name
-1. Update all IDs in the new slide to be unique
-1. Follow the "Adding a New Slide" steps above
-1. **CRITICAL**: Remove or update any notes slide references in `_rels` files
-1. Remove references to unused media files
+2. Update all IDs in the new slide to be unique
+3. Follow the "Adding a New Slide" steps above
+4. **CRITICAL**: Remove or update any notes slide references in `_rels` files
+5. Remove references to unused media files
 
 ### Reordering Slides
 
 1. **Update `ppt/presentation.xml`**: Reorder `<p:sldId>` elements in `<p:sldIdLst>`
-1. The order of `<p:sldId>` elements determines slide order
-1. Keep slide IDs and relationship IDs unchanged
+2. The order of `<p:sldId>` elements determines slide order
+3. Keep slide IDs and relationship IDs unchanged
 
 Example:
 
@@ -411,11 +411,11 @@ Example:
 ### Deleting a Slide
 
 1. **Remove from `ppt/presentation.xml`**: Delete the `<p:sldId>` entry
-1. **Remove from `ppt/_rels/presentation.xml.rels`**: Delete the relationship
-1. **Remove from `[Content_Types].xml`**: Delete the Override entry
-1. **Delete files**: Remove `ppt/slides/slideN.xml` and `ppt/slides/_rels/slideN.xml.rels`
-1. **Update `docProps/app.xml`**: Decrement slide count and update statistics
-1. **Clean up unused media**: Remove orphaned images from `ppt/media/`
+2. **Remove from `ppt/_rels/presentation.xml.rels`**: Delete the relationship
+3. **Remove from `[Content_Types].xml`**: Delete the Override entry
+4. **Delete files**: Remove `ppt/slides/slideN.xml` and `ppt/slides/_rels/slideN.xml.rels`
+5. **Update `docProps/app.xml`**: Decrement slide count and update statistics
+6. **Clean up unused media**: Remove orphaned images from `ppt/media/`
 
 Note: Don't renumber remaining slides - keep their original IDs and filenames.
 

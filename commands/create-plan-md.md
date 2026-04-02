@@ -12,7 +12,7 @@ Create a high-quality `PLAN.md` as a living implementation plan.
 
    - Use skill `plan-md` for structure, guardrails, and maintenance rules.
 
-1. **Handle existing PLAN.md**
+2. **Handle existing PLAN.md**
 
    - If `PLAN.md` already exists in the project root:
      - Read and analyze the existing file
@@ -21,7 +21,7 @@ Create a high-quality `PLAN.md` as a living implementation plan.
      - Inform user: "Existing plan archived as PLAN-<feature-title>.md"
    - If no feature title found, rename to `PLAN-archived-<timestamp>.md`
 
-1. **Collect required inputs before writing the plan**
+3. **Collect required inputs before writing the plan**
 
    - If `$ARGUMENTS` is missing or incomplete, ask for the following in one concise questionnaire:
      - Feature title (short, action-oriented)
@@ -34,14 +34,14 @@ Create a high-quality `PLAN.md` as a living implementation plan.
      - Preferred rollout order or milestones
    - If `$ARGUMENTS` is present, parse it and only ask follow-up questions for missing fields.
 
-1. **Research code context**
+4. **Research code context**
 
    - Inspect the repository areas related to the feature.
    - Confirm or refine the key files list with full repo-relative paths.
    - Identify existing implementation patterns to follow.
    - **Read key files** to capture patterns, dependencies, and context needed for self-contained plan.
 
-1. **Generate the plan file**
+5. **Generate the plan file**
 
    - Create `PLAN.md` in the **project root** using the `plan-md` skill template.
    - Ensure sections are complete and **self-contained**:
@@ -55,7 +55,7 @@ Create a high-quality `PLAN.md` as a living implementation plan.
    - Add the initial progress entry:
      - `- [x] (<timestamp>) Created PLAN.md`
 
-1. **Quality gate before finishing**
+6. **Quality gate before finishing**
 
    - Verify the plan is:
      - **Self-contained**: A fresh session could implement with only this file
@@ -65,7 +65,7 @@ Create a high-quality `PLAN.md` as a living implementation plan.
      - Explicit about validation commands/behaviors
      - Ready for implementation without further planning
 
-1. **Return a concise summary**
+7. **Return a concise summary**
 
    - Report file path (`PLAN.md`), feature name, and any remaining open questions (if any).
    - Remind user: "A fresh agent session can implement by reading @PLAN.md"

@@ -5,10 +5,10 @@ You are reviewing code changes for production readiness.
 **Your task:**
 
 1. Review {WHAT_WAS_IMPLEMENTED}
-1. Compare against {PLAN_OR_REQUIREMENTS}
-1. Check code quality, architecture, testing
-1. Categorize issues by severity
-1. Assess production readiness
+2. Compare against {PLAN_OR_REQUIREMENTS}
+3. Check code quality, architecture, testing
+4. Categorize issues by severity
+5. Assess production readiness
 
 ## What Was Implemented
 

@@ -12,7 +12,7 @@ Quick reference for bulk code refactoring and transfer operations.
 6. [Safety Checks](#safety-checks)
 7. [Common Patterns](#common-patterns)
 
----
+______________________________________________________________________
 
 ## Refactoring Workflow
 
@@ -43,7 +43,7 @@ Grep(pattern="oldName", output_mode="files_with_matches")  # Should return none
 Grep(pattern="newName", output_mode="content", -n=true)     # Confirm replacements
 ```
 
----
+______________________________________________________________________
 
 ## Bulk Operations
 
@@ -70,7 +70,7 @@ Grep(pattern="newName", output_mode="content", -n=true)     # Confirm replacemen
 2. Replace: `Edit(old_string="'/api/auth/login'", new_string="'/api/v2/auth/login'", replace_all=true)`
 3. Test: Recommend integration tests
 
----
+______________________________________________________________________
 
 ## Code Transfer
 
@@ -103,7 +103,7 @@ Edit(
 )
 ```
 
----
+______________________________________________________________________
 
 ## Line-Based Operations
 
@@ -127,11 +127,12 @@ python3 skills/code-transfer/scripts/line_insert.py src/new.py 1 "import os"
 ```
 
 **When to use:**
+
 - User specifies exact line number
 - Inserting into new/empty files
 - Inserting at beginning/end without context
 
----
+______________________________________________________________________
 
 ## Execution Mode (10+ Files)
 
@@ -163,7 +164,7 @@ operations = [{
 batch_copy(operations)
 ```
 
----
+______________________________________________________________________
 
 ## Safety Checks
 
@@ -186,17 +187,19 @@ batch_copy(operations)
 ### Tool Reference
 
 **Edit with replace_all:**
+
 - `replace_all=true`: Replace all occurrences
 - `replace_all=false`: Replace only first (or fail if multiple)
 - Must match EXACTLY (whitespace, quotes)
 
 **Grep options:**
+
 - `-n=true`: Show line numbers
 - `-B=N, -A=N`: Context lines before/after
 - `-i=true`: Case-insensitive
 - `type="py"`: Filter by file type
 
----
+______________________________________________________________________
 
 ## Common Patterns
 

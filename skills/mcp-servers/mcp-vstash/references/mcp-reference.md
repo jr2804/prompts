@@ -41,6 +41,7 @@ Hybrid search with context expansion and relevance signal.
 | `top_k` | integer | 5 | Number of results |
 
 **Response:**
+
 ```json
 {
   "chunks": [
@@ -78,6 +79,7 @@ Semantic search + LLM-generated answer with sources.
 | `top_k` | integer | 5 | Chunks to retrieve |
 
 **Response:**
+
 ```json
 {
   "answer": "The main argument is...",
@@ -109,6 +111,7 @@ Database statistics.
 ```
 
 **Response:**
+
 ```json
 {
   "documents": 42,

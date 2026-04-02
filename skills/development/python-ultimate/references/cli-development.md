@@ -13,7 +13,7 @@ Universal patterns for developing command-line interfaces in Python.
 7. [Help Text and Documentation](#7-help-text-and-documentation)
 8. [Testing CLI Applications](#8-testing-cli-applications)
 
----
+______________________________________________________________________
 
 ## 1. Framework Selection
 
@@ -72,7 +72,7 @@ parser.add_argument("-o", "--output", help="Output file path")
 args = parser.parse_args()
 ```
 
----
+______________________________________________________________________
 
 ## 2. Project Structure
 
@@ -122,7 +122,7 @@ if __name__ == "__main__":
     app()
 ```
 
----
+______________________________________________________________________
 
 ## 3. Parameter Handling
 
@@ -184,7 +184,7 @@ force: bool = typer.Option(False, "--force/--no-force", help="Force operation")
 files: list[str] = typer.Option([], "-f", "--file", help="Input files (multiple allowed)")
 ```
 
----
+______________________________________________________________________
 
 ## 4. Output Formatting
 
@@ -234,7 +234,7 @@ with Progress(
     progress.update(task, advance=50)
 ```
 
----
+______________________________________________________________________
 
 ## 5. Environment Variables Integration
 
@@ -288,7 +288,7 @@ def process(config, debug):
     ...
 ```
 
----
+______________________________________________________________________
 
 ## 6. Error Handling
 
@@ -349,7 +349,7 @@ def main():
 | 2 | Misuse of command |
 | 127 | Command not found |
 
----
+______________________________________________________________________
 
 ## 7. Help Text and Documentation
 
@@ -402,7 +402,7 @@ def main(
 - Provide examples for complex commands
 - Document exit codes for scripts
 
----
+______________________________________________________________________
 
 ## 8. Testing CLI Applications
 

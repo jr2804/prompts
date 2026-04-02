@@ -14,7 +14,7 @@ Quick reference for writing effective Python tests.
 8. [Running Tests](#running-tests)
 9. [Test File Conventions](#test-file-conventions)
 
----
+______________________________________________________________________
 
 ## Test Organization
 
@@ -47,7 +47,7 @@ class TestDataProcessor:
         ...
 ```
 
----
+______________________________________________________________________
 
 ## Coverage Standards
 
@@ -63,7 +63,7 @@ Run coverage with fail-under:
 pytest --cov=src --cov-report=term-missing --cov-fail-under=90 tests/
 ```
 
----
+______________________________________________________________________
 
 ## Fixtures
 
@@ -111,7 +111,7 @@ def cache_dir(tmp_path):
     return tmp_path / "cache"
 ```
 
----
+______________________________________________________________________
 
 ## Parameterized Testing
 
@@ -141,7 +141,7 @@ def test_addition(a, b, expected):
     assert a + b == expected
 ```
 
----
+______________________________________________________________________
 
 ## Mocking
 
@@ -182,7 +182,7 @@ def test_callback_is_called():
     callback.assert_called_once_with(3)  # Total sum
 ```
 
----
+______________________________________________________________________
 
 ## Performance Testing
 
@@ -214,7 +214,7 @@ def test_sorting_performance(benchmark):
     assert result == data
 ```
 
----
+______________________________________________________________________
 
 ## Test-Driven Development
 
@@ -239,7 +239,7 @@ def test_sorting_performance(benchmark):
 
 **Rationale**: Tests written after code often miss edge cases and don't drive design.
 
----
+______________________________________________________________________
 
 ## Running Tests
 
@@ -275,7 +275,7 @@ pytest --lf
 pytest -s
 ```
 
----
+______________________________________________________________________
 
 ## Test File Conventions
 
