@@ -6,6 +6,12 @@ npm = "latest"
 ripgrep = "latest"
 "github:peteretelej/tree" = { version = "latest", rename_exe = "tree-cli" }
 
+# Linter/formatter/type checker tools
+"ruff" = "latest"
+"ty" = "latest"
+"pipx:mdformat" = "latest"
+"pipx:undersort" = "latest"
+
 [settings.npm]
 package_manager = "bun"
 
@@ -23,12 +29,14 @@ run = "uv sync -U --dev --all-extras --all-groups"
 [tasks.format]
 description = "Format source code and markdown files"
 run = [
-    "uv run undersort .",
-    "uv run ruff check --select I --fix", # isort-equivalent sorting of imports
-    "uv run ruff format .",
-    "uv run mdformat .",
+    "undersort .",
+    "ruff check --select I --fix", # isort-equivalent sorting of imports
+    "ruff format .",
 ]
 
+[tasks.format-md]
+description = "Format Markdown files"
+run = "mdformat .  --exclude .config/"
 
 [tasks.add-skills]
 description = "Add skills to the agent"
