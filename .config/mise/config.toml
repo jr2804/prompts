@@ -9,7 +9,7 @@ ripgrep = "latest"
 # Linter/formatter/type checker tools
 "ruff" = "latest"
 "ty" = "latest"
-"pipx:mdformat" = "latest"
+"pipx:mdformat" = {version = "latest", pipx_args = "--with mdformat-frontmatter"}
 "pipx:undersort" = "latest"
 
 [settings.npm]
