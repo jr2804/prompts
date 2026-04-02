@@ -36,7 +36,7 @@ run = [
 
 [tasks.format-md]
 description = "Format Markdown files"
-run = "mdformat .  --exclude .config/"
+run = "mdformat .  --exclude .config/ --end-of-line keep --number"
 
 [tasks.add-skills]
 description = "Add skills to the agent"
