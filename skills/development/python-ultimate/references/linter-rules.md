@@ -62,7 +62,7 @@ ______________________________________________________________________
 
 **Problem Pattern:** Loop variables that are never referenced after assignment.
 
-**Fix Pattern:** Prefix unused loop variables with an underscore (`_`) to indicate intentional non-use.
+**Fix Pattern:** Prefix unused loop variables with an underscore (`_`) to indicate intentional non-use. See [naming-conventions.md](naming-conventions.md) for complete guidelines.
 
 **Example:**
 

@@ -36,6 +36,8 @@ tests/
 - Place tests co-located with source code or in `tests/` directory
 - Use `conftest.py` for shared fixtures at any directory level
 
+See [naming-conventions.md](naming-conventions.md) for complete naming guidelines.
+
 ### Test Class Naming
 
 ```python

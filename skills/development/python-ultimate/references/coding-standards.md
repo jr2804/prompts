@@ -10,6 +10,7 @@ description: Consolidated Python coding standards reference for type hints, stri
 01. [Type Hints](#1-type-hints-mandatory)
 02. [String Formatting](#2-string-formatting)
 03. [Data Structures](#3-data-structures)
+    03.5. [Naming Conventions](#35-naming-conventions)
 04. [Logging](#4-logging)
 05. [Code Size Limits](#5-code-size-limits)
 06. [Docstrings](#6-docstrings)
@@ -121,6 +122,18 @@ f = open("data.json")
 data = json.load(f)
 f.close()
 ```
+
+______________________________________________________________________
+
+## 3.5. Naming Conventions
+
+See [naming-conventions.md](naming-conventions.md) for comprehensive naming conventions, including:
+
+- Files and directories (suffix-based naming: `_file`, `_dir`, `_path`)
+- Test naming conventions
+- Fixture naming conventions
+- Unused loop variables
+- Constants and enums
 
 ______________________________________________________________________
 

@@ -16,6 +16,7 @@ Complete Python development reference. Covers standards, tooling, workflows, and
 ## Quick Start
 
 **Writing code?** → Start with [Coding Standards](#coding-standards)
+**Checking naming?** → Go to [Naming Conventions](#naming-conventions)
 **Building a CLI?** → Go to [CLI Development](#cli-development)
 **Fixing linter errors?** → Go to [Linter Rules](#linter-rules)
 **Writing tests?** → Go to [Testing](#testing)
@@ -65,6 +66,37 @@ Google style. Required for public functions and classes.
 - `Optional[T]` (use `T | None`)
 - `# noqa` comments
 - `sys.path` manipulation
+
+______________________________________________________________________
+
+## Naming Conventions
+
+Variable naming standards for clarity and consistency. See [references/naming-conventions.md](references/naming-conventions.md) for full details.
+
+### Files and Directories
+
+| Pattern | Suffix | Example |
+|---------|--------|---------|
+| Files | `_file` | `output_file`, `config_file` |
+| Directories | `_dir` | `cache_dir`, `output_dir` |
+| Unknown type | `_path` | `data_path` (exceptional only) |
+
+### Test Naming
+
+- Files: `test_<module>.py`
+- Classes: `Test<DataProcessor>` (PascalCase with Test prefix)
+- Methods: `test_<description>` (snake_case with test\_ prefix)
+
+### Automated Validation
+
+```bash
+# Check a variable name
+uv run assets/check_path_naming.py output_file
+# Output: is_file
+
+# Scan for violations
+uv run assets/check_path_naming.py --check-files src/
+```
 
 ______________________________________________________________________
 
