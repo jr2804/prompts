@@ -9,7 +9,7 @@ ripgrep = "latest"
 # Linter/formatter/type checker tools
 "ruff" = "latest"
 "ty" = "latest"
-"pipx:mdformat" = {version = "latest", uvx = "true", uvx_args = "--with mdformat-frontmatter"}
+"pipx:mdformat" = {version = "latest", uvx = "true", uvx_args = "--with mdformat-front-matters"}
 "pipx:undersort" = "latest"
 
 [settings.npm]
@@ -36,7 +36,7 @@ run = [
 
 [tasks.format-md]
 description = "Format Markdown files"
-run = "mdformat .  --exclude .config/ --end-of-line keep --number"
+run = "uv tool run --with mdformat-front-matters mdformat . --exclude .config/ --end-of-line keep --number"
 
 [tasks.add-skills]
 description = "Add skills to the agent"
