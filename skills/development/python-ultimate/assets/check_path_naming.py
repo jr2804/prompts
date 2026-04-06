@@ -50,6 +50,8 @@ def check_path_naming(name: str | Path) -> PathValidity:
     - "_path" suffix is only allowed in exceptional cases when
       the type cannot be clearly determined
     - Anti-patterns like "path", "dir_output", "file_output" are invalid
+    - Bare generic names (path, file, folder, dir, directory, etc.) are invalid
+      when they represent file system paths
 
     Args:
         name: Variable name to check (string or Path object)
@@ -66,6 +68,8 @@ def check_path_naming(name: str | Path) -> PathValidity:
         <PathValidity.PATH: 'is_path_exceptional'>
         >>> check_path_naming("path")
         <PathValidity.INVALID: 'invalid'>
+        >>> check_path_naming("folder")
+        <PathValidity.INVALID: 'invalid'>
     """
     # Convert Path to string if needed
     var_name = str(name)
@@ -73,9 +77,22 @@ def check_path_naming(name: str | Path) -> PathValidity:
     # Strip any Path parent components, get just the name
     var_name = Path(var_name).name if "/" in var_name or "\\" in var_name else var_name
 
-    # Anti-patterns - these are always invalid
-    # Generic "path" is too ambiguous
-    if var_name == "path":
+    # Anti-patterns - bare generic names for path-related variables
+    # These are always invalid when representing file system paths
+    generic_path_names = {
+        "path",
+        "file",
+        "folder",
+        "dir",
+        "directory",
+        "output",
+        "input",
+        "source",
+        "target",
+        "dest",
+        "destination",
+    }
+    if var_name in generic_path_names:
         return PathValidity.INVALID
 
     # "dir" or "file" as prefix instead of suffix
@@ -113,10 +130,28 @@ def get_violation_reason(name: str, validity: PathValidity) -> str | None:
     if validity == PathValidity.PATH:
         return None
 
-    # Invalid cases
-    if name == "path":
-        return "Generic 'path' is ambiguous - use 'xxx_file' or 'xxx_dir' instead"
+    # Generic bare names for path-related variables
+    generic_path_names = {
+        "path",
+        "file",
+        "folder",
+        "dir",
+        "directory",
+        "output",
+        "input",
+        "source",
+        "target",
+        "dest",
+        "destination",
+    }
+    if name in generic_path_names:
+        return (
+            f"'{name}' is a bare generic name - too ambiguous for path variables. "
+            f"Use descriptive names like '{name}_file' or '{name}_dir' "
+            f"(e.g., 'input_file', 'output_dir', 'source_dir')"
+        )
 
+    # Invalid cases
     if name.startswith("dir_"):
         return f"'{name}' uses 'dir_' as prefix - use '_dir' suffix instead (e.g., '{name[4:]}_dir')"
 

@@ -81,6 +81,14 @@ Variable naming standards for clarity and consistency. See [references/naming-co
 | Directories | `_dir` | `cache_dir`, `output_dir` |
 | Unknown type | `_path` | `data_path` (exceptional only) |
 
+**Anti-patterns (always invalid for path variables):**
+
+- Bare generic names: `path`, `file`, `folder`, `dir`, `directory`, `output`, `input`, `source`, `target`, `dest`
+- Prefix instead of suffix: `dir_output`, `file_config`
+- Missing suffix: `results`, `data`, `config` (ambiguous)
+
+See [references/naming-conventions.md](references/naming-conventions.md#13-anti-patterns) for the complete anti-pattern list.
+
 ### Test Naming
 
 - Files: `test_<module>.py`

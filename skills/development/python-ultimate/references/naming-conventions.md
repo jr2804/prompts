@@ -92,6 +92,23 @@ file_output = Path("output.txt")  # Should be: output_file
    - ✅ `output_dir = Path("output")`
    - ✅ `output_file = Path("output.txt")`
 
+5. **Bare generic names for path-related variables** - Names like `path`, `file`, `folder`, `dir`, `directory`, `output`, `input`, `source`, `target`, `dest` are too ambiguous when they represent file system paths. They could refer to a file, a directory, a result object, a string, or anything else.
+
+   - ❌ `file = Path("data.txt")`
+   - ❌ `folder = Path("output")`
+   - ❌ `dir = Path("cache")`
+   - ❌ `directory = Path("build")`
+   - ❌ `source = Path("src")`
+   - ❌ `target = Path("dist")`
+   - ✅ `input_file = Path("data.txt")`
+   - ✅ `output_dir = Path("output")`
+   - ✅ `cache_dir = Path("cache")`
+   - ✅ `build_dir = Path("build")`
+   - ✅ `source_dir = Path("src")`
+   - ✅ `dist_dir = Path("dist")`
+
+   **Exception:** These bare names are acceptable for *non-path* variables (e.g., `file` as a file handle/open file object, `source` as a string of source code, `target` as a function argument name in a generic API). The violation occurs specifically when the variable holds a `Path` object or a path string.
+
 ### 1.4 Rationale
 
 - **Consistency with `pathlib.Path`**: Since `Path` objects can represent both files and directories, the variable name must clarify which is intended.
