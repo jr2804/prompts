@@ -42,6 +42,7 @@ A list of MCP servers and CLI tools with similar functionality that are useful f
 - [beads issue tracker](https://github.com/steveyegge/beads)
 - [SkillKit](https://github.com/rohitg00/skillkit)
 - [Skillz](https://github.com/intellectronica/skillz)
+- [AutoSkills](https://github.com/midudev/autoskills)
 - *To be continued...*
 
 Related tools:
@@ -50,12 +51,19 @@ Related tools:
 - [OpenCLI](https://github.com/jackwener/opencli)
 - *To be continued...*
 
-## Collection of Skills & Agents
+## Skills & Agents
+
+### Collections
 
 - [Awesome Claude Skills](https://github.com/BehiSecc/awesome-claude-skills)
 - [Awesome Copilot](https://github.com/github/awesome-copilot)
 - [Claude Code Ultimate Guide](https://github.com/FlorianBruniaux/claude-code-ultimate-guide/tree/main/examples/skills)
 - *To be continued...*
+
+### Indivial skills and agents
+
+- [caveman](https://github.com/JuliusBrussee/caveman) - Token saving skill for code generation.
+-
 
 ## References
 
