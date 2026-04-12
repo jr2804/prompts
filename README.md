@@ -63,6 +63,7 @@ Related tools:
 ### Indivial skills and agents
 
 - [caveman](https://github.com/JuliusBrussee/caveman) - Token saving skill for code generation.
+- [markdown-viewer](https://github.com/markdown-viewer/skills)
 
 ## Upcoming skills/ideas
 
