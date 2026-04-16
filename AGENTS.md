@@ -53,3 +53,29 @@ uv run pytest <paths> -v --tb=short
 - Before adding new logic or files, verify an equivalent pattern does not already exist.
 - Validate changes with the smallest relevant lint/test scope.
 - If task-specific details are needed, open the nearest domain `SKILL.md` file first.
+
+## Agent Neutrality
+
+**All skills must be agent-agnostic**—designed to work across Claude Code, Qwen, Gemini, Cursor, and other AI coding assistants.
+
+### Requirements
+
+- **Avoid agent-specific mentions**: Do not reference "Claude," "Claude Code," "Gemini CLI," etc. in skill text.
+- **Use universal language**: Write "when you write code" instead of "Claude writes code"; "use the MCP server" instead of "use this in Claude Code."
+- **Tool references must be portable**: If a skill requires an MCP server, plugin, or tool, name the capability, not the agent integration path.
+- **Examples**: Code examples should use generic idioms (Python, TypeScript, etc.), not agent-specific APIs or imports.
+
+### Frontmatter Guidance
+
+- `description`: Must indicate when/why to use the skill, not which agent it supports.
+- `when-to-use`: Keep focused on the task, not the agent.
+
+### Audit Checklist
+
+Before finalizing a skill, check:
+
+- [ ] No hardcoded "Claude", "Gemini", "Qwen", "Copilot" references
+- [ ] Examples use only standard language/framework idioms
+- [ ] Tool/MCP server references describe the capability, not the agent's integration method
+- [ ] Instructions use "agents", "LLMs", "you" instead of agent names
+- [ ] References to external systems (APIs, files, databases) are generic
