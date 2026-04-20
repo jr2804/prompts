@@ -1,6 +1,11 @@
-______________________________________________________________________
-
-## name: "create-skill-from-url" description: "Generate skills from documentation websites, GitHub repositories, PDFs, or local codebases using Skill Seekers. Use when user wants to create a skill from a URL, GitHub repo, or local path. Triggers: 'create skill from URL', 'generate skill from docs', 'make skill from GitHub repo'."
+---
+name: create-skill-from-url
+description: >-
+  Generate skills from documentation websites, GitHub repositories, PDFs, or
+  local codebases using Skill Seekers. Use when user wants to create a skill from
+  a URL, GitHub repo, or local path. Triggers: 'create skill from URL',
+  'generate skill from docs', 'make skill from GitHub repo'.
+---
 
 # Create Skill from URL
 

@@ -1,6 +1,10 @@
-______________________________________________________________________
-
-## name: "create-plan-md" description: "Create a PLAN.md in the project root for medium-complexity features by collecting required inputs first, then using the plan-md skill. Trigger phrases: 'create plan.md', 'plan this feature', 'start implementation plan'."
+---
+name: create-plan-md
+description: >-
+  Create a PLAN.md in the project root for medium-complexity features by
+  collecting required inputs first, then using the plan-md skill. Trigger
+  phrases: 'create plan.md', 'plan this feature', 'start implementation plan'.
+---
 
 # createPlanMd
 

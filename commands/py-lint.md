@@ -1,6 +1,8 @@
-______________________________________________________________________
-
-## name: "py-lint" description: "Use a Python linter to analyze code for potential errors and style issues" model: "github-copilot/gpt-5-mini"
+---
+name: py-lint
+description: Use a Python linter to analyze code for potential errors and style issues
+model: github-copilot/gpt-5-mini
+---
 
 # pyLint
 

@@ -1,6 +1,7 @@
-______________________________________________________________________
-
-## name: "commit-groups" description: "Organize related changes into logical commit groups for version control"
+---
+name: commit-groups
+description: Organize related changes into logical commit groups for version control
+---
 
 # commitGroups
 

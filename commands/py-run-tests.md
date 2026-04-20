@@ -1,6 +1,7 @@
-______________________________________________________________________
-
-## name: "py-run-tests" description: "Run Python tests using pytest and report the results"
+---
+name: py-run-tests
+description: Run Python tests using pytest and report the results
+---
 
 # pyRunTests
 
