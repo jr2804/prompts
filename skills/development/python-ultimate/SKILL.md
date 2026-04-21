@@ -5,7 +5,7 @@ description: >-
   linting, testing, debugging, refactoring, code review, auditing, documentation,
   and project planning. Use when writing, reviewing, refactoring, debugging, or
   documenting Python code; configuring linters; setting up CLI tools; planning
-  features; or performing code audits. Consolidates 17 specialized Python skills
+  features; or performing code audits. Consolidates specialized Python skills
   into one reference.
 ---
 
@@ -15,17 +15,17 @@ Complete Python development reference. Covers standards, tooling, workflows, and
 
 ## Quick Start
 
-**Writing code?** → Start with [Coding Standards](#coding-standards)
-**Checking naming?** → Go to [Naming Conventions](#naming-conventions)
-**Building a CLI?** → Go to [CLI Development](#cli-development)
-**Fixing linter errors?** → Go to [Linter Rules](#linter-rules)
-**Writing tests?** → Go to [Testing](#testing)
-**Debugging a bug?** → Go to [Debugging](#debugging)
-**Refactoring?** → Go to [Refactoring](#refactoring)
-**Reviewing code?** → Go to [Code Review](#code-review)
-**Auditing codebase?** → Go to [Auditing](#auditing)
-**Documenting?** → Go to [Documentation](#documentation)
-**Planning a feature?** → Go to [Planning](#planning)
+**Writing code?** → Start with [Coding Standards](references/coding-standards.md)
+**Checking naming?** → Go to [Naming Conventions](references/naming-conventions.md)
+**Building a CLI?** → Go to [CLI Development](references/cli-development.md)
+**Fixing linter errors?** → Go to [Linter Rules](references/linter-rules.md)
+**Writing tests?** → Go to [Testing](references/testing.md)
+**Debugging a bug?** → Go to [Debugging](references/debugging.md)
+**Refactoring?** → Go to [Refactoring](references/refactoring.md)
+**Reviewing code?** → Go to [Code Review](references/code-review.md)
+**Auditing codebase?** → Go to [Auditing](references/auditing.md)
+**Documenting?** → Go to [Documentation](references/documentation.md)
+**Planning a feature?** → Go to [Planning](references/planning.md)
 
 ______________________________________________________________________
 
@@ -66,6 +66,8 @@ Google style. Required for public functions and classes.
 - `Optional[T]` (use `T | None`)
 - `# noqa` comments
 - `sys.path` manipulation
+- Defensive `try/except ImportError` for required dependencies (see [references/imports-optional-dependencies.md](references/imports-optional-dependencies.md))
+- Vague or wide parameter/return types with hidden `isinstance`/`hasattr` checks and `None`-as-error returns (see [references/coding-standards.md](#vague-inputoutput-types))
 
 ______________________________________________________________________
 
@@ -342,3 +344,5 @@ All detailed content lives in `references/`. Load only what you need:
 | `planning.md` | PLAN.md template and example |
 | `file-analysis.md` | Metadata, line counting, pattern searching |
 | `project-setup.md` | Project structure, uv, imports |
+| `verification.md` | Pre-commit hooks, tox, Makefile targets |
+| `imports-optional-dependencies.md` | Required vs optional dependency import patterns |

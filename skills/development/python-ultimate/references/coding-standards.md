@@ -370,6 +370,75 @@ Use `pathlib.Path` instead of `os.path`.
 
 Use `T | None` instead of `Optional[T]`.
 
+### Vague Input/Output Types
+
+Never design functions with wide, ambiguous parameter or return types that force the caller to handle many implicit cases. Such signatures are a sign that the function is doing too much input validation and output normalization internally — responsibilities that should belong to the caller.
+
+**Anti-pattern — all of these are wrong:**
+
+```python
+def fear_to_failure_func(
+    arg1: int | str | None,
+    arg2: str | None = None,
+    arg3: Any | None = None,
+) -> int | None:
+    if arg1 is None:
+        return None
+    if isinstance(arg1, str):
+        try:
+            arg1 = int(arg1)
+        except ValueError:
+            return None
+    # ... boilerplate for arg2, arg3 ...
+    if result > 0:
+        return result
+    return None
+```
+
+**Why it's wrong:**
+
+- The function signature hides what it actually accepts, making callers guess.
+- Repeated `isinstance` / `hasattr` checks inside the function are a code smell — they indicate the function is compensating for a vague signature.
+- `T | None` for both input and output forces callers to handle many implicit branches.
+- The function silently swallows cases (`return None`) instead of failing loudly, masking bugs.
+
+**Principles to apply instead:**
+
+1. **Be precise.** Use the narrowest type that describes the actual data, not the widest type you think might work. If `arg1` should be an `int`, say `int`, not `int | str | None`.
+2. **Fail loudly.** If a caller passes an invalid type, raise a clear `TypeError` or `ValueError` immediately rather than returning `None`. Let the caller handle the error at the call site.
+3. **Separate concerns.** Input conversion and output normalization are the caller's responsibility. The function should trust its contract.
+4. **Avoid `Any` in signatures.** Use it only in genuinely untyped contexts (e.g., `**kwargs`). Prefer protocols or base types for structured flexibility.
+5. **Single-responsibility functions.** If you find yourself writing `isinstance` or `hasattr` checks inside a function, split it into two functions: one that validates/transforms, one that does the work.
+
+**Correct patterns:**
+
+```python
+# Input: accept only what you actually need
+def process_item(item_id: int) -> dict[str, Any]:
+    """Process a single item by its integer ID."""
+    ...
+
+# Output: use a dedicated result type instead of None-as-error
+@dataclass
+class ProcessResult:
+    value: int
+    reason: str | None = None
+
+def process_item(item_id: int) -> ProcessResult:
+    ...
+```
+
+**When `T | None` is acceptable:**
+
+- Return type when `None` is a legitimate, documented outcome (e.g., "not found" vs "found"). Document it explicitly.
+- Parameters that are genuinely optional in the business sense — e.g., `timeout: float | None = None` where `None` means "use default". Not because you are afraid of validation.
+
+**Quick self-check:**
+
+- Does the function body contain `isinstance` or `hasattr` on its own parameters? → Split or narrow the type.
+- Does the function return `None` as a silent fallback for more than one condition? → Use a result type or raise an exception.
+- Is `Any` in the signature because you don't know what the caller might pass? → The caller should convert first.
+
 ______________________________________________________________________
 
 ## Linting and Formatting
