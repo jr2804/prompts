@@ -1,6 +1,6 @@
 ---
 name: subagent-driven-development
-description: Use when executing implementation plans with independent tasks in the current session
+description: Structured multi-task development workflow with integrated two-stage review (spec compliance + code quality). Use when executing implementation plans in the CURRENT session with independent tasks. Dispatches fresh subagent per task with built-in review gates. For ad-hoc single reviews, use requesting-code-review instead.
 ---
 
 # Subagent-Driven Development

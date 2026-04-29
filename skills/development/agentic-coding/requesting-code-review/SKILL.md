@@ -1,6 +1,6 @@
 ---
 name: requesting-code-review
-description: Use when completing tasks, implementing major features, or before merging to verify work meets requirements
+description: Lightweight standalone code review workflow. Use for ad-hoc reviews outside structured development workflows—after completing single tasks, before merging to main, or when stuck and needing a fresh perspective. For structured multi-task development, use subagent-driven-development instead (which includes integrated review stages).
 ---
 
 # Requesting Code Review
