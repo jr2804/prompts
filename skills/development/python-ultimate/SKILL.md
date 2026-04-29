@@ -3,10 +3,11 @@ name: python-ultimate
 description: >-
   Comprehensive Python development skill covering coding standards, CLI development,
   linting, testing, debugging, refactoring, code review, auditing, documentation,
-  and project planning. Use when writing, reviewing, refactoring, debugging, or
-  documenting Python code; configuring linters; setting up CLI tools; planning
-  features; or performing code audits. Consolidates specialized Python skills
-  into one reference.
+  project planning, and bulk operations. Use when writing, reviewing, refactoring,
+  debugging, or documenting Python code; configuring linters; setting up CLI tools;
+  planning features; performing code audits; or handling bulk operations (10+ files)
+  that need 90%+ token savings.
+license: MIT
 ---
 
 # Python Ultimate
@@ -26,6 +27,7 @@ Complete Python development reference. Covers standards, tooling, workflows, and
 **Auditing codebase?** → Go to [Auditing](references/auditing.md)
 **Documenting?** → Go to [Documentation](references/documentation.md)
 **Planning a feature?** → Go to [Planning](references/planning.md)
+**Bulk operations?** → Go to [Bulk Operations](#bulk-operations) (10+ files, 90%+ token savings)
 
 ______________________________________________________________________
 
@@ -322,6 +324,79 @@ Never use `TYPE_CHECKING` guards. See [references/type-checking.md](references/t
 2. Use protocols for structural typing
 3. Forward references (string literals)
 4. Local imports (last resort)
+
+______________________________________________________________________
+
+## Bulk Operations
+
+High-efficiency Python execution for 10+ file operations. **90-99% token savings** vs. iterative approaches.
+
+**When to use:**
+- Bulk operations (10+ files)
+- Complex multi-step workflows
+- Iterative processing across many files
+- User mentions efficiency/performance
+
+**Workflow pattern:**
+1. **Analyze locally** — Use metadata operations (file counts, grep patterns)
+2. **Process locally** — Execute all transformations in Python
+3. **Return summary** — Report counts, not full data
+
+**Example patterns:**
+
+```python
+# Bulk refactor across 50 files
+from pathlib import Path
+import re
+
+files = list(Path('.').glob('**/*.py'))
+modified = 0
+
+for f in files:
+    content = f.read_text()
+    new_content = re.sub(r'old_pattern', 'new_pattern', content)
+    if new_content != content:
+        f.write_text(new_content)
+        modified += 1
+
+result = {'files_scanned': len(files), 'files_modified': modified}
+```
+
+```python
+# Code audit metadata extraction
+from pathlib import Path
+import ast
+
+files = list(Path('src').glob('**/*.py'))
+complexity_issues = []
+
+for f in files:
+    tree = ast.parse(f.read_text())
+    for node in ast.walk(tree):
+        if isinstance(node, ast.FunctionDef):
+            # Calculate simple complexity metric
+            nested = sum(1 for n in ast.walk(node) if isinstance(n, (ast.If, ast.For, ast.While)))
+            if nested > 10:
+                complexity_issues.append({'file': str(f), 'function': node.name, 'complexity': nested})
+
+result = {'files_audited': len(files), 'high_complexity': len(complexity_issues)}
+```
+
+**Best practices:**
+- ✅ Return summaries, not full data
+- ✅ Batch operations where possible
+- ✅ Use `pathlib.Path` for file operations
+- ✅ Handle errors gracefully, return error counts
+- ❌ Don't read full source into context when metadata suffices
+- ❌ Don't process files one-by-one interactively
+
+**Token savings scale with file count:**
+
+| Files | Interactive | Bulk Operation | Savings |
+|-------|-------------|----------------|---------|
+| 10    | ~5K tokens  | ~500 tokens    | 90%     |
+| 50    | ~25K tokens | ~600 tokens    | 97.6%   |
+| 100   | ~150K tokens| ~1K tokens     | 99.3%   |
 
 ______________________________________________________________________
 
