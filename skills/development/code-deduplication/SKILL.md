@@ -1,6 +1,6 @@
 ---
 name: code-deduplication
-description: Prevent semantic code duplication with capability index and check-before-write workflow. Use before creating new utility functions or shared code to verify equivalent patterns don't already exist.
+description: Pre-write workflow to prevent semantic code duplication. Use BEFORE creating new utility functions, shared modules, or helper code to verify equivalent capabilities don't already exist in the codebase. Requires maintaining CODE_INDEX.md as a capability index organized by purpose (not file location).
 ---
 
 # Code Deduplication

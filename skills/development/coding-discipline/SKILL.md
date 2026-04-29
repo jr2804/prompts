@@ -1,6 +1,6 @@
 ---
 name: coding-discipline
-description: Behavioral guidelines to reduce common LLM coding mistakes. Use when writing, reviewing, or refactoring code to avoid overcomplication, make surgical changes, surface assumptions, and define verifiable success criteria.
+description: Language-agnostic behavioral guidelines to reduce common LLM coding mistakes. Use for ANY coding task (all languages) to avoid overcomplication, make surgical changes, surface assumptions before coding, and define verifiable success criteria. Applies behavioral rigor—separate from language-specific technical standards.
 license: MIT
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: output-quality
-description: Detect and eliminate generic, low-quality patterns in natural language, code, and design. Use when reviewing or improving content quality, preventing generic AI patterns, cleaning up existing content, or enforcing quality standards.
+description: Detect and eliminate generic, low-quality "AI slop" patterns in natural language, code, and design. Use when REVIEWING existing content (text, code, or visual designs) for quality issues, cleaning up generic patterns, or establishing quality standards. Focuses on pattern detection—not content creation.
 ---
 
 # Output Quality
