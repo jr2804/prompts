@@ -26,7 +26,15 @@ TODO
 
 ### Skills
 
-TODO
+**Skill Families** (organized by domain):
+
+| Family | Skills | Purpose |
+|--------|--------|---------|
+| **Quality & Discipline** | `coding-discipline`, `code-deduplication`, `output-quality` | Behavioral rigor, anti-duplication, anti-slop |
+| **Agentic Coding** | `using-git-worktrees`, `dispatching-parallel-agents`, `subagent-driven-development`, `requesting-code-review` | Agent-assisted development workflows |
+| **Python Development** | `python-ultimate` | Comprehensive Python standards, tooling, bulk operations |
+
+See individual skill folders under `skills/` for full documentation.
 
 ### Agents
 
@@ -64,30 +72,6 @@ Related tools:
 
 - [caveman](https://github.com/JuliusBrussee/caveman) - Token saving skill for code generation.
 - [markdown-viewer](https://github.com/markdown-viewer/skills)
-
-## Upcoming skills/ideas
-
-### Quality & Discipline Skills Family
-
-Organized as a modular family addressing complementary concerns:
-
-**1. output-quality** — Detect and eliminate generic, low-quality patterns in prose, code, and design
-*Consolidates*: [deslopify](https://github.com/glaforge/deslopify), [cc-polymath anti-slop](https://github.com/rand/cc-polymath/tree/main/skills/anti-slop)
-*Includes*: Text/design anti-slop patterns, code style smells, optional Python detection/cleanup scripts
-*Agent-agnostic*: Works across Claude, Qwen, Gemini, Cursor, etc.
-
-**2. coding-discipline** — Behavioral protocol for writing better code first time
-*Source*: [Andrej Karpathy's observations](https://x.com/karpathy/status/2015883857489522876) on LLM coding pitfalls
-*Covers*: Surface assumptions, simplicity-first, surgical changes, goal-driven execution
-*Integration*: Full EXAMPLES.md as first-class references in SKILL.md
-*Agent-neutral*: Discipline principles apply to all code-writing agents
-
-**3. code-deduplication** — Pre-write capability index and check-before-write workflow
-*Source*: [claude-bootstrap](https://github.com/alinaqi/claude-bootstrap/tree/main/skills/code-deduplication)
-*Includes*: CODE_INDEX.md template, audit utilities, duplicate detection heuristics
-*Use with*: coding-discipline for comprehensive implementation rigor
-
-**Rationale:** These three skills address different problem classes (output quality, execution discipline, codebase hygiene) and work best as linked companions rather than one monolithic skill. Each can be invoked independently or in combination.
 
 ## References
 
