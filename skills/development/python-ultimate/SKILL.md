@@ -5,8 +5,9 @@ description: >-
   linting, testing, debugging, refactoring, code review, auditing, documentation,
   project planning, and bulk operations. Use when writing, reviewing, refactoring,
   debugging, or documenting Python code; configuring linters; setting up CLI tools;
-  planning features; performing code audits; or handling bulk operations (10+ files)
-  that need 90%+ token savings.
+    planning features; performing code audits; checking Python antipatterns, forbidden
+    methods, or bad style; or handling bulk operations (10+ files) that need 90%+
+    token savings.
 license: MIT
 ---
 
@@ -28,6 +29,45 @@ Complete Python development reference. Covers standards, tooling, workflows, and
 **Documenting?** → Go to [Documentation](references/documentation.md)
 **Planning a feature?** → Go to [Planning](references/planning.md)
 **Bulk operations?** → Go to [Bulk Operations](#bulk-operations) (10+ files, 90%+ token savings)
+
+### Slash Command Flow
+
+Use `/python-ultimate` when you want a fast antipattern check.
+
+1. Start with [Antipatterns / Forbidden Styles Index](#antipatterns--forbidden-styles-index)
+2. Open the linked reference section for details
+3. Apply the matching fix pattern from that section
+
+### Expected `/python-ultimate` Antipattern Response Format
+
+For consistency across agents, format antipattern-check responses as:
+
+1. **Summary** — total findings by severity and category
+2. **Findings** — one item per finding: `file:line`, matched pattern class, short rationale
+3. **Fix Guidance** — preferred replacement pattern with one concrete before/after example
+4. **References** — direct links to the relevant section in `references/*.md`
+5. **Verification** — exact command(s) run and observed result
+
+Use concise, technical language. Avoid performative agreement and avoid speculative wording.
+
+## Antipatterns / Forbidden Styles Index
+
+Canonical quick-reference for common bad or forbidden patterns. Detailed rationale and examples stay in reference files.
+
+| Category | Forbidden pattern | Preferred pattern | Source |
+|----------|-------------------|-------------------|--------|
+| Type checking | `TYPE_CHECKING` import guards | Refactor module boundaries, use forward refs/protocols | [references/type-checking.md#1-rule-never-use-type_checking-guards](references/type-checking.md#1-rule-never-use-type_checking-guards) |
+| Type hints | `Optional[T]` | `T \| None` | [references/coding-standards.md#1-type-hints-mandatory](references/coding-standards.md#1-type-hints-mandatory) |
+| String formatting | `.format()` and `%` formatting | f-strings | [references/coding-standards.md#2-string-formatting](references/coding-standards.md#2-string-formatting) |
+| Paths | `os.path` usage | `pathlib.Path` | [references/coding-standards.md#ospath](references/coding-standards.md#ospath) |
+| Lint suppression | `# noqa` to hide issues | Fix root issue | [references/coding-standards.md#prohibited-linter-rules](references/coding-standards.md#prohibited-linter-rules) |
+| Import policy | Defensive `try/except ImportError` for required deps | Normal top-level imports for required deps | [references/imports-optional-dependencies.md#31-anti-pattern-defensive-import-for-required-dependency](references/imports-optional-dependencies.md#31-anti-pattern-defensive-import-for-required-dependency) |
+| Path variable naming | Bare names like `path`, `file`, `output` for paths | Use `_file` / `_dir` suffixes | [references/naming-conventions.md#13-anti-patterns](references/naming-conventions.md#13-anti-patterns) |
+| Path variable naming | Prefix forms `dir_x`, `file_x` | Suffix forms `x_dir`, `x_file` | [references/naming-conventions.md#13-anti-patterns](references/naming-conventions.md#13-anti-patterns) |
+| Comments | Restating obvious code intent | Explain why/constraints only | [references/coding-standards.md#7-comments](references/coding-standards.md#7-comments) |
+| Debugging workflow | Guess-and-check fixes before RCA | Follow 4-phase process | [references/debugging.md#4-phase-process](references/debugging.md#4-phase-process) |
+| Debugging behavior | Repeated "one more try" after multiple failures | Stop and reassess architecture | [references/debugging.md#when-to-stop-and-reassess](references/debugging.md#when-to-stop-and-reassess) |
+| Code review behavior | Performative agreement phrases | Technical response and evidence | [references/code-review.md#no-performative-agreement](references/code-review.md#no-performative-agreement) |
 
 ______________________________________________________________________
 
@@ -69,7 +109,7 @@ Google style. Required for public functions and classes.
 - `# noqa` comments
 - `sys.path` manipulation
 - Defensive `try/except ImportError` for required dependencies (see [references/imports-optional-dependencies.md](references/imports-optional-dependencies.md))
-- Vague or wide parameter/return types with hidden `isinstance`/`hasattr` checks and `None`-as-error returns (see [references/coding-standards.md](#vague-inputoutput-types))
+- Vague or wide parameter/return types with hidden `isinstance`/`hasattr` checks and `None`-as-error returns (see [references/coding-standards.md#vague-inputoutput-types](references/coding-standards.md#vague-inputoutput-types))
 
 ______________________________________________________________________
 
@@ -108,7 +148,15 @@ uv run assets/check_path_naming.py output_file
 
 # Scan for violations
 uv run assets/check_path_naming.py --check-files src/
+
+# Scan for core forbidden patterns
+uv run assets/check_path_naming.py --check-forbidden src/
+
+# Repro fixture scan (see assets/examples)
+uv run assets/check_path_naming.py --check-forbidden assets/examples/
 ```
+
+Reference fixture files and expected output: [assets/examples/forbidden-scan-expected.md](assets/examples/forbidden-scan-expected.md)
 
 ______________________________________________________________________
 

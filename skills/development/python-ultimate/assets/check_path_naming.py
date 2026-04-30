@@ -11,6 +11,7 @@ naming conventions for files, directories, and paths.
 Usage:
     uv run check_path_naming.py <name>
     uv run check_path_naming.py --check-files <python-file-or-directory>
+    uv run check_path_naming.py --check-forbidden <python-file-or-directory>
 
 Examples:
     uv run check_path_naming.py output_file
@@ -21,14 +22,20 @@ Examples:
 
     uv run check_path_naming.py --check-files src/
     # Output: List of violations in Python files
+
+    uv run check_path_naming.py --check-forbidden src/
+    # Output: List of forbidden pattern matches in Python files
 """
 
 from __future__ import annotations
 
 import argparse
+import ast
 import enum
+import io
 import re
 import sys
+import tokenize
 from pathlib import Path
 
 
@@ -39,6 +46,16 @@ class PathValidity(enum.StrEnum):
     DIR = "is_dir"
     PATH = "is_path_exceptional"
     INVALID = "invalid"
+
+
+FORBIDDEN_REASON: dict[str, str] = {
+    "TYPE_CHECKING guard": "Avoid TYPE_CHECKING guards. Refactor imports/types as described in references/type-checking.md.",
+    "Optional[T]": "Use pipe syntax (T | None) instead of Optional[T].",
+    "os.path usage": "Use pathlib.Path instead of os.path.",
+    "noqa suppression": "Fix the underlying lint issue instead of suppressing with # noqa.",
+    "sys.path manipulation": "Avoid sys.path manipulation. Use proper package/module layout and imports.",
+    "defensive required import": "Check whether this ImportError guard is wrapping a required dependency import.",
+}
 
 
 def check_path_naming(name: str | Path) -> PathValidity:
@@ -237,6 +254,95 @@ def scan_directory(directory: Path) -> dict[Path, list[tuple[int, str, str]]]:
     return all_violations
 
 
+def scan_forbidden_patterns(file_path: Path) -> list[tuple[int, str, str]]:
+    """Scan a Python file for forbidden-style patterns.
+
+    Args:
+        file_path: Path to Python file to scan
+
+    Returns:
+        List of (line_number, pattern_name, reason) tuples for matches
+    """
+    matches: list[tuple[int, str, str]] = []
+
+    try:
+        content = file_path.read_text(encoding="utf-8")
+    except Exception:
+        return matches
+
+    found: set[tuple[int, str]] = set()
+
+    try:
+        tree = ast.parse(content)
+    except SyntaxError:
+        return matches
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom) and node.module == "typing":
+            if any(alias.name == "TYPE_CHECKING" for alias in node.names):
+                found.add((node.lineno, "TYPE_CHECKING guard"))
+
+        if isinstance(node, ast.If):
+            if isinstance(node.test, ast.Name) and node.test.id == "TYPE_CHECKING":
+                found.add((node.lineno, "TYPE_CHECKING guard"))
+
+        if isinstance(node, ast.Subscript):
+            value = node.value
+            if isinstance(value, ast.Name) and value.id == "Optional":
+                found.add((node.lineno, "Optional[T]"))
+            if (
+                isinstance(value, ast.Attribute)
+                and isinstance(value.value, ast.Name)
+                and value.value.id == "typing"
+                and value.attr == "Optional"
+            ):
+                found.add((node.lineno, "Optional[T]"))
+
+        if isinstance(node, ast.Import):
+            if any(alias.name == "os.path" for alias in node.names):
+                found.add((node.lineno, "os.path usage"))
+
+        if isinstance(node, ast.Attribute):
+            if isinstance(node.value, ast.Name):
+                if node.value.id == "os" and node.attr == "path":
+                    found.add((node.lineno, "os.path usage"))
+                if node.value.id == "sys" and node.attr == "path":
+                    found.add((node.lineno, "sys.path manipulation"))
+
+        if isinstance(node, ast.ExceptHandler) and node.type is not None:
+            if isinstance(node.type, ast.Name) and node.type.id == "ImportError":
+                found.add((node.lineno, "defensive required import"))
+
+    token_stream = tokenize.generate_tokens(io.StringIO(content).readline)
+    for token in token_stream:
+        if token.type == tokenize.COMMENT and re.search(r"#\s*noqa\b", token.string, re.IGNORECASE):
+            found.add((token.start[0], "noqa suppression"))
+
+    for line_num, pattern_name in sorted(found):
+        matches.append((line_num, pattern_name, FORBIDDEN_REASON[pattern_name]))
+
+    return matches
+
+
+def scan_directory_forbidden(directory: Path) -> dict[Path, list[tuple[int, str, str]]]:
+    """Recursively scan directory for forbidden-style pattern matches.
+
+    Args:
+        directory: Directory to scan
+
+    Returns:
+        Dictionary mapping file paths to their forbidden-style matches
+    """
+    all_matches: dict[Path, list[tuple[int, str, str]]] = {}
+
+    for py_file in directory.rglob("*.py"):
+        file_matches = scan_forbidden_patterns(py_file)
+        if file_matches:
+            all_matches[py_file] = file_matches
+
+    return all_matches
+
+
 def main() -> int:
     """Main entry point for CLI usage."""
     parser = argparse.ArgumentParser(
@@ -247,6 +353,7 @@ Examples:
   uv run %(prog)s output_file           # Check single name
   uv run %(prog)s cache_dir             # Returns: is_dir
   uv run %(prog)s --check-files src/    # Scan directory for violations
+    uv run %(prog)s --check-forbidden src/  # Scan directory for forbidden patterns
         """,
     )
 
@@ -260,6 +367,12 @@ Examples:
         "--check-files",
         metavar="PATH",
         help="Scan Python file or directory for naming violations",
+    )
+
+    parser.add_argument(
+        "--check-forbidden",
+        metavar="PATH",
+        help="Scan Python file or directory for forbidden-style patterns",
     )
 
     parser.add_argument(
@@ -317,6 +430,41 @@ Examples:
             else:
                 print(f"No violations found in {check_path}")
                 return 0
+
+    # Check forbidden-style patterns
+    if args.check_forbidden:
+        check_path = Path(args.check_forbidden)
+
+        if not check_path.exists():
+            print(f"Error: Path not found: {check_path}", file=sys.stderr)
+            return 2
+
+        if check_path.is_file():
+            matches = scan_forbidden_patterns(check_path)
+            if matches:
+                print(f"\nFound {len(matches)} forbidden pattern match(es) in {check_path}:")
+                for line_num, pattern_name, reason in matches:
+                    print(f"  Line {line_num}: [{pattern_name}] {reason}")
+                return 1
+            else:
+                print(f"No forbidden pattern matches found in {check_path}")
+                return 0
+
+        if check_path.is_dir():
+            matches = scan_directory_forbidden(check_path)
+            total = sum(len(v) for v in matches.values())
+
+            if matches:
+                print(f"\nFound {total} forbidden pattern match(es) in {len(matches)} file(s):\n")
+                for file_path, file_matches in matches.items():
+                    print(f"{file_path}:")
+                    for line_num, pattern_name, reason in file_matches:
+                        print(f"  Line {line_num}: [{pattern_name}] {reason}")
+                    print()
+                return 1
+
+            print(f"No forbidden pattern matches found in {check_path}")
+            return 0
 
     parser.print_help()
     return 2
