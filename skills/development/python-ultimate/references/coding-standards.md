@@ -174,7 +174,7 @@ ______________________________________________________________________
 Keep modules and symbols small to preserve maintainability:
 
 | Symbol | Limit |
-|--------|-------|
+| ------ | ----- |
 | Modules (`.py` file) | < 250 lines |
 | Functions | < 75 lines |
 | Classes | < 200 lines |
@@ -246,7 +246,7 @@ ______________________________________________________________________
 ## 8. Library Preferences
 
 | Task | Preferred Library | Notes |
-|------|-------------------|-------|
+| ---- | ----------------- | ----- |
 | CLI | typer | Type hints for CLI |
 | Terminal formatting | rich | Beautiful terminal output |
 | Data models | pydantic | Validation and serialization |
@@ -264,7 +264,7 @@ ______________________________________________________________________
 
 ### Commit Message Format
 
-```
+```text
 Type: feat, fix, docs, style, refactor, perf, test, chore
 Scope: optional module/component
 Subject: imperative, present tense, <50 chars
@@ -274,7 +274,7 @@ Footer: optional breaking changes, issue references
 
 ### Branch Naming
 
-```
+```text
 Feature branches: feature/<name>
 Bug fixes: fix/<description>
 Documentation: docs/<topic>
@@ -336,6 +336,8 @@ ______________________________________________________________________
 ### TYPE_CHECKING
 
 Never use `TYPE_CHECKING` as a permanent solution for circular imports. Refactor to eliminate circular dependencies.
+
+Canonical deep-dive guidance for this rule lives in [type-checking.md](type-checking.md). Keep this section concise and use the dedicated reference for alternatives and migration steps.
 
 ```python
 # WRONG - permanent TYPE_CHECKING guard
