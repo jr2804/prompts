@@ -28,7 +28,7 @@ Complete Python development reference. Covers standards, tooling, workflows, and
 **Auditing codebase?** → Go to [Auditing](references/auditing.md)
 **Documenting?** → Go to [Documentation](references/documentation.md)
 **Planning a feature?** → Go to [Planning](references/planning.md)
-**Bulk operations?** → Go to [Bulk Operations](#bulk-operations) (10+ files, 90%+ token savings)
+**Bulk operations?** → Go to [Refactoring](references/refactoring.md) (10+ files)
 
 ### Slash Command Flow
 
@@ -54,22 +54,22 @@ Use concise, technical language. Avoid performative agreement and avoid speculat
 
 Canonical quick-reference for common bad or forbidden patterns. Detailed rationale and examples stay in reference files.
 
-| Category | Forbidden pattern | Preferred pattern | Source |
-|----------|-------------------|-------------------|--------|
-| Type checking | `TYPE_CHECKING` import guards | Refactor module boundaries, use forward refs/protocols | [references/type-checking.md#1-rule-never-use-type_checking-guards](references/type-checking.md#1-rule-never-use-type_checking-guards) |
-| Type hints | `Optional[T]` | `T \| None` | [references/coding-standards.md#1-type-hints-mandatory](references/coding-standards.md#1-type-hints-mandatory) |
-| String formatting | `.format()` and `%` formatting | f-strings | [references/coding-standards.md#2-string-formatting](references/coding-standards.md#2-string-formatting) |
-| Paths | `os.path` usage | `pathlib.Path` | [references/coding-standards.md#ospath](references/coding-standards.md#ospath) |
-| Lint suppression | `# noqa` to hide issues | Fix root issue | [references/coding-standards.md#prohibited-linter-rules](references/coding-standards.md#prohibited-linter-rules) |
-| Import policy | Defensive `try/except ImportError` for required deps | Normal top-level imports for required deps | [references/imports-optional-dependencies.md#31-anti-pattern-defensive-import-for-required-dependency](references/imports-optional-dependencies.md#31-anti-pattern-defensive-import-for-required-dependency) |
-| Path variable naming | Bare names like `path`, `file`, `output` for paths | Use `_file` / `_dir` suffixes | [references/naming-conventions.md#13-anti-patterns](references/naming-conventions.md#13-anti-patterns) |
-| Path variable naming | Prefix forms `dir_x`, `file_x` | Suffix forms `x_dir`, `x_file` | [references/naming-conventions.md#13-anti-patterns](references/naming-conventions.md#13-anti-patterns) |
-| Comments | Restating obvious code intent | Explain why/constraints only | [references/coding-standards.md#7-comments](references/coding-standards.md#7-comments) |
-| Debugging workflow | Guess-and-check fixes before RCA | Follow 4-phase process | [references/debugging.md#4-phase-process](references/debugging.md#4-phase-process) |
-| Debugging behavior | Repeated "one more try" after multiple failures | Stop and reassess architecture | [references/debugging.md#when-to-stop-and-reassess](references/debugging.md#when-to-stop-and-reassess) |
-| Code review behavior | Performative agreement phrases | Technical response and evidence | [references/code-review.md#no-performative-agreement](references/code-review.md#no-performative-agreement) |
+| Category             | Forbidden pattern                                    | Preferred pattern                                      | Source                                                                                                                                                                                                       |
+| -------------------- | ---------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Type checking        | `TYPE_CHECKING` import guards                        | Refactor module boundaries, use forward refs/protocols | [references/type-checking.md#1-rule-never-use-type_checking-guards](references/type-checking.md#1-rule-never-use-type_checking-guards)                                                                       |
+| Type hints           | `Optional[T]`                                        | `T \| None`                                            | [references/coding-standards.md#1-type-hints-mandatory](references/coding-standards.md#1-type-hints-mandatory)                                                                                               |
+| String formatting    | `.format()` and `%` formatting                       | f-strings                                              | [references/coding-standards.md#2-string-formatting](references/coding-standards.md#2-string-formatting)                                                                                                     |
+| Paths                | `os.path` usage                                      | `pathlib.Path`                                         | [references/coding-standards.md#ospath](references/coding-standards.md#ospath)                                                                                                                               |
+| Lint suppression     | `# noqa` to hide issues                              | Fix root issue                                         | [references/coding-standards.md#prohibited-linter-rules](references/coding-standards.md#prohibited-linter-rules)                                                                                             |
+| Import policy        | Defensive `try/except ImportError` for required deps | Normal top-level imports for required deps             | [references/imports-optional-dependencies.md#31-anti-pattern-defensive-import-for-required-dependency](references/imports-optional-dependencies.md#31-anti-pattern-defensive-import-for-required-dependency) |
+| Path variable naming | Bare names like `path`, `file`, `output` for paths   | Use `_file` / `_dir` suffixes                          | [references/naming-conventions.md#13-anti-patterns](references/naming-conventions.md#13-anti-patterns)                                                                                                       |
+| Path variable naming | Prefix forms `dir_x`, `file_x`                       | Suffix forms `x_dir`, `x_file`                         | [references/naming-conventions.md#13-anti-patterns](references/naming-conventions.md#13-anti-patterns)                                                                                                       |
+| Comments             | Restating obvious code intent                        | Explain why/constraints only                           | [references/coding-standards.md#7-comments](references/coding-standards.md#7-comments)                                                                                                                       |
+| Debugging workflow   | Guess-and-check fixes before RCA                     | Follow 4-phase process                                 | [references/debugging.md#4-phase-process](references/debugging.md#4-phase-process)                                                                                                                           |
+| Debugging behavior   | Repeated "one more try" after multiple failures      | Stop and reassess architecture                         | [references/debugging.md#when-to-stop-and-reassess](references/debugging.md#when-to-stop-and-reassess)                                                                                                       |
+| Code review behavior | Performative agreement phrases                       | Technical response and evidence                        | [references/code-review.md#no-performative-agreement](references/code-review.md#no-performative-agreement)                                                                                                   |
 
-______________________________________________________________________
+---
 
 ## Coding Standards
 
@@ -91,11 +91,11 @@ Use f-strings only. No `.format()` or `%` formatting.
 
 ### Code Size Limits
 
-| Target | Limit |
-|--------|-------|
-| Module | < 250 lines |
-| Function | < 75 lines |
-| Class | < 200 lines |
+| Target   | Limit       |
+| -------- | ----------- |
+| Module   | < 250 lines |
+| Function | < 75 lines  |
+| Class    | < 200 lines |
 
 ### Docstrings
 
@@ -111,7 +111,7 @@ Google style. Required for public functions and classes.
 - Defensive `try/except ImportError` for required dependencies (see [references/imports-optional-dependencies.md](references/imports-optional-dependencies.md))
 - Vague or wide parameter/return types with hidden `isinstance`/`hasattr` checks and `None`-as-error returns (see [references/coding-standards.md#vague-inputoutput-types](references/coding-standards.md#vague-inputoutput-types))
 
-______________________________________________________________________
+---
 
 ## Naming Conventions
 
@@ -119,10 +119,10 @@ Variable naming standards for clarity and consistency. See [references/naming-co
 
 ### Files and Directories
 
-| Pattern | Suffix | Example |
-|---------|--------|---------|
-| Files | `_file` | `output_file`, `config_file` |
-| Directories | `_dir` | `cache_dir`, `output_dir` |
+| Pattern      | Suffix  | Example                        |
+| ------------ | ------- | ------------------------------ |
+| Files        | `_file` | `output_file`, `config_file`   |
+| Directories  | `_dir`  | `cache_dir`, `output_dir`      |
 | Unknown type | `_path` | `data_path` (exceptional only) |
 
 **Anti-patterns (always invalid for path variables):**
@@ -131,7 +131,7 @@ Variable naming standards for clarity and consistency. See [references/naming-co
 - Prefix instead of suffix: `dir_output`, `file_config`
 - Missing suffix: `results`, `data`, `config` (ambiguous)
 
-See [references/naming-conventions.md](references/naming-conventions.md#13-anti-patterns) for the complete anti-pattern list.
+See [references/naming-conventions.md](references/naming-conventions.md) for the complete anti-pattern list.
 
 ### Test Naming
 
@@ -158,7 +158,7 @@ uv run assets/check_path_naming.py --check-forbidden assets/examples/
 
 Reference fixture files and expected output: [assets/examples/forbidden-scan-expected.md](assets/examples/forbidden-scan-expected.md)
 
-______________________________________________________________________
+---
 
 ## CLI Development
 
@@ -175,7 +175,7 @@ Use **Typer** for new projects (type-hint driven, less boilerplate). Use **Click
 - Environment variable integration
 - Exit codes for error states
 
-______________________________________________________________________
+---
 
 ## Linter Rules
 
@@ -183,21 +183,21 @@ Context-aware fixes for Ruff linter rules. See [references/linter-rules.md](refe
 
 ### Covered Rules
 
-| Rule | Description | Quick Fix |
-|------|-------------|-----------|
-| E402 | Module-level import not at top | Move imports to top |
-| B007 | Unused loop variable | Prefix with `_` |
-| B008 | Function call in default arg | Use `None` sentinel |
-| S108 | Hardcoded temp file path | Use `tempfile` |
-| PLC0415 | Import not at top-level | Move to module level |
-| NPY002 | Legacy numpy random | Use `numpy.random` |
-| S311 | Standard random | Use `secrets` for security |
+| Rule    | Description                    | Quick Fix                  |
+| ------- | ------------------------------ | -------------------------- |
+| E402    | Module-level import not at top | Move imports to top        |
+| B007    | Unused loop variable           | Prefix with `_`            |
+| B008    | Function call in default arg   | Use `None` sentinel        |
+| S108    | Hardcoded temp file path       | Use `tempfile`             |
+| PLC0415 | Import not at top-level        | Move to module level       |
+| NPY002  | Legacy numpy random            | Use `numpy.random`         |
+| S311    | Standard random                | Use `secrets` for security |
 
 ### Typer Exception
 
-B008 is allowed for Typer `Annotated` parameters. See [references/linter-rules.md](references/linter-rules.md#typer-cli-exception-for-b008).
+B008 is allowed for Typer `Annotated` parameters. See [references/linter-rules.md](references/linter-rules.md).
 
-______________________________________________________________________
+---
 
 ## Testing
 
@@ -220,9 +220,9 @@ uv run pytest --cov=src --cov-report=term-missing
 
 ### TDD Cycle
 
-Red → Green → Refactor. No production code without a failing test first. See [references/testing.md](references/testing.md#test-driven-development).
+Red → Green → Refactor. No production code without a failing test first. See [references/testing.md](references/testing.md).
 
-______________________________________________________________________
+---
 
 ## Debugging
 
@@ -245,7 +245,7 @@ Systematic 4-phase debugging process. See [references/debugging.md](references/d
 - Fixing symptoms without understanding cause
 - Multiple failed fix attempts
 
-______________________________________________________________________
+---
 
 ## Refactoring
 
@@ -259,9 +259,9 @@ Find → Replace → Verify workflow. See [references/refactoring.md](references
 
 ### Code Transfer
 
-Line-based code movement between files. See [references/refactoring.md](references/refactoring.md#code-transfer).
+Line-based code movement between files. See [references/refactoring.md](references/refactoring.md).
 
-______________________________________________________________________
+---
 
 ## Code Review
 
@@ -278,7 +278,7 @@ Read → Understand → Verify → Evaluate → Respond → Implement
 - Verify feedback before implementing
 - Evaluate: is the suggestion correct?
 
-______________________________________________________________________
+---
 
 ## Auditing
 
@@ -297,7 +297,7 @@ ______________________________________________________________________
 
 Critical → High → Medium → Low
 
-______________________________________________________________________
+---
 
 ## Documentation
 
@@ -315,7 +315,7 @@ Project Overview, Architecture, Key Components, Data Flow, API Reference, Config
 
 Use for architecture, sequence, and flowchart visualizations.
 
-______________________________________________________________________
+---
 
 ## Planning
 
@@ -329,7 +329,7 @@ Features spanning 3-15 prompts. Self-contained for fresh sessions.
 
 Goal → Context → Phases → Validation → Progress → Decisions → Notes
 
-______________________________________________________________________
+---
 
 ## Project Setup
 
@@ -347,7 +347,7 @@ Project structure, dependencies, and imports. See [references/project-setup.md](
 2. Third-party
 3. Local (absolute imports)
 
-______________________________________________________________________
+---
 
 ## File Analysis
 
@@ -360,7 +360,7 @@ Non-destructive file and codebase analysis. See [references/file-analysis.md](re
 - Grep for pattern searching
 - Glob for file discovery
 
-______________________________________________________________________
+---
 
 ## Type Checking Alternatives
 
@@ -373,19 +373,21 @@ Never use `TYPE_CHECKING` guards. See [references/type-checking.md](references/t
 3. Forward references (string literals)
 4. Local imports (last resort)
 
-______________________________________________________________________
+---
 
 ## Bulk Operations
 
 High-efficiency Python execution for 10+ file operations. **90-99% token savings** vs. iterative approaches.
 
 **When to use:**
+
 - Bulk operations (10+ files)
 - Complex multi-step workflows
 - Iterative processing across many files
 - User mentions efficiency/performance
 
 **Workflow pattern:**
+
 1. **Analyze locally** — Use metadata operations (file counts, grep patterns)
 2. **Process locally** — Execute all transformations in Python
 3. **Return summary** — Report counts, not full data
@@ -431,6 +433,7 @@ result = {'files_audited': len(files), 'high_complexity': len(complexity_issues)
 ```
 
 **Best practices:**
+
 - ✅ Return summaries, not full data
 - ✅ Batch operations where possible
 - ✅ Use `pathlib.Path` for file operations
@@ -440,32 +443,32 @@ result = {'files_audited': len(files), 'high_complexity': len(complexity_issues)
 
 **Token savings scale with file count:**
 
-| Files | Interactive | Bulk Operation | Savings |
-|-------|-------------|----------------|---------|
-| 10    | ~5K tokens  | ~500 tokens    | 90%     |
-| 50    | ~25K tokens | ~600 tokens    | 97.6%   |
-| 100   | ~150K tokens| ~1K tokens     | 99.3%   |
+| Files | Interactive  | Bulk Operation | Savings |
+| ----- | ------------ | -------------- | ------- |
+| 10    | ~5K tokens   | ~500 tokens    | 90%     |
+| 50    | ~25K tokens  | ~600 tokens    | 97.6%   |
+| 100   | ~150K tokens | ~1K tokens     | 99.3%   |
 
-______________________________________________________________________
+---
 
 ## Reference Files
 
 All detailed content lives in `references/`. Load only what you need:
 
-| File | Content |
-|------|---------|
-| `coding-standards.md` | Type hints, formatting, size limits, docstrings, comments |
-| `cli-development.md` | Typer/Click, parameters, Rich output, env vars |
-| `linter-rules.md` | Ruff rules E402, B007, B008, S108, PLC0415, NPY002, S311 |
-| `testing.md` | Fixtures, parameterized, mocking, TDD, coverage |
-| `type-checking.md` | TYPE_CHECKING alternatives, protocols, forward refs |
-| `debugging.md` | 4-phase process, red flags, rationalizations |
-| `refactoring.md` | Bulk operations, code transfer, safety checks |
-| `code-review.md` | Receiving feedback, push back, evaluation |
-| `auditing.md` | 6-dimension analysis, severity ratings |
-| `documentation.md` | 10-section structure, Mermaid diagrams |
-| `planning.md` | PLAN.md template and example |
-| `file-analysis.md` | Metadata, line counting, pattern searching |
-| `project-setup.md` | Project structure, uv, imports |
-| `verification.md` | Pre-commit hooks, tox, Makefile targets |
-| `imports-optional-dependencies.md` | Required vs optional dependency import patterns |
+| File                               | Content                                                   |
+| ---------------------------------- | --------------------------------------------------------- |
+| `coding-standards.md`              | Type hints, formatting, size limits, docstrings, comments |
+| `cli-development.md`               | Typer/Click, parameters, Rich output, env vars            |
+| `linter-rules.md`                  | Ruff rules E402, B007, B008, S108, PLC0415, NPY002, S311  |
+| `testing.md`                       | Fixtures, parameterized, mocking, TDD, coverage           |
+| `type-checking.md`                 | TYPE_CHECKING alternatives, protocols, forward refs       |
+| `debugging.md`                     | 4-phase process, red flags, rationalizations              |
+| `refactoring.md`                   | Bulk operations, code transfer, safety checks             |
+| `code-review.md`                   | Receiving feedback, push back, evaluation                 |
+| `auditing.md`                      | 6-dimension analysis, severity ratings                    |
+| `documentation.md`                 | 10-section structure, Mermaid diagrams                    |
+| `planning.md`                      | PLAN.md template and example                              |
+| `file-analysis.md`                 | Metadata, line counting, pattern searching                |
+| `project-setup.md`                 | Project structure, uv, imports                            |
+| `verification.md`                  | Pre-commit hooks, tox, Makefile targets                   |
+| `imports-optional-dependencies.md` | Required vs optional dependency import patterns           |
