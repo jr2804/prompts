@@ -6,14 +6,31 @@ description: >-
   project planning, and bulk operations. Use when writing, reviewing, refactoring,
   debugging, or documenting Python code; configuring linters; setting up CLI tools;
     planning features; performing code audits; checking Python antipatterns, forbidden
-    methods, or bad style; or handling bulk operations (10+ files) that need 90%+
-    token savings.
+    methods, or bad style; or handling bulk operations (10+ files) that benefit from
+    batch workflows instead of per-file iteration.
+arguments:
+  - name: sub-command
+    description: >-
+      Targeted guideline review to run. When omitted, runs a general antipattern check.
+    enum:
+      - naming
+      - type-checking
+      - imports
+      - coding-standards
+      - linter-rules
+      - testing
+      - debugging
+      - audit
+      - verification
+      - code-review
+      - help
+    required: false
 license: MIT
 ---
 
 # Python Ultimate
 
-Complete Python development reference. Covers standards, tooling, workflows, and best practices.
+Single Python reference with quick routes for standards, tooling, workflows, and best practices.
 
 ## Quick Start
 
@@ -30,17 +47,197 @@ Complete Python development reference. Covers standards, tooling, workflows, and
 **Planning a feature?** → Go to [Planning](references/planning.md)
 **Bulk operations?** → Go to [Refactoring](references/refactoring.md) (10+ files)
 
-### Slash Command Flow
+### Slash Commands
 
-Use `/python-ultimate` when you want a fast antipattern check.
+The `/python-ultimate` command accepts an optional `sub-command` argument to run
+a targeted guideline review. When invoked without a sub-command (e.g., just
+`/python-ultimate`), run a general antipattern check using the
+Antipatterns / Forbidden Styles Index section below.
 
-1. Start with [Antipatterns / Forbidden Styles Index](#antipatterns--forbidden-styles-index)
-2. Open the linked reference section for details
-3. Apply the matching fix pattern from that section
+#### Routing
 
-### Expected `/python-ultimate` Antipattern Response Format
+Match the `sub-command` argument to one of the sections below and follow its
+workflow. If the argument does not match any known sub-command, explain the
+available options (you can output the table from `python-ultimate help`).
 
-For consistency across agents, format antipattern-check responses as:
+---
+
+### python-ultimate help
+
+When the sub-command is `help` (or when the user asks for available commands),
+render the following table so the user sees all available options:
+
+```
+Sub-Command                    │ What It Reviews                                        │ Reference
+───────────────────────────────┼────────────────────────────────────────────────────────┼──────────────────────────────────
+python-ultimate naming         │ File/dir variable naming (_file/_dir/_path suffixes)  │ references/naming-conventions.md
+python-ultimate type-checking  │ TYPE_CHECKING guards and Optional[T] usage             │ references/type-checking.md
+python-ultimate imports        │ Required-vs-optional import patterns                    │ references/imports-optional-dependencies.md
+python-ultimate coding-standards│ Type hints, f-strings, pathlib, docstrings, comments  │ references/coding-standards.md
+python-ultimate linter-rules   │ Ruff violations (E402, B007, B008, S108, etc.)         │ references/linter-rules.md
+python-ultimate debugging      │ Systematic 4-phase debugging process                   │ references/debugging.md
+python-ultimate testing        │ Test organization, fixtures, mocking, TDD, coverage    │ references/testing.md
+python-ultimate audit          │ 6-dimension codebase audit                             │ references/auditing.md
+python-ultimate verification   │ Evidence-based completion claims                       │ references/verification.md
+python-ultimate code-review    │ Code review feedback evaluation                        │ references/code-review.md
+```
+
+---
+
+### python-ultimate naming
+
+Reviews file and directory variable naming conventions (`_file` / `_dir` / `_path`
+suffixes).
+
+**Workflow:**
+1. Open `references/naming-conventions.md` and load the "1. Files and Directories" section
+2. Scan the codebase for bare path names (`path`, `file`, `dir`, `output`, `source`, `target`) used as `Path` variables
+3. Check for prefix patterns (`dir_output` → should be `output_dir`)
+4. Find generic path variable names missing suffixes (`results` → ambiguous)
+5. Report findings using the standard [antipattern response format](SKILL.md)
+
+---
+
+### python-ultimate type-checking
+
+Scans for `TYPE_CHECKING` guards and `Optional[T]` usage.
+
+**Workflow:**
+1. Open `references/type-checking.md` and load the "Rule: Never Use TYPE_CHECKING Guards" section
+2. Search for `TYPE_CHECKING` imports: `rg "TYPE_CHECKING" src/`
+3. Search for `Optional[` usage: `rg "Optional\[" src/`
+4. For each finding, identify the root cause (circular imports, type-only imports)
+5. Recommend the appropriate alternative (shared types module, protocols, forward refs, local imports)
+6. Report findings using the standard [antipattern response format](SKILL.md)
+
+---
+
+### python-ultimate imports
+
+Reviews import patterns — distinguishes required vs optional dependencies.
+
+**Workflow:**
+1. Open `references/imports-optional-dependencies.md` and load the hard rule
+2. Check `pyproject.toml` to determine which packages are required vs optional
+3. Search for `try/except ImportError` patterns guarding required deps:
+   `rg "except ImportError" src/`
+4. For each match, classify: required dep → normal top-level import; optional dep → localized handling
+5. Report findings using the standard [antipattern response format](SKILL.md)
+
+---
+
+### python-ultimate coding-standards
+
+Reviews compliance with coding standards: type hints, f-strings, pathlib, docstrings,
+comments, prohibited patterns, vague input/output types.
+
+**Workflow:**
+1. Open `references/coding-standards.md` and load relevant sections
+2. For each prohibited pattern, search with targeted grep patterns:
+   - `Optional\[` → must be `T | None`
+   - `\.format\(` or `% ` formatting → must be f-strings
+   - `os\.path\.` → must be `pathlib.Path`
+   - `# noqa` → fix root issue
+3. Check for vague input/output types with multiple `isinstance` checks
+4. Report findings using the standard [antipattern response format](SKILL.md)
+
+---
+
+### python-ultimate linter-rules
+
+Reviews and fixes specific Ruff linter violations using context-aware patterns.
+
+**Workflow:**
+1. Open `references/linter-rules.md` and load the relevant rule section
+2. Run `ruff check src/` to identify violations
+3. For each violated rule, apply the context-specific fix pattern from the reference:
+   - E402 → Move import to top of module
+   - B007 → Prefix unused loop variable with `_`
+   - B008 → Use `None` sentinel (except Typer `Annotated` parameters)
+   - S108 → Use `tempfile` or `tmp_path` fixture
+   - PLC0415 → Move import to module level
+   - NPY002 → Use `default_rng()`
+   - S311 → Use `secrets` for security contexts
+4. Re-run `ruff check src/` to confirm fixes
+5. Report findings using the standard [antipattern response format](SKILL.md)
+
+---
+
+### python-ultimate debugging
+
+Initiates the systematic 4-phase debugging process.
+
+**Workflow:**
+1. Open `references/debugging.md` and load the full 4-phase process
+2. **Phase 1 — Root Cause:** Reproduce the issue, read error messages, trace data flow from symptom to origin
+3. **Phase 2 — Pattern:** Find working examples, compare against broken code, list every difference
+4. **Phase 3 — Hypothesis:** Form a single testable hypothesis, make the smallest possible change to test it
+5. **Phase 4 — Implementation:** Write a failing test first, implement the fix, verify all tests pass
+6. Remember the iron law: **No fixes without root cause investigation first.**
+7. If 3+ fixes have failed, stop and reassess architecture rather than continuing to guess
+
+---
+
+### python-ultimate testing
+
+Reviews test organization, coverage, fixtures, mocking, and TDD compliance.
+
+**Workflow:**
+1. Open `references/testing.md` for patterns and standards
+2. Check test file naming: `test_<module>.py` convention
+3. Check test class naming: `Test<Name>` PascalCase
+4. Check test method naming: `test_<description>` snake_case
+5. Run coverage: `uv run pytest --cov=src --cov-report=term-missing`
+6. Review fixture quality (descriptive names, proper scope, teardown)
+7. Report findings using the standard [antipattern response format](SKILL.md)
+
+---
+
+### python-ultimate audit
+
+Runs a 6-dimension codebase audit.
+
+**Workflow:**
+1. Open `references/auditing.md` and load all six dimensions
+2. For each dimension (Architecture, Quality, Security, Performance, Testing, Maintainability):
+   - Scan with grep/glob for relevant red flags
+   - Rate findings by severity (Critical, High, Medium, Low)
+3. Synthesize into an audit report using the format from `references/auditing.md`
+4. Include an executive summary with health score and top recommendation
+5. Include an action plan with immediate/short-term/medium-term/backlog items
+
+---
+
+### python-ultimate verification
+
+Verifies that completion claims are backed by fresh evidence.
+
+**Workflow:**
+1. Open `references/verification.md` and load the iron law and gate function
+2. For each claim, determine what command proves it
+3. Run the full command, read the output, check the exit code
+4. Only then state the result — with evidence, not assumptions
+5. Forbidden words: `should`, `probably`, `might`, `likely`
+6. Report results using the standard [antipattern response format](SKILL.md)
+
+---
+
+### python-ultimate code-review
+
+Evaluates code review feedback and responds with technical rigor.
+
+**Workflow:**
+1. Open `references/code-review.md` and load the full workflow
+2. Follow the READ → UNDERSTAND → VERIFY → EVALUATE → RESPOND → IMPLEMENT sequence
+3. For each feedback item: verify against codebase reality, evaluate technical soundness
+4. No performative agreement — respond with technical reasoning or push back with evidence
+5. Push back when: suggestion breaks existing functionality, violates YAGNI, lacks full context
+
+---
+
+### Expected `/python-ultimate` Response Format
+
+For consistency across agents, format all sub-command responses as:
 
 1. **Summary** — total findings by severity and category
 2. **Findings** — one item per finding: `file:line`, matched pattern class, short rationale
@@ -56,18 +253,18 @@ Canonical quick-reference for common bad or forbidden patterns. Detailed rationa
 
 | Category             | Forbidden pattern                                    | Preferred pattern                                      | Source                                                                                                                                                                                                       |
 | -------------------- | ---------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Type checking        | `TYPE_CHECKING` import guards                        | Refactor module boundaries, use forward refs/protocols | [references/type-checking.md#1-rule-never-use-type_checking-guards](references/type-checking.md#1-rule-never-use-type_checking-guards)                                                                       |
-| Type hints           | `Optional[T]`                                        | `T \| None`                                            | [references/coding-standards.md#1-type-hints-mandatory](references/coding-standards.md#1-type-hints-mandatory)                                                                                               |
-| String formatting    | `.format()` and `%` formatting                       | f-strings                                              | [references/coding-standards.md#2-string-formatting](references/coding-standards.md#2-string-formatting)                                                                                                     |
-| Paths                | `os.path` usage                                      | `pathlib.Path`                                         | [references/coding-standards.md#ospath](references/coding-standards.md#ospath)                                                                                                                               |
-| Lint suppression     | `# noqa` to hide issues                              | Fix root issue                                         | [references/coding-standards.md#prohibited-linter-rules](references/coding-standards.md#prohibited-linter-rules)                                                                                             |
-| Import policy        | Defensive `try/except ImportError` for required deps | Normal top-level imports for required deps             | [references/imports-optional-dependencies.md#31-anti-pattern-defensive-import-for-required-dependency](references/imports-optional-dependencies.md#31-anti-pattern-defensive-import-for-required-dependency) |
-| Path variable naming | Bare names like `path`, `file`, `output` for paths   | Use `_file` / `_dir` suffixes                          | [references/naming-conventions.md#13-anti-patterns](references/naming-conventions.md#13-anti-patterns)                                                                                                       |
-| Path variable naming | Prefix forms `dir_x`, `file_x`                       | Suffix forms `x_dir`, `x_file`                         | [references/naming-conventions.md#13-anti-patterns](references/naming-conventions.md#13-anti-patterns)                                                                                                       |
-| Comments             | Restating obvious code intent                        | Explain why/constraints only                           | [references/coding-standards.md#7-comments](references/coding-standards.md#7-comments)                                                                                                                       |
-| Debugging workflow   | Guess-and-check fixes before RCA                     | Follow 4-phase process                                 | [references/debugging.md#4-phase-process](references/debugging.md#4-phase-process)                                                                                                                           |
-| Debugging behavior   | Repeated "one more try" after multiple failures      | Stop and reassess architecture                         | [references/debugging.md#when-to-stop-and-reassess](references/debugging.md#when-to-stop-and-reassess)                                                                                                       |
-| Code review behavior | Performative agreement phrases                       | Technical response and evidence                        | [references/code-review.md#no-performative-agreement](references/code-review.md#no-performative-agreement)                                                                                                   |
+| Type checking        | `TYPE_CHECKING` import guards                        | Refactor module boundaries, use forward refs/protocols | [references/type-checking.md](references/type-checking.md)                                                                                                           |
+| Type hints           | `Optional[T]`                                        | `T \| None`                                            | [references/coding-standards.md](references/coding-standards.md)                                                                                                       |
+| String formatting    | `.format()` and `%` formatting                       | f-strings                                              | [references/coding-standards.md](references/coding-standards.md)                                                                                                     |
+| Paths                | `os.path` usage                                      | `pathlib.Path`                                         | [references/coding-standards.md](references/coding-standards.md)                                                                                                                               |
+| Lint suppression     | `# noqa` to hide issues                              | Fix root issue                                         | [references/coding-standards.md](references/coding-standards.md)                                                                                             |
+| Import policy        | Defensive `try/except ImportError` for required deps | Normal top-level imports for required deps             | [references/imports-optional-dependencies.md](references/imports-optional-dependencies.md) |
+| Path variable naming | Bare names like `path`, `file`, `output` for paths   | Use `_file` / `_dir` suffixes                          | [references/naming-conventions.md](references/naming-conventions.md)                                                                                                       |
+| Path variable naming | Prefix forms `dir_x`, `file_x`                       | Suffix forms `x_dir`, `x_file`                         | [references/naming-conventions.md](references/naming-conventions.md)                                                                                                       |
+| Comments             | Restating obvious code intent                        | Explain why/constraints only                           | [references/coding-standards.md](references/coding-standards.md)                                                                                                                       |
+| Debugging workflow   | Guess-and-check fixes before RCA                     | Follow 4-phase process                                 | [references/debugging.md](references/debugging.md)                                                                                                                           |
+| Debugging behavior   | Repeated "one more try" after multiple failures      | Stop and reassess architecture                         | [references/debugging.md](references/debugging.md)                                                                                                       |
+| Code review behavior | Performative agreement phrases                       | Technical response and evidence                        | [references/code-review.md](references/code-review.md)                                                                                                   |
 
 ---
 
@@ -109,7 +306,7 @@ Google style. Required for public functions and classes.
 - `# noqa` comments
 - `sys.path` manipulation
 - Defensive `try/except ImportError` for required dependencies (see [references/imports-optional-dependencies.md](references/imports-optional-dependencies.md))
-- Vague or wide parameter/return types with hidden `isinstance`/`hasattr` checks and `None`-as-error returns (see [references/coding-standards.md#vague-inputoutput-types](references/coding-standards.md#vague-inputoutput-types))
+- Vague or wide parameter/return types with hidden `isinstance`/`hasattr` checks and `None`-as-error returns (see [references/coding-standards.md](references/coding-standards.md))
 
 ---
 
