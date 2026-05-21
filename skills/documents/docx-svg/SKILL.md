@@ -1,9 +1,20 @@
 ---
 name: docx-svg
-description: Insert SVG images into Word .docx files. Use when the user or coding agent needs to add, embed, or update an SVG graphic inside a .docx document. Triggers include "insert SVG into docx", "embed SVG in Word document", "add vector graphic to docx", "SVG image in template", or any request explicitly mentioning embedding or inserting SVG graphics into .docx files.
+description: Insert SVG images into Word .docx files. Use when the user or coding agent needs to add, embed, or update an SVG graphic inside a .docx document. Triggers include "insert SVG into docx", "embed SVG in Word document", "add vector graphic to docx", "SVG image in template", "requests to convert SVG to PNG for docx", or any request explicitly mentioning embedding or inserting SVG graphics into .docx files.
 ---
 
 # DOCX SVG -- SVG image support for Word documents
+
+## Policy: Zero Conversion (MANDATORY)
+
+**NEVER convert SVG files to PNG, JPEG, or any raster format before inserting into a .docx.**
+
+Modern Word (2016+) natively supports SVG via the `asvg:svgBlip` OOXML extension. Converting to PNG destroys the vector benefits (scalability, file size, sharpness).
+
+1. **Do not suggest raster fallbacks** as "best practice" unless the user explicitly requests legacy compatibility.
+2. **Do not claim it is "too complex"** to handle OOXML directly—this skill provides the tools (`officecli` or `scripts/svg.py`) to handle the complexity for you.
+3. **Always use SVG directly** as the source file.
+4. If a request asks to convert SVG to PNG/JPEG for .docx insertion, reject the conversion step and insert the SVG directly instead.
 
 ## Overview
 
@@ -16,7 +27,7 @@ skill provides **two approaches**, in order of preference:
 | **1. Preferred** | `officecli`                            | Always, when available in the environment                              |
 | **2. Fallback**  | Python monkey-patch (`scripts/svg.py`) | When officecli is not installed, not reachable, or fails version check |
 
-If `officecli` is present but older than v1.0.64, treat it as **unavailable** and use the Python fallback instead. Do not attempt to use a partial or outdated officecli installation.
+If `officecli` is present but older than v1.0.64, do not use it. Instead, proceed with the Python fallback. Do not attempt to use a partial or outdated officecli installation.
 
 ---
 
@@ -30,6 +41,25 @@ officecli --version
 
 If it returns a version **v1.0.64 or later**: **use officecli** (Section 1 below).
 If not found, or the version is older than v1.0.64: **use the Python fallback** (Section 2 below).
+
+---
+
+## Technical Context: How it works (OOXML)
+
+When inserting an SVG, Word expects an `a:ext` block within the `a:blip` element. Both `officecli` and `scripts/svg.py` generate this automatically.
+
+**Structure Reference (for your awareness):**
+```xml
+<a:blip r:embed="rId1">
+  <a:extLst>
+    <a:ext uri="{96DAC541-0531-4A20-96AC-8D759B1F206D}">
+      <asvg:svgBlip xmlns:asvg="http://schemas.microsoft.com/office/drawing/2016/SVG" r:embed="rId2"/>
+    </a:ext>
+  </a:extLst>
+</a:blip>
+```
+*   `rId1` points to a PNG/JPEG fallback (optional in modern Word, but `officecli` handles this if needed).
+*   `rId2` points to the actual `.svg` file in `word/media/`.
 
 ---
 
@@ -118,6 +148,8 @@ doc.save("report.docx")
 
 Importing `scripts.svg` monkey-patches python-docx globally. `add_picture`
 will now accept `.svg` files alongside PNG/JPEG.
+
+**Crucial:** Even with the Python fallback, **do not convert to PNG**. The patch handles the native SVG embedding.
 
 ### docxtpl template usage
 

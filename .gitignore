@@ -4,3 +4,6 @@ skills-lock.json
 .agents
 /.vscode
 /QWEN.md
+tmp/
+/**/evals/
+docs/onboarding
