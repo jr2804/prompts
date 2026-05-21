@@ -42,9 +42,15 @@ run = "uv tool run --with mdformat-front-matters mdformat . --exclude .config/ -
 description = "Add skills to the agent"
 run = [
     "cls",
+    # coding & tools skills
+    "bun x skills add jr2804/prompts -a universal -y -s python-ultimate -s docx -s docx-svg -s docling-document-intelligence -s pdf -s pptx -s xlsx",
+    # "bun x skills add AlmogBaku/debug-skill -a universal -y",
+
     "bun x skills add https://github.com/nicobailon/visual-explainer -a universal -y",
-    "bun x skills add https://github.com/alinaqi/claude-bootstrap -s code-deduplication -a universal -y",
     "bun x skills add https://github.com/hardikpandya/stop-slop -a universal -y",
+
+    # document intelligence skills
     "bun x skills add kreuzberg-dev/kreuzberg -a universal -y",
-    "bun x skills add AlmogBaku/debug-skill -a universal -y",
+    "bun x skills add run-llama/llamaparse-agent-skills --skill liteparse -a universal -y",
+
 ]
