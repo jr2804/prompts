@@ -1,0 +1,71 @@
+# Tables and Figures
+
+## Tables
+
+### Styles (use concrete names from SDO drafting skill)
+
+- Caption (placed **above** the table): `table-caption`
+- Header row: `table-header`
+- Data rows: `table-data`
+- Table notes (merged row at bottom of table): `table-note`
+
+### Layout
+
+- Centre all tables horizontally on the page.
+- Final edit: set column width to "Autofit to contents" for all tables.
+
+### Captions and cross-references
+
+- Caption format: `Table&#160;N: <caption text>` -- use a non-breaking
+  space between "Table" and the number.
+- Do **not** hard-code the table number. Use a `{SEQ Table \* ARABIC}`
+  field for automatic numbering.
+- Insert a **bookmark** around the `Table&#160;N` part only (not the full
+  caption text). Name it `tbl_<short_name>`.
+- Cross-reference in body text with `{REF tbl_<short_name>}`. Never insert
+  hard-coded plain-text references.
+- See `sdo-docx-operations` for officecli field-code and bookmark injection.
+
+## Figures
+
+### Styles (use concrete names from SDO drafting skill)
+
+- Paragraph containing the image: `figure-para`
+- Caption (placed **below** the figure): `figure-caption`
+- Figure notes placed directly below the image and before the caption:
+  `figure-note`
+
+### Layout
+
+- Maintain the original aspect ratio when resizing.
+- Labels inside figures must be clearly legible; use maximum feasible font
+  size.
+- Prefer page width. Reduce only if the figure would exceed about 50% of
+  the page height; minimum width is half the page width.
+- Export diagrams as SVG for maximum quality. When using Draw.io, follow the
+  [Draw.io SVG text rendering guidelines](https://www.drawio.com/doc/faq/svg-export-text-problems)
+  to avoid text display issues in Word.
+
+### Captions and cross-references
+
+- Caption format: `Figure&#160;N: <caption text>` -- use a non-breaking
+  space between "Figure" and the number.
+- Do **not** hard-code the figure number. Use a `{SEQ Figure \* ARABIC}`
+  field for automatic numbering.
+- Insert a **bookmark** around the `Figure&#160;N` part only (not the full
+  caption text). Name it `fig_<short_name>`.
+- Cross-reference in body text with `{REF fig_<short_name>}`. Never insert
+  hard-coded plain-text references.
+- See `sdo-docx-operations` for officecli field-code and bookmark injection.
+
+## Style mapping
+
+| Abstract | Concrete (per SDO drafting skill) |
+|----------|-----------------------------------|
+| `table-caption` | SDO-specific style for table caption above table |
+| `table-header` | SDO-specific style for table header row |
+| `table-data` | SDO-specific style for table data rows |
+| `table-note` | SDO-specific style for table bottom-row notes |
+| `figure-para` | SDO-specific style for paragraph containing image |
+| `figure-caption` | SDO-specific style for figure caption below figure |
+| `figure-note` | SDO-specific style for notes below figure |
