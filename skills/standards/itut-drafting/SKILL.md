@@ -208,7 +208,7 @@ Text inside a proposed new/amended clause uses `"ind.left":"720"`
 - `sdo-docx-formatting` -- formatting rules (delegated; see mapping above)
 - `sdo-docx-operations` -- officecli guardrails for raw-set, field codes, bookmarks
 - `sdo-writing-style` -- prose quality rules
+- `sdo-writing-conventions` -- mechanical writing rules
 - `itut-basics` -- ITU-T organisation context
-- `itut-meetings` -- meeting structure and contribution deadlines
 - `itut-contributions` -- contribution types and numbering
 - `itut-recommendations` -- Recommendation structure and approval

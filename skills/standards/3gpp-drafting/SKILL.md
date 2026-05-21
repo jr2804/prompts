@@ -78,6 +78,7 @@ See `sdo-docx-formatting/references/headings.md` for full rules. The
 - `sdo-docx-formatting` -- formatting rules (delegated; see mapping above)
 - `sdo-docx-operations` -- officecli guardrails for raw-set, field codes, bookmarks
 - `sdo-writing-style` -- prose quality rules
+- `sdo-writing-conventions` -- mechanical writing rules (spelling, numbers, abbreviations)
 - `3gpp-basics` -- 3GPP organisation context
 - `3gpp-meetings` -- meeting structure and identifiers
 - `3gpp-tdocs` -- TDoc numbering patterns and FTP access

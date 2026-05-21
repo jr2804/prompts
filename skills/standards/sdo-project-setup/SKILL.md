@@ -53,6 +53,7 @@ uv run .agents/skills/sdo-project-setup/scripts/set_docx_props.py \
 - `sdo-docx-formatting` -- formatting rules (loaded for all SDOs)
 - `sdo-docx-operations` -- officecli guardrails (loaded for all SDOs)
 - `sdo-writing-style` -- prose quality (loaded when drafting content)
+- `sdo-writing-conventions` -- mechanical writing rules (loaded when drafting content)
 - `3gpp-drafting` -- 3GPP-specific template, metadata, header structure
 - `etsi-drafting` -- ETSI-specific template, metadata, header structure
 - `itut-drafting` -- ITU-T-specific template, header table structure
