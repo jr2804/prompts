@@ -1,6 +1,6 @@
 ---
 name: itut-recommendations
-description: ITU-T Recommendation structure, approval processes, amendment/corrigendum procedures, and ITU-T | ISO/IEC common text conventions. Use when the agent needs to understand how ITU-T Recommendations are structured (clause order, element types, annex conventions), approved (TAP/AAP), amended, or how joint ITU-T/ISO/IEC texts work. Sources: Rec. ITU-T A.1 (09/2019) + Rules for presentation of ITU-T | ISO/IEC common text (2014).
+description: "ITU-T Recommendation structure, approval processes, amendment/corrigendum procedures, and ITU-T | ISO/IEC common text conventions. Use when the agent needs to understand how ITU-T Recommendations are structured (clause order, element types, annex conventions), approved (TAP/AAP), amended, or how joint ITU-T/ISO/IEC texts work. Sources: Rec. ITU-T A.1 (09/2019) + Rules for presentation of ITU-T | ISO/IEC common text (2014)."
 ---
 
 # ITU-T Recommendations -- structure & approval

@@ -1,6 +1,6 @@
 ---
 name: itut-basics
-description: ITU-T organizational structure, document types, terminology, roles, and meeting procedures. Use when the agent needs context about how ITU-T works: study groups, working parties, rapporteurs, Question/WTSA/TSAG/TSB concepts, meeting procedures, or ITU-T document type definitions (Recommendation, amendment, corrigendum, annex, appendix). Sources: Rec. ITU-T A.1 (09/2019).
+description: "ITU-T organizational structure, document types, terminology, roles, and meeting procedures. Use when the agent needs context about how ITU-T works: study groups, working parties, rapporteurs, Question/WTSA/TSAG/TSB concepts, meeting procedures, or ITU-T document type definitions (Recommendation, amendment, corrigendum, annex, appendix). Sources: Rec. ITU-T A.1 (09/2019)."
 ---
 
 # ITU-T Basics

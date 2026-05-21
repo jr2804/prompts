@@ -1,6 +1,6 @@
 ---
 name: itut-drafting
-description: ITU-T-specific contribution document drafting: template structure, header table fields, style-name mapping, equation conventions, and batch workflows. Use when preparing or editing ITU-T contribution .docx files (C-series or TD-series). Delegates formatting rules to sdo-docx-formatting and officecli operations to sdo-docx-operations.
+description: "ITU-T-specific contribution document drafting: template structure, header table fields, style-name mapping, equation conventions, and batch workflows. Use when preparing or editing ITU-T contribution .docx files (C-series or TD-series). Delegates formatting rules to sdo-docx-formatting and officecli operations to sdo-docx-operations."
 ---
 
 # ITU-T Contribution Drafting

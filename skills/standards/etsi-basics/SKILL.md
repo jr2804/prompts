@@ -1,6 +1,6 @@
 ---
 name: etsi-basics
-description: ETSI organisation overview, deliverable types, standards development lifecycle, and key roles. Use when the agent needs context about how ETSI works: Technical Committees, deliverable types (TS, ES, EN, HS, TR, EG, SR, GS), approval processes, the standards development lifecycle (Work Item through publication), or ETSI-specific terminology. Sources: ETSI Guide to Writing World Class Standards + ETSI Directives.
+description: "ETSI organisation overview, deliverable types, standards development lifecycle, and key roles. Use when the agent needs context about how ETSI works: Technical Committees, deliverable types (TS, ES, EN, HS, TR, EG, SR, GS), approval processes, the standards development lifecycle (Work Item through publication), or ETSI-specific terminology. Sources: ETSI Guide to Writing World Class Standards + ETSI Directives."
 ---
 
 # ETSI Basics

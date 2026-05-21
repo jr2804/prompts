@@ -1,6 +1,6 @@
 ---
 name: etsi-drafting
-description: ETSI-specific deliverable drafting conventions: document structure, clause ordering, requirements writing (shall/should/may), figures/tables/equations, annexes, and ETSI style-name mapping. Use when preparing or editing ETSI deliverable .docx files (TS, ES, EN, TR, EG, SR, GS). Delegates formatting rules to sdo-docx-formatting and officecli operations to sdo-docx-operations.
+description: "ETSI-specific deliverable drafting conventions: document structure, clause ordering, requirements writing (shall/should/may), figures/tables/equations, annexes, and ETSI style-name mapping. Use when preparing or editing ETSI deliverable .docx files (TS, ES, EN, TR, EG, SR, GS). Delegates formatting rules to sdo-docx-formatting and officecli operations to sdo-docx-operations."
 ---
 
 # ETSI Deliverable Drafting

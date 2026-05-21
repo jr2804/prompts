@@ -1,6 +1,6 @@
 ---
 name: sdo-writing-conventions
-description: Mechanical writing conventions for formal standards documents across all SDOs (3GPP, ETSI, ITU-T). Use when drafting or revising text to ensure consistent spelling (-ize/-ise), hyphenation, number formatting, capitalization, abbreviations, list formatting, proper names, and non-discriminatory language. Complements sdo-writing-style (prose quality) with mechanical correctness rules. Sources: ITU English Language Style Guide (2024).
+description: "Mechanical writing conventions for formal standards documents across all SDOs (3GPP, ETSI, ITU-T). Use when drafting or revising text to ensure consistent spelling (-ize/-ise), hyphenation, number formatting, capitalization, abbreviations, list formatting, proper names, and non-discriminatory language. Complements sdo-writing-style (prose quality) with mechanical correctness rules. Sources: ITU English Language Style Guide (2024)."
 ---
 
 # SDO Writing Conventions

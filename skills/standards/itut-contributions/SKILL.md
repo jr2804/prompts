@@ -1,6 +1,6 @@
 ---
 name: itut-contributions
-description: ITU-T contribution and TDoc submission procedures, deadlines, liaison statement format, and IPR requirements. Use when the agent needs to understand how to submit, format, or process ITU-T contributions (C-series documents), TDocs (Temporary Documents), or liaison statements. Covers submission deadlines, translation rules, patent/copyright declarations, and electronic posting. Sources: Rec. ITU-T A.1 (09/2019) clause 3.
+description: "ITU-T contribution and TDoc submission procedures, deadlines, liaison statement format, and IPR requirements. Use when the agent needs to understand how to submit, format, or process ITU-T contributions (C-series documents), TDocs (Temporary Documents), or liaison statements. Covers submission deadlines, translation rules, patent/copyright declarations, and electronic posting. Sources: Rec. ITU-T A.1 (09/2019) clause 3."
 ---
 
 # ITU-T Contributions & TDoc Procedures
