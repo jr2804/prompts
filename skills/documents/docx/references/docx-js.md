@@ -10,16 +10,54 @@ Assumes docx is already installed globally
 If not installed: `npm install -g docx`
 
 ```javascript
-const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, ImageRun, Media, 
-        Header, Footer, AlignmentType, PageOrientation, LevelFormat, ExternalHyperlink, 
-        InternalHyperlink, TableOfContents, HeadingLevel, BorderStyle, WidthType, TabStopType, 
-        TabStopPosition, UnderlineType, ShadingType, VerticalAlign, SymbolRun, PageNumber,
-        FootnoteReferenceRun, Footnote, PageBreak } = require('docx');
+const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, ImageRun, Media,
+        Header, Footer, AlignmentType, PageOrientation, LevelFormat, ExternalHyperlink,
+        InternalHyperlink, Bookmark, FootnoteReferenceRun, PositionalTab,
+        PositionalTabAlignment, PositionalTabRelativeTo, PositionalTabLeader,
+        TabStopType, TabStopPosition, Column, SectionType,
+        TableOfContents, HeadingLevel, BorderStyle, WidthType, ShadingType,
+        VerticalAlign, PageNumber, PageBreak } = require('docx');
 
 // Create & Save
 const doc = new Document({ sections: [{ children: [/* content */] }] });
 Packer.toBuffer(doc).then(buffer => fs.writeFileSync("doc.docx", buffer)); // Node.js
 Packer.toBlob(doc).then(blob => { /* download logic */ }); // Browser
+```
+
+## Page Size
+
+**CRITICAL: docx-js defaults to A4, not US Letter.** Always set page size explicitly for consistent results.
+
+```javascript
+sections: [{
+  properties: {
+    page: {
+      size: {
+        width: 12240,   // 8.5 inches in DXA
+        height: 15840   // 11 inches in DXA
+      },
+      margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 } // 1 inch margins
+    }
+  },
+  children: [/* content */]
+}]
+```
+
+**Common page sizes (DXA units, 1440 DXA = 1 inch):**
+
+| Paper | Width | Height | Content Width (1" margins) |
+|-------|-------|--------|---------------------------|
+| US Letter | 12,240 | 15,840 | 9,360 |
+| A4 (default) | 11,906 | 16,838 | 9,026 |
+
+**Landscape orientation:** docx-js swaps width/height internally, so pass portrait dimensions and let it handle the swap:
+```javascript
+size: {
+  width: 12240,   // Pass SHORT edge as width
+  height: 15840,  // Pass LONG edge as height
+  orientation: PageOrientation.LANDSCAPE  // docx-js swaps them in the XML
+},
+// Content width = 15840 - left margin - right margin (uses the long edge)
 ```
 
 ## Text & Formatting
@@ -38,7 +76,7 @@ new Paragraph({
     new TextRun({ text: "Bold", bold: true }),
     new TextRun({ text: "Italic", italics: true }),
     new TextRun({ text: "Underlined", underline: { type: UnderlineType.DOUBLE, color: "FF0000" } }),
-    new TextRun({ text: "Colored", color: "FF0000", size: 28, font: "Arial" }), // Arial default
+    new TextRun({ text: "Colored", color: "FF0000", size: 28, font: "Arial" }),
     new TextRun({ text: "Highlighted", highlight: "yellow" }),
     new TextRun({ text: "Strikethrough", strike: true }),
     new TextRun({ text: "x2", superScript: true }),
@@ -79,8 +117,8 @@ const doc = new Document({
   sections: [{
     properties: { page: { margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 } } },
     children: [
-      new Paragraph({ heading: HeadingLevel.TITLE, children: [new TextRun("Document Title")] }), // Uses overridden Title style
-      new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("Heading 1")] }), // Uses overridden Heading1 style
+      new Paragraph({ heading: HeadingLevel.TITLE, children: [new TextRun("Document Title")] }),
+      new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("Heading 1")] }),
       new Paragraph({ style: "myStyle", children: [new TextRun("Custom paragraph style")] }),
       new Paragraph({ children: [
         new TextRun("Normal with "),
@@ -106,7 +144,7 @@ const doc = new Document({
 - **Set a default font** using `styles.default.document.run.font` - Arial is universally supported
 - **Establish visual hierarchy** with different font sizes (titles > headers > body)
 - **Add proper spacing** with `before` and `after` paragraph spacing
-- **Use colors sparingly**: Default to black (000000) and shades of gray for titles and headings (heading 1, heading 2, etc.)
+- **Use colors sparingly**: Default to black (000000) and shades of gray for titles and headings
 - **Set consistent margins** (1440 = 1 inch is standard)
 
 ## Lists (ALWAYS USE PROPER LISTS - NEVER USE UNICODE BULLETS)
@@ -161,60 +199,50 @@ const doc = new Document({
 
 ## Tables
 
+**CRITICAL: Tables need dual widths** — set both `columnWidths` on the table AND `width` on each cell. Without both, tables render incorrectly on some platforms.
+
+**CRITICAL: Always set table width** using `WidthType.DXA` — never use `WidthType.PERCENTAGE` (breaks in Google Docs).
+
 ```javascript
-// Complete table with margins, borders, headers, and bullet points
-const tableBorder = { style: BorderStyle.SINGLE, size: 1, color: "CCCCCC" };
-const cellBorders = { top: tableBorder, bottom: tableBorder, left: tableBorder, right: tableBorder };
+// CRITICAL: Use ShadingType.CLEAR (not SOLID) to prevent black backgrounds
+const border = { style: BorderStyle.SINGLE, size: 1, color: "CCCCCC" };
+const borders = { top: border, bottom: border, left: border, right: border };
 
 new Table({
-  columnWidths: [4680, 4680], // ⚠️ CRITICAL: Set column widths at table level - values in DXA (twentieths of a point)
+  width: { size: 9360, type: WidthType.DXA }, // Always use DXA (percentages break in Google Docs)
+  columnWidths: [4680, 4680], // Must sum to table width (DXA: 1440 = 1 inch)
   margins: { top: 100, bottom: 100, left: 180, right: 180 }, // Set once for all cells
   rows: [
     new TableRow({
       tableHeader: true,
       children: [
         new TableCell({
-          borders: cellBorders,
-          width: { size: 4680, type: WidthType.DXA }, // ALSO set width on each cell
-          // ⚠️ CRITICAL: Always use ShadingType.CLEAR to prevent black backgrounds in Word.
-          shading: { fill: "D5E8F0", type: ShadingType.CLEAR }, 
+          borders,
+          width: { size: 4680, type: WidthType.DXA }, // Also set on each cell
+          shading: { fill: "D5E8F0", type: ShadingType.CLEAR }, // CLEAR not SOLID
+          margins: { top: 80, bottom: 80, left: 120, right: 120 }, // Cell padding
           verticalAlign: VerticalAlign.CENTER,
-          children: [new Paragraph({ 
-            alignment: AlignmentType.CENTER,
+          children: [new Paragraph({ alignment: AlignmentType.CENTER,
             children: [new TextRun({ text: "Header", bold: true, size: 22 })]
           })]
         }),
         new TableCell({
-          borders: cellBorders,
-          width: { size: 4680, type: WidthType.DXA }, // ALSO set width on each cell
+          borders,
+          width: { size: 4680, type: WidthType.DXA },
           shading: { fill: "D5E8F0", type: ShadingType.CLEAR },
-          children: [new Paragraph({ 
-            alignment: AlignmentType.CENTER,
-            children: [new TextRun({ text: "Bullet Points", bold: true, size: 22 })]
-          })]
+          children: [new Paragraph({ children: [new TextRun("Cell 2")] })]
         })
       ]
     }),
     new TableRow({
       children: [
         new TableCell({
-          borders: cellBorders,
-          width: { size: 4680, type: WidthType.DXA }, // ALSO set width on each cell
-          children: [new Paragraph({ children: [new TextRun("Regular data")] })]
+          borders, width: { size: 4680, type: WidthType.DXA },
+          children: [new Paragraph({ children: [new TextRun("Data")] })]
         }),
         new TableCell({
-          borders: cellBorders,
-          width: { size: 4680, type: WidthType.DXA }, // ALSO set width on each cell
-          children: [
-            new Paragraph({ 
-              numbering: { reference: "bullet-list", level: 0 },
-              children: [new TextRun("First bullet point")] 
-            }),
-            new Paragraph({ 
-              numbering: { reference: "bullet-list", level: 0 },
-              children: [new TextRun("Second bullet point")] 
-            })
-          ]
+          borders, width: { size: 4680, type: WidthType.DXA },
+          children: [new Paragraph({ children: [new TextRun("Data")] })]
         })
       ]
     })
@@ -222,13 +250,21 @@ new Table({
 })
 ```
 
-**IMPORTANT: Table Width & Borders**
+**Table width calculation:**
 
-- Use BOTH `columnWidths: [width1, width2, ...]` array AND `width: { size: X, type: WidthType.DXA }` on each cell
-- Values in DXA (twentieths of a point): 1440 = 1 inch, Letter usable width = 9360 DXA (with 1" margins)
-- Apply borders to individual `TableCell` elements, NOT the `Table` itself
+| Paper | Content Width (1" margins) |
+|-------|---------------------------|
+| US Letter | 12,240 - 2,880 = 9,360 DXA |
+| A4 | 11,906 - 2,880 = 9,026 DXA |
 
-**Precomputed Column Widths (Letter size with 1" margins = 9360 DXA total):**
+**Width rules:**
+- **Always use `WidthType.DXA`** — never `WidthType.PERCENTAGE` (incompatible with Google Docs)
+- Table width must equal the sum of `columnWidths`
+- Cell `width` must match corresponding `columnWidth`
+- Cell `margins` are internal padding - they reduce content area, not add to cell width
+- For full-width tables: use content width (page width minus left and right margins)
+
+**Precomputed Column Widths (Letter size with 1" margins = 9,360 DXA total):**
 
 - **2 columns:** `columnWidths: [4680, 4680]` (equal width)
 - **3 columns:** `columnWidths: [3120, 3120, 3120]` (equal width)
@@ -237,8 +273,8 @@ new Table({
 
 ```javascript
 // TOC (requires headings) - CRITICAL: Use HeadingLevel only, NOT custom styles
-// ❌ WRONG: new Paragraph({ heading: HeadingLevel.HEADING_1, style: "customHeader", children: [new TextRun("Title")] })
-// ✅ CORRECT: new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("Title")] })
+// ❌ WRONG: new Paragraph({ heading: HeadingLevel.HEADING_1, style: "customHeader", children: [...] })
+// ✅ CORRECT: new Paragraph({ heading: HeadingLevel.HEADING_1, children: [...] })
 new TableOfContents("Table of Contents", { hyperlink: true, headingStyleRange: "1-3" }),
 
 // External link
@@ -249,31 +285,50 @@ new Paragraph({
   })]
 }),
 
-// Internal link & bookmark
-new Paragraph({
-  children: [new InternalHyperlink({
-    children: [new TextRun({ text: "Go to Section", style: "Hyperlink" })],
-    anchor: "section1"
-  })]
-}),
-new Paragraph({
-  children: [new TextRun("Section Content")],
-  bookmark: { id: "section1", name: "section1" }
-}),
+// Internal link (bookmark + reference)
+// 1. Create bookmark at destination
+new Paragraph({ heading: HeadingLevel.HEADING_1, children: [
+  new Bookmark({ id: "chapter1", children: [new TextRun("Chapter 1")] }),
+]})
+// 2. Link to it
+new Paragraph({ children: [new InternalHyperlink({
+  children: [new TextRun({ text: "See Chapter 1", style: "Hyperlink" })],
+  anchor: "chapter1",
+})]}),
+```
+
+## Footnotes
+
+```javascript
+const doc = new Document({
+  footnotes: {
+    1: { children: [new Paragraph("Source: Annual Report 2024")] },
+    2: { children: [new Paragraph("See appendix for methodology")] },
+  },
+  sections: [{
+    children: [new Paragraph({
+      children: [
+        new TextRun("Revenue grew 15%"),
+        new FootnoteReferenceRun(1),
+        new TextRun(" using adjusted metrics"),
+        new FootnoteReferenceRun(2),
+      ],
+    })]
+  }]
+});
 ```
 
 ## Images & Media
 
 ```javascript
-// Basic image with sizing & positioning
 // CRITICAL: Always specify 'type' parameter - it's REQUIRED for ImageRun
 new Paragraph({
   alignment: AlignmentType.CENTER,
   children: [new ImageRun({
-    type: "png", // NEW REQUIREMENT: Must specify image type (png, jpg, jpeg, gif, bmp, svg)
+    type: "png", // Required: png, jpg, jpeg, gif, bmp, svg
     data: fs.readFileSync("image.png"),
     transformation: { width: 200, height: 150, rotation: 0 }, // rotation in degrees
-    altText: { title: "Logo", description: "Company logo", name: "Name" } // IMPORTANT: All three fields are required
+    altText: { title: "Logo", description: "Company logo", name: "Name" } // All three required
   })]
 })
 ```
@@ -291,7 +346,7 @@ new Paragraph({
 })
 
 // ⚠️ CRITICAL: NEVER use PageBreak standalone - it will create invalid XML that Word cannot open
-// ❌ WRONG: new PageBreak() 
+// ❌ WRONG: new PageBreak()
 // ✅ CORRECT: new Paragraph({ children: [new PageBreak()] })
 ```
 
@@ -308,13 +363,13 @@ const doc = new Document({
       }
     },
     headers: {
-      default: new Header({ children: [new Paragraph({ 
+      default: new Header({ children: [new Paragraph({
         alignment: AlignmentType.RIGHT,
         children: [new TextRun("Header Text")]
       })] })
     },
     footers: {
-      default: new Footer({ children: [new Paragraph({ 
+      default: new Footer({ children: [new Paragraph({
         alignment: AlignmentType.CENTER,
         children: [new TextRun("Page "), new TextRun({ children: [PageNumber.CURRENT] }), new TextRun(" of "), new TextRun({ children: [PageNumber.TOTAL_PAGES] })]
       })] })
@@ -324,17 +379,71 @@ const doc = new Document({
 });
 ```
 
-## Tabs
+## Tab Stops
 
 ```javascript
+// Right-align text on same line (e.g., date opposite a title)
 new Paragraph({
-  tabStops: [
-    { type: TabStopType.LEFT, position: TabStopPosition.MAX / 4 },
-    { type: TabStopType.CENTER, position: TabStopPosition.MAX / 2 },
-    { type: TabStopType.RIGHT, position: TabStopPosition.MAX * 3 / 4 }
+  children: [
+    new TextRun("Company Name"),
+    new TextRun("\tJanuary 2025"),
   ],
-  children: [new TextRun("Left\tCenter\tRight")]
+  tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
 })
+
+// Dot leader (e.g., TOC-style)
+new Paragraph({
+  children: [
+    new TextRun("Introduction"),
+    new TextRun({ children: [
+      new PositionalTab({
+        alignment: PositionalTabAlignment.RIGHT,
+        relativeTo: PositionalTabRelativeTo.MARGIN,
+        leader: PositionalTabLeader.DOT,
+      }),
+      "3",
+    ]}),
+  ],
+})
+
+// Two-column footer using tab stops (NOT tables)
+new Paragraph({
+  tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
+  children: [new TextRun("Left content"), new TextRun("\tRight content")]
+})
+```
+
+## Multi-Column Layouts
+
+```javascript
+// Equal-width columns
+sections: [{
+  properties: {
+    column: {
+      count: 2,          // number of columns
+      space: 720,        // gap between columns in DXA (720 = 0.5 inch)
+      equalWidth: true,
+      separate: true,    // vertical line between columns
+    },
+  },
+  children: [/* content flows naturally across columns */]
+}]
+
+// Custom-width columns (equalWidth must be false)
+sections: [{
+  properties: {
+    column: {
+      equalWidth: false,
+      children: [
+        new Column({ width: 5400, space: 720 }),
+        new Column({ width: 3240 }),
+      ],
+    },
+  },
+  children: [/* content */]
+}]
+
+// Force a column break with a new section using type: SectionType.NEXT_COLUMN
 ```
 
 ## Constants & Quick Reference
@@ -343,22 +452,23 @@ new Paragraph({
 - **Borders:** `SINGLE`, `DOUBLE`, `DASHED`, `DOTTED`
 - **Numbering:** `DECIMAL` (1,2,3), `UPPER_ROMAN` (I,II,III), `LOWER_LETTER` (a,b,c)
 - **Tabs:** `LEFT`, `CENTER`, `RIGHT`, `DECIMAL`
-- **Symbols:** `"2022"` (•), `"00A9"` (©), `"00AE"` (®), `"2122"` (™), `"00B0"` (°), `"F070"` (✓), `"F0FC"` (✗)
+- **Symbols:** `"2022"` (•), `"00A9"` (©), `"00AE"` (®), `"2122"` (™), `"00B0"` (°)
 
 ## Critical Issues & Common Mistakes
 
-- **CRITICAL: PageBreak must ALWAYS be inside a Paragraph** - standalone PageBreak creates invalid XML that Word cannot open
-- **ALWAYS use ShadingType.CLEAR for table cell shading** - Never use ShadingType.SOLID (causes black background).
-- Measurements in DXA (1440 = 1 inch) | Each table cell needs ≥1 Paragraph | TOC requires HeadingLevel styles only
-- **ALWAYS use custom styles** with Arial font for professional appearance and proper visual hierarchy
-- **ALWAYS set a default font** using `styles.default.document.run.font` - Arial recommended
-- **ALWAYS use columnWidths array for tables** + individual cell widths for compatibility
-- **NEVER use unicode symbols for bullets** - always use proper numbering configuration with `LevelFormat.BULLET` constant (NOT the string "bullet")
-- **NEVER use \\n for line breaks anywhere** - always use separate Paragraph elements for each line
-- **ALWAYS use TextRun objects within Paragraph children** - never use text property directly on Paragraph
-- **CRITICAL for images**: ImageRun REQUIRES `type` parameter - always specify "png", "jpg", "jpeg", "gif", "bmp", or "svg"
-- **CRITICAL for bullets**: Must use `LevelFormat.BULLET` constant, not string "bullet", and include `text: "•"` for the bullet character
-- **CRITICAL for numbering**: Each numbering reference creates an INDEPENDENT list. Same reference = continues numbering (1,2,3 then 4,5,6). Different reference = restarts at 1 (1,2,3 then 1,2,3). Use unique reference names for each separate numbered section!
-- **CRITICAL for TOC**: When using TableOfContents, headings must use HeadingLevel ONLY - do NOT add custom styles to heading paragraphs or TOC will break
-- **Tables**: Set `columnWidths` array + individual cell widths, apply borders to cells not table
-- **Set table margins at TABLE level** for consistent cell padding (avoids repetition per cell)
+- **Set page size explicitly** — docx-js defaults to A4; use US Letter (12240 x 15840 DXA) for US documents
+- **Landscape: pass portrait dimensions** — docx-js swaps width/height internally; pass short edge as `width`, long edge as `height`, and set `orientation: PageOrientation.LANDSCAPE`
+- **Never use `\n`** — use separate Paragraph elements
+- **Never use unicode bullets** — use `LevelFormat.BULLET` with numbering config
+- **PageBreak must be in Paragraph** — standalone creates invalid XML
+- **ImageRun requires `type`** — always specify png/jpg/etc
+- **Always set table `width` with DXA** — never use `WidthType.PERCENTAGE` (breaks in Google Docs)
+- **Tables need dual widths** — `columnWidths` array AND cell `width`, both must match
+- **Table width = sum of columnWidths** — for DXA, ensure they add up exactly
+- **Always add cell margins** — use `margins: { top: 80, bottom: 80, left: 120, right: 120 }` for readable padding
+- **Use `ShadingType.CLEAR`** — never SOLID for table shading
+- **Never use tables as dividers/rules** — cells have minimum height and render as empty boxes (including in headers/footers); use `border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: "2E75B6", space: 1 } }` on a Paragraph instead. For two-column footers, use tab stops, not tables
+- **TOC requires HeadingLevel only** — no custom styles on heading paragraphs or TOC will break
+- **Override built-in styles** — use exact IDs: "Heading1", "Heading2", etc.
+- **Include `outlineLevel`** — required for TOC (0 for H1, 1 for H2, etc.)
+- **ALWAYS use TextRun objects within Paragraph children** — never use text property directly on Paragraph

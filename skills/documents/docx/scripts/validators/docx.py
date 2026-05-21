@@ -18,8 +18,64 @@ class DOCXSchemaValidator(BaseSchemaValidator):
     WORD_2006_NAMESPACE = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 
     # Word-specific element to relationship type mappings
-    # Start with empty mapping - add specific cases as we discover them
     ELEMENT_RELATIONSHIP_TYPES = {}
+
+    def repair(self) -> int:
+        """Auto-repair common issues. Returns number of repairs made."""
+        repairs = super().repair()
+        repairs += self.repair_durableId()
+        return repairs
+
+    def repair_durableId(self) -> int:
+        """Fix durableId values >= 0x7FFFFFFF which cause validation failures."""
+        import defusedxml.minidom
+        import random
+
+        repairs = 0
+
+        for xml_file in self.xml_files:
+            try:
+                content = xml_file.read_text(encoding="utf-8")
+                dom = defusedxml.minidom.parseString(content)
+                modified = False
+
+                for elem in dom.getElementsByTagName("*"):
+                    if not elem.hasAttribute("w16cid:durableId"):
+                        continue
+
+                    durable_id = elem.getAttribute("w16cid:durableId")
+                    needs_repair = False
+
+                    if xml_file.name == "numbering.xml":
+                        try:
+                            needs_repair = self._parse_id_value(durable_id, base=10) >= 0x7FFFFFFF
+                        except ValueError:
+                            needs_repair = True
+                    else:
+                        try:
+                            needs_repair = self._parse_id_value(durable_id, base=16) >= 0x7FFFFFFF
+                        except ValueError:
+                            needs_repair = True
+
+                    if needs_repair:
+                        value = random.randint(1, 0x7FFFFFFE)
+                        new_id = str(value) if xml_file.name == "numbering.xml" else f"{value:08X}"
+                        elem.setAttribute("w16cid:durableId", new_id)
+                        repairs += 1
+                        modified = True
+
+                if modified:
+                    xml_file.write_bytes(dom.toxml(encoding="UTF-8"))
+
+            except Exception:
+                pass
+
+        return repairs
+
+    @staticmethod
+    def _parse_id_value(value: str, base: int) -> int:
+        """Parse an ID value in the given base."""
+        return int(value, base)
 
     def validate(self):
         """Run all validation checks and return True if all pass."""

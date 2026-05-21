@@ -6,20 +6,16 @@
 - [Document Content Patterns](#document-content-patterns) - XML patterns for headings, lists, tables, formatting, etc.
 - [Document Library (Python)](#document-library-python) - Recommended approach for OOXML manipulation with automatic infrastructure setup
 - [Tracked Changes (Redlining)](#tracked-changes-redlining) - XML patterns for implementing tracked changes
+- [Comments](#comments) - XML patterns for adding comments
 
 ## Technical Guidelines
 
 ### Schema Compliance
 
-- **Element ordering in `<w:pPr>`**: `<w:pStyle>`, `<w:numPr>`, `<w:spacing>`, `<w:ind>`, `<w:jc>`
-- **Whitespace**: Add `xml:space='preserve'` to `<w:t>` elements with leading/trailing spaces
-- **Unicode**: Escape characters in ASCII content: `"` becomes `&#8220;`
-  - **Character encoding reference**: Curly quotes `""` become `&#8220;&#8221;`, apostrophe `'` becomes `&#8217;`, em-dash `—` becomes `&#8212;`
-- **Tracked changes**: Use `<w:del>` and `<w:ins>` tags with `w:author="Claude"` outside `<w:r>` elements
-  - **Critical**: `<w:ins>` closes with `</w:ins>`, `<w:del>` closes with `</w:del>` - never mix
-  - **RSIDs must be 8-digit hex**: Use values like `00AB1234` (only 0-9, A-F characters)
-  - **trackRevisions placement**: Add `<w:trackRevisions/>` after `<w:proofState>` in settings.xml
-- **Images**: Add to `word/media/`, reference in `document.xml`, set dimensions to prevent overflow
+- **Element order in `<w:pPr>`**: `<w:pStyle>`, `<w:numPr>`, `<w:spacing>`, `<w:ind>`, `<w:jc>`, `<w:rPr>` last
+- **Whitespace**: Add `xml:space="preserve"` to `<w:t>` elements with leading/trailing spaces
+- **RSIDs**: Must be 8-digit hex (e.g., `00AB1234`)
+- **Smart quotes**: Use XML entities for professional typography — `&#x2018;` ('), `&#x2019;` ('), `&#x201C;` (“), `&#x201D;` (”)
 
 ## Document Content Patterns
 
@@ -287,7 +283,7 @@ Use the Document class from `scripts/document.py` for all tracked changes and co
 
 ### Initialization
 
-**Find the docx skill root** (directory containing `scripts/` and `ooxml/`):
+**Find the docx skill root** (directory containing `scripts/`):
 
 ```bash
 # Search for document.py to locate the skill root
@@ -622,14 +618,37 @@ The validator checks that the document text matches the original after reverting
 </w:ins>
 ```
 
-**Restoring Another Author's Deletion:**
-
+**Deleting entire paragraphs/list items** — when removing ALL content from a paragraph, also mark the paragraph mark as deleted so it merges with the next paragraph. Add `<w:del/>` inside `<w:pPr><w:rPr>`:
 ```xml
-<!-- Leave their deletion unchanged, add new insertion after it -->
-<w:del w:author="Jane Smith" w:id="50">
-  <w:r><w:delText>within 30 days</w:delText></w:r>
+<w:p>
+  <w:pPr>
+    <w:numPr>...</w:numPr>  <!-- list numbering if present -->
+    <w:rPr>
+      <w:del w:id="1" w:author="Claude" w:date="2025-01-01T00:00:00Z"/>
+    </w:rPr>
+  </w:pPr>
+  <w:del w:id="2" w:author="Claude" w:date="2025-01-01T00:00:00Z">
+    <w:r><w:delText>Entire paragraph content being deleted...</w:delText></w:r>
+  </w:del>
+</w:p>
+```
+Without the `<w:del/>` in `<w:pPr><w:rPr>`, accepting changes leaves an empty paragraph/list item.
+
+**Rejecting another author's insertion** — nest deletion inside their insertion:
+```xml
+<w:ins w:author="Jane" w:id="5">
+  <w:del w:author="Claude" w:id="10">
+    <w:r><w:delText>their inserted text</w:delText></w:r>
+  </w:del>
+</w:ins>
+```
+
+**Restoring another author's deletion** — add insertion after (don't modify their deletion):
+```xml
+<w:del w:author="Jane" w:id="5">
+  <w:r><w:delText>deleted text</w:delText></w:r>
 </w:del>
-<w:ins w:author="Claude" w:id="51">
-  <w:r><w:t>within 30 days</w:t></w:r>
+<w:ins w:author="Claude" w:id="10">
+  <w:r><w:t>deleted text</w:t></w:r>
 </w:ins>
 ```

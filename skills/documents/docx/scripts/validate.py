@@ -1,16 +1,22 @@
 #!/usr/bin/env python3
-"""
-Command line tool to validate Office document XML files against XSD schemas and tracked changes.
+# /// script
+# dependencies = [
+#   "defusedxml",
+#   "lxml",
+# ]
+# /
+"""Validate Office document XML files against XSD schemas and tracked changes.
 
 Usage:
-    python validate.py <dir> --original <original_file>
+    python validate.py <unpacked_dir> --original <original_file>
 """
 
 import argparse
 import sys
 from pathlib import Path
 
-from validation import DOCXSchemaValidator, PPTXSchemaValidator, RedliningValidator
+from helpers.simplify_redlines import infer_author
+from validators import DOCXSchemaValidator, PPTXSchemaValidator, RedliningValidator
 
 
 def main():
@@ -32,31 +38,42 @@ def main():
     )
     args = parser.parse_args()
 
-    # Validate paths
     unpacked_dir = Path(args.unpacked_dir)
     original_file = Path(args.original)
     file_extension = original_file.suffix.lower()
+
     assert unpacked_dir.is_dir(), f"Error: {unpacked_dir} is not a directory"
     assert original_file.is_file(), f"Error: {original_file} is not a file"
     assert file_extension in [".docx", ".pptx", ".xlsx"], (
         f"Error: {original_file} must be a .docx, .pptx, or .xlsx file"
     )
 
-    # Run validations
     match file_extension:
         case ".docx":
-            validators = [DOCXSchemaValidator, RedliningValidator]
+            author = "Claude"
+            try:
+                author = infer_author(unpacked_dir, original_file)
+            except ValueError as e:
+                print(f"Warning: {e} Using default author 'Claude'.", file=sys.stderr)
+            validators = [
+                DOCXSchemaValidator(unpacked_dir, original_file, verbose=args.verbose),
+                RedliningValidator(unpacked_dir, original_file, verbose=args.verbose, author=author),
+            ]
         case ".pptx":
-            validators = [PPTXSchemaValidator]
+            validators = [PPTXSchemaValidator(unpacked_dir, original_file, verbose=args.verbose)]
         case _:
             print(f"Error: Validation not supported for file type {file_extension}")
             sys.exit(1)
 
+    # Run auto-repair
+    total_repairs = sum(v.repair() for v in validators)
+    if total_repairs:
+        print(f"Auto-repaired {total_repairs} issue(s)")
+
     # Run validators
     success = True
-    for V in validators:
-        validator = V(unpacked_dir, original_file, verbose=args.verbose)
-        if not validator.validate():
+    for v in validators:
+        if not v.validate():
             success = False
 
     if success:

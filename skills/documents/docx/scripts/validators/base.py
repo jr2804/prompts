@@ -108,8 +108,8 @@ class BaseSchemaValidator:
         self.original_file = Path(original_file)
         self.verbose = verbose
 
-        # Set schemas directory
-        self.schemas_dir = Path(__file__).parent.parent.parent / "schemas"
+        # Set schemas directory (scripts/validators/ → skill root → assets/schemas/)
+        self.schemas_dir = Path(__file__).parent.parent.parent / "assets" / "schemas"
 
         # Get all XML and .rels files
         patterns = ["*.xml", "*.rels"]
@@ -119,6 +119,39 @@ class BaseSchemaValidator:
 
         if not self.xml_files:
             print(f"Warning: No XML files found in {self.unpacked_dir}")
+
+    def repair(self) -> int:
+        """Auto-repair common issues. Returns number of repairs made."""
+        return self.repair_whitespace_preservation()
+
+    def repair_whitespace_preservation(self) -> int:
+        """Add xml:space='preserve' to <w:t> elements with leading/trailing whitespace."""
+        import defusedxml.minidom
+
+        repairs = 0
+
+        for xml_file in self.xml_files:
+            try:
+                content = xml_file.read_text(encoding="utf-8")
+                dom = defusedxml.minidom.parseString(content)
+                modified = False
+
+                for elem in dom.getElementsByTagName("*"):
+                    if elem.tagName.endswith(":t") and elem.firstChild:
+                        text = elem.firstChild.nodeValue
+                        if text and (text.startswith((' ', '\t')) or text.endswith((' ', '\t'))):
+                            if elem.getAttribute("xml:space") != "preserve":
+                                elem.setAttribute("xml:space", "preserve")
+                                repairs += 1
+                                modified = True
+
+                if modified:
+                    xml_file.write_bytes(dom.toxml(encoding="UTF-8"))
+
+            except Exception:
+                pass
+
+        return repairs
 
     def validate(self):
         """Run all validation checks and return True if all pass."""
