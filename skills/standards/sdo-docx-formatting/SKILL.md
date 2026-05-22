@@ -12,8 +12,11 @@ per-SDO drafting skill (`3gpp-drafting`, `etsi-drafting`, `itut-drafting`).
 
 ## Core rules
 
-1. Apply formatting through **named styles** defined in the document template,
-   never through manual formatting (bold, italic, font size, colour overrides).
+1. Apply formatting exclusively through **named paragraph and character styles**
+   defined in the document template. Never apply direct/ad-hoc formatting
+   (e.g., toggling bold, changing font size, or adding colour without a named
+   style). If a required named style is missing from the document template,
+   inform the user and offer to create the style definition before applying it.
 2. Keep numbering and references **update-safe** -- use SEQ fields and
    bookmarks, never hard-coded numbers.
 3. Use **non-breaking spaces** (`\u00a0`) for semantic units (number+unit,
@@ -33,8 +36,47 @@ the concrete mapping. Example:
 | `heading-1` through `heading-3` | Section headings | `Heading 1`--`Heading 3` | `Heading 1`--`Heading 3` |
 
 Always consult the per-SDO drafting skill for the correct concrete style IDs.
+If the per-SDO drafting skill is not available in context, ask the user which
+SDO applies and use the example mappings in the table above as defaults.
 
 ## Conventions by domain
+
+### Headings (critical rules)
+- **Never use MS Word automatic numbering** for sections. Use `<w:tab/>`
+  between heading number and title.
+- Numbering: `N` → `N.M` → `N.M.P`. `Introduction` is numbered like any
+  other section. `References` is **not** numbered.
+
+### Enumerations (critical rules)
+- **Never use MS Word built-in list feature.** Prefer en-dash (`–`)
+  enumerations with `<w:tab/>` after the bullet.
+- Styles: `enum-1`, `enum-2`, `enum-3` for hierarchy levels.
+
+### Notes (critical rules)
+- Format: `NOTE\u00a0N:\t<text>` (uppercase NOTE, non-breaking space, real
+  tab). Omit number for single notes.
+- Last note in a block → `note-main`; preceding notes → `note-continuation`.
+
+### Tables and Figures (critical rules)
+- Table caption **above**: `Table\u00a0N: <text>` with `{SEQ Table \* ARABIC}`
+  field; bookmark `tbl_<name>` around the number part only.
+- Figure caption **below**: `Figure\u00a0N: <text>` with `{SEQ Figure \* ARABIC}`
+  field; bookmark `fig_<name>` around the number part only.
+- **Never hard-code numbers.** Cross-ref with `{REF bookmark}`.
+
+### Citations (critical rules)
+- Each entry: `[N]\t<text>` using `reference-entry` style and `{SEQ Ref \* ARABIC}`
+  field. Bookmark `ref_<name>` around the sequence field only.
+- `References` is the **last** section, after annexes, unnumbered.
+
+### Text formatting (critical rules)
+- Use `body-text` for paragraphs, `code-text` for inline code/filenames.
+- Non-breaking spaces between number+unit and Figure/Table+number.
+- Straight quotes only (`"`, `'`), never curly/typographic.
+
+---
+
+Full details in reference files:
 
 - [references/headings.md](references/headings.md)
 - [references/enumerations.md](references/enumerations.md)

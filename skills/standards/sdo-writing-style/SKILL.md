@@ -48,6 +48,12 @@ When rules conflict:
 
 ## Core rules
 
+Rules grouped by concern for incremental application:
+- **Content Integrity** (1, 3, 4): anchor to context, be specific, verify facts
+- **Style & Voice** (5, 6, 7, 8): plain words, coherent reference, no performance, calibrated stance
+- **Structure** (2, 9, 11, 12, 13): fit format, show before generalizing, develop thought, choose shape, avoid catalog prose
+- **Revision** (10, 14): watch regularity, re-read and cut
+
 ### 1. Anchor to the actual context before drafting
 
 Decide what the text is, who it is for, what register it uses, what answer
@@ -64,7 +70,8 @@ makes it harder to evaluate.
 
 ### 3. Prefer concrete specificity over polished generality
 
-Each substantial paragraph should carry at least one concrete anchor:
+Each paragraph of three or more sentences (excluding transitional paragraphs)
+should carry at least one concrete anchor:
 
 **What counts:**
 - A proper noun the reader could look up (spec name, organization)
@@ -117,10 +124,12 @@ answer stops.
 ### 8. Calibrate confidence, stance, and voice to genre
 
 Standards documents aim at neutrality and precision. Do not inject first
-person or attitude just to make the text feel human. If the subject
-naturally invites a recommendation, state it clearly with supporting
-evidence -- do not sand everything down to evenly polite neutrality. If
-the subject does not require a view, do not manufacture one.
+person or attitude just to make the text feel human. A recommendation is
+appropriate when: (a) the document's purpose is to propose or evaluate a
+technical choice, (b) evidence supports a specific conclusion, or (c) the
+contributing body has asked for a position. In those cases, state the
+recommendation clearly with supporting evidence. Otherwise, remain neutral --
+do not manufacture a view where none is required.
 
 ### 9. Show concrete things before generalizing
 

@@ -16,7 +16,7 @@ see `sdo-writing-style`. This skill covers only mechanical correctness.
 
 | Category | Rule |
 |----------|------|
-| **Spelling** | UK Oxford spelling; prefer -ize (organize, standardize); -ise for root words (surprise, comprise) |
+| **Spelling** | UK Oxford spelling; prefer -ize (organize, standardize); use -ise only where removing -ise does not leave a recognizable English word or Latin root (e.g., surprise, comprise, advise, exercise). Note: some SDOs (e.g., ETSI) use -ise throughout; defer to the per-SDO drafting skill when it specifies a different convention. |
 | **telecommunication** | Noun: "telecommunications"; Adjective: "telecommunication" |
 | **ICT** | Full form: "information and communication technology" (NOT communications); adjective: "ICT" only |
 | **Hyphens** | Minimum use; non-, self-, quasi-, ex- always hyphenated; cyber and tele not hyphenated; e- always hyphenated |
@@ -26,7 +26,7 @@ see `sdo-writing-style`. This skill covers only mechanical correctness.
 | **Decimals** | Precede with zero: 0.3; "per cent" in text, "%" in tables |
 | **Capitalization** | General = lower case; specific reference with number = initial caps; "if in doubt, lower case" |
 | **Abbreviations** | Spell out on first use; no "the" before org abbreviations (ITU, not the ITU) |
-| **Lists** | Three formats (A/B/C); consistency within document; "etc." never with "e.g."/"including" |
+| **Lists** | Format A (items < 1 sentence): lower case, full stop only on last item; Format B (longer items): semicolons between items, full stop on last; Format C (each item >= 1 sentence): capitals, full stops on all. Consistency within document; "etc." never with "e.g."/"including" |
 | **Gender** | Use "chair" not "chairman"; "workforce" not "manpower"; avoid masculine-only pronouns |
 | **Disability** | People-first: "persons with disabilities"; "wheelchair user" not "wheelchair-bound" |
 

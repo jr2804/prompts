@@ -16,7 +16,7 @@ Member States and other duly authorized entities registered with a study group.
 |--------|--------|
 | >= 2 months before meeting | May be translated; posted on web; printed copies on request at meeting |
 | >= 12 calendar days, < 2 months | **Cannot be translated**; still accepted for meeting |
-| < 12 calendar days | Not on agenda; not distributed; held for next meeting (exceptions: contributions of extreme importance at Director's discretion with meeting approval) |
+| < 12 calendar days | Not on agenda; not distributed; held for next meeting (exceptions: contributions of extreme importance at Director's discretion with meeting approval — e.g., urgent security vulnerabilities or regulatory deadlines requiring immediate action, as judged by the TSB Director) |
 
 ### Presentation
 Must follow ITU-T A.2 clause 2 rules. TSB Director may return non-compliant documents.

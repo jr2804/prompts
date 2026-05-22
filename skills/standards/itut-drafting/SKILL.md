@@ -11,6 +11,28 @@ notes, tables, figures, citations), see `sdo-docx-formatting`. For officecli
 operations (tab-run injection, field codes, bookmarks), see
 `sdo-docx-operations`.
 
+## Critical rules from delegated skills
+
+These key constraints are inlined here to reduce cross-referencing:
+
+**From `sdo-docx-formatting`:**
+- Apply formatting through **named styles** from the template, never manual
+  overrides (bold, italic, font size, colour).
+- Keep numbering **update-safe** — use SEQ fields and bookmarks, never
+  hard-coded numbers.
+- Use **non-breaking spaces** (`\u00a0`) for semantic units (number+unit,
+  Figure/Table+number).
+- Use **real tab runs** (`<w:tab/>`), never spaces, for structural tabs
+  (heading number+title, enumeration bullet+text, note label+text).
+
+**From `sdo-docx-operations`:**
+- Open in resident mode (`officecli open <doc>`) before multi-step edits;
+  close at end.
+- Prefer style/ordinal or explicit XPath targeting, not paraId targeting.
+- Never use `raw-set --action replace` with an empty XML payload.
+- Always preserve non-breaking spaces and explicit tab runs.
+- Validate with `officecli validate <doc>` after every major batch update.
+
 ## Assets
 
 - `assets/template.docx` -- canonical ITU-T contribution Word template with
@@ -39,12 +61,12 @@ formatting rules from `sdo-docx-formatting`.
 | `table-caption` | `Table_No & title` | officecli styleId: `TableNotitle` |
 | `table-header` | `Table_head` | officecli styleId: `Tablehead` |
 | `table-data` | `Table_text` | officecli styleId: `Tabletext` |
-| `table-note` | (varies by template) | Check template |
+| `table-note` | (varies by template) | If not found in template, omit styling and add a TODO comment for manual review |
 | `figure-para` | `Figure` | Paragraph containing image |
 | `figure-caption` | `Figure_No & title` | Below figure |
-| `figure-note` | (varies by template) | Check template |
+| `figure-note` | (varies by template) | If not found in template, omit styling and add a TODO comment for manual review |
 | `note-main` | `Note` | Last note in block |
-| `note-continuation` | (varies by template) | Check template |
+| `note-continuation` | (varies by template) | If not found in template, omit styling and add a TODO comment for manual review |
 | `reference-entry` | `References` | Each references entry |
 | `code-text` | `Macro Text` | officecli styleId: `MacroText` |
 
@@ -117,6 +139,9 @@ Use a **single paragraph** with style `Equation` containing
 `\t[inline equation]\t(7-X)`. The `Equation` style has two tab stops:
 first centred (for the equation), second right-aligned (for the label).
 This centres the equation and right-aligns the label on the same line.
+Set paragraph `alignment: left` so the tab stops (not paragraph
+justification) control positioning — `left` here means "do not
+centre-justify the paragraph itself," not "left-align the equation."
 
 Target structure:
 
@@ -147,9 +172,9 @@ after creation.
 ### Inline equations in body text
 
 Rebuild paragraphs with mixed text + inline equations as a sequence of
-`set` + `add` commands (run, equation, run, ...). Batch limit: <=12
-commands per batch file. For complex paragraphs, split into two sequential
-batches.
+`set` + `add` commands (run, equation, run, ...). Each JSON array
+passed to `officecli batch` must contain at most 12 JSON command objects.
+If more are needed, split into sequential batch calls.
 
 ### Known KaTeX constraints
 
@@ -180,8 +205,9 @@ batches.
 
 1. **Start from template**: `Copy-Item "docs\template.docx" -Destination "<output>.docx" -Force`
 2. **Resident mode**: `officecli open <doc>` before editing; `officecli close <doc>` at end.
-3. **Batch mode**: pipe JSON arrays to `officecli batch <doc>`. Keep arrays
-   to <=12 commands per batch to stay below the intermittent failure threshold.
+3. **Batch mode**: pipe JSON arrays to `officecli batch <doc>`. Each JSON
+   array must contain at most 12 JSON command objects. If more are needed,
+   split into sequential batch calls.
 4. **Validate frequently**: `officecli validate <doc>` after every major
    batch update.
 

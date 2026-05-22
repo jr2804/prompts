@@ -32,8 +32,8 @@ Recommendation is organized as follows:
 | 4 | **Abbreviations** *(optional)* | All abbreviations used in the text |
 | 5 | **Conventions** *(optional)* | Any particular notation used |
 | 6+ | **Text** | Body of the Recommendation |
-| Annex A+ | **Integral annexes** | Normative appendices (same approval) |
-| Annex (continues) | **Non-integral annexes** | Informative/supplementary (SG agreement) |
+| Annex A+ | **Integral annexes** | Normative material (same approval as Recommendation) |
+| Annex (continues) | **Non-integral annexes** | Informative/supplementary (SG agreement, not full approval) |
 | *(last)* | **Index** *(optional)* | |
 
 ### Subdivision numbering
@@ -59,7 +59,7 @@ Recommendation is organized as follows:
 |------|---------|
 | **shall** | Mandatory requirement |
 | **shall not** | Prohibition |
-| **may** | Optional requirement |
+| **may** | Permission; indicates an action that is permitted but not required |
 | **need not** | Negative of "may" (avoid "may not") |
 
 ---
