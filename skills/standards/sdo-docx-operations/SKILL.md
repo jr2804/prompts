@@ -56,6 +56,7 @@ uv run scripts/fix_note_tabs.py --doc <doc> --notes assets/specs/fix_note_tabs.e
 - [references/constraints.md](references/constraints.md)
 - [references/xpath-patterns.md](references/xpath-patterns.md)
 - [references/field-code-patterns.md](references/field-code-patterns.md)
+- [references/tracked-changes.md](references/tracked-changes.md)
 
 ## Cross-references
 

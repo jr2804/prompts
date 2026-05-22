@@ -36,6 +36,23 @@ formatting.
 Use the helper scripts in `scripts/` to apply these patterns without
 hand-writing XML.
 
+## 7. Tracked changes require correct OOXML marker placement
+
+Inserting tracked changes via raw XML has a critical structural requirement:
+revision markers (`<w:ins>`, `<w:del>`) go in different locations depending
+on whether you are modifying a paragraph or individual runs.
+
+| Scope | Marker location | Content element |
+|-------|----------------|-----------------|
+| Entire paragraph inserted | `<w:ins>` inside `<w:pPr>/<w:rPr>` | `<w:t>` |
+| Run inserted within paragraph | `<w:ins>` wrapping `<w:r>` as child of `<w:p>` | `<w:t>` |
+| Entire paragraph deleted | `<w:del>` inside `<w:pPr>/<w:rPr>` | `<w:delText>` |
+| Run deleted within paragraph | `<w:del>` wrapping `<w:r>` as child of `<w:p>` | `<w:delText>` |
+
+**The most common mistake:** wrapping entire paragraph content in `<w:ins>`
+as a direct child of `<w:p>`. This produces zero visible tracked changes.
+See `references/tracked-changes.md` for complete OOXML patterns.
+
 ## 4. High-level commands cannot insert REF/SEQ field codes
 
 Using `set --prop text=` for cross-references produces hardcoded plain text

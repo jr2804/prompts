@@ -22,6 +22,18 @@
 - Do not use manual formatting (bold, italic, font size) for note text --
   rely on the style definition.
 
+## Content rules
+
+- When generalising, expanding, or adding new content, **add a new note**
+  rather than replacing an existing note. Existing notes may still be
+  needed for context or may contain constraints that are not yet ready for
+  removal.
+- If an existing note is truly superseded or incorrect, replace it and
+  mark the change with tracked changes (see
+  `sdo-docx-operations/references/tracked-changes.md`).
+- Keep each note focused on a single point. Split unrelated observations
+  into separate notes.
+
 ## Example (3GPP/ETSI style names)
 
 ```
