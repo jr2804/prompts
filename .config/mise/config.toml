@@ -12,6 +12,10 @@ ripgrep = "latest"
 "pipx:mdformat" = {version = "latest", uvx = "true", uvx_args = "--with mdformat-front-matters"}
 "pipx:undersort" = "latest"
 
+"github:kreuzberg-dev/kreuzberg" = "latest"
+"npm:@llamaindex/liteparse" = "latest"
+"github:iOfficeAI/OfficeCLI" = "latest"
+
 [settings.npm]
 package_manager = "bun"
 
