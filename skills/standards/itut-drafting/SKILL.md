@@ -237,4 +237,5 @@ Text inside a proposed new/amended clause uses `"ind.left":"720"`
 - `sdo-writing-conventions` -- mechanical writing rules
 - `itut-basics` -- ITU-T organisation context
 - `itut-contributions` -- contribution types and numbering
+- `itut-patents` -- patent policy, IPR disclosure, licensing declarations
 - `itut-recommendations` -- Recommendation structure and approval

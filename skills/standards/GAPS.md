@@ -156,6 +156,10 @@ drafting skills. The ETSI mapping is identical to 3GPP for the shared pool
 9. Create `itut-spec-retrieval` with Python script
 10. Create `etsi-work-items` for Work Item lifecycle detail
 
+### Completed
+
+- **`itut-patents`** -- created 2025-05-22 from Common Patent Policy Guidelines (2022) + ITU patents book Ch.15. Patent policy, IPR disclosure, 3 licensing options, declaration forms, database, neutrality principles.
+
 ---
 
 ## Overall assessment

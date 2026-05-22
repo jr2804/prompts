@@ -111,4 +111,5 @@ External references use ITU-T first: "see Rec. ITU-T X.882 | ISO/IEC 13712-3"
 - `itut-basics` -- ITU-T organization, roles, meeting procedures
 - `itut-contributions` -- contribution submission and TDocs
 - `itut-drafting` -- ITU-T contribution .docx template and formatting
+- `itut-patents` -- patent policy, IPR disclosure, licensing declarations
 - `sdo-docx-formatting` -- formatting rules (delegated)

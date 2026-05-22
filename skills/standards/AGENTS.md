@@ -108,6 +108,7 @@ for a given SDO -- no document formatting.
 | `itut-basics` | ITU-T organisation, Study Groups, Questions, Recommendations, approval processes (TAP, AAP), ITU-T languages |
 | `itut-meetings` | SG/WP meeting structure, contribution deadlines, document numbering (C, TD series) |
 | `itut-contributions` | Contribution types, cover page fields, header table structure, abstract |
+| `itut-patents` | Common Patent Policy (ITU-T/ITU-R/ISO/IEC), IPR disclosure obligations, 3 licensing options (RF/RAND/refusal), declaration forms, patent database, neutrality principles |
 | `itut-recommendations` | Recommendation structure (clause numbering), amendment vs revision, consent/approval, publication stages |
 
 ### Layer 3 -- SDO drafting skills (per-SDO prefix)
@@ -195,7 +196,7 @@ When an agent works on a specific contribution, the project root follows:
 | `sdo-`  | Common across all SDOs | `sdo-project-setup`, `sdo-writing-style`, `sdo-docx-formatting`, `sdo-docx-operations` |
 | `3gpp-` | 3GPP-specific | `3gpp-basics`, `3gpp-tdocs`, `3gpp-drafting` |
 | `etsi-` | ETSI-specific | `etsi-spec`, `etsi-basics`, `etsi-drafting` |
-| `itut-` | ITU-T-specific | `itut-basics`, `itut-contributions`, `itut-drafting` |
+| `itut-` | ITU-T-specific | `itut-basics`, `itut-contributions`, `itut-drafting`, `itut-patents` |
 
 Existing skills in this repo already follow this convention; no renames needed.
 
@@ -222,6 +223,7 @@ Existing skills in this repo already follow this convention; no renames needed.
 | `3gpp-drafting` | 3 | Done |
 | `itut-basics` | 2 | Done |
 | `itut-contributions` | 2 | Done |
+| `itut-patents` | 2 | Done |
 | `itut-recommendations` | 2 | Done |
 | `itut-drafting` | 3 | Done |
 | `etsi-basics` | 2 | Done |

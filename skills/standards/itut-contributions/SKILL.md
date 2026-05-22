@@ -129,4 +129,5 @@ Contact:            John Jones, rapporteur for Q4/15
 - `itut-basics` -- ITU-T organization, roles, terminology
 - `itut-recommendations` -- Recommendation structure and approval
 - `itut-drafting` -- ITU-T contribution .docx template and formatting
+- `itut-patents` -- patent policy, IPR disclosure, licensing declarations
 - `sdo-project-setup` -- project bootstrap workflow
