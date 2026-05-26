@@ -2,6 +2,11 @@
 
 ## Tables
 
+> **SDO-specific note:** ITU-T uses per-clause SEQ counters (`SEQ TAB6`)
+> with `TAB_` bookmark prefix instead of the generic `tbl_` prefix and
+> global `SEQ Table`. See the per-SDO drafting skill for the concrete
+> convention.
+
 ### Styles (use concrete names from SDO drafting skill)
 
 - Caption (placed **above** the table): `table-caption`
@@ -27,6 +32,11 @@
 - See `sdo-docx-operations` for officecli field-code and bookmark injection.
 
 ## Figures
+
+> **SDO-specific note:** ITU-T uses per-clause SEQ counters (`SEQ FIG6`)
+> with `FIG_` bookmark prefix instead of the generic `fig_` prefix and
+> global `SEQ Figure`. See the per-SDO drafting skill for the concrete
+> convention.
 
 ### Styles (use concrete names from SDO drafting skill)
 
