@@ -28,13 +28,36 @@ Recommendation is organized as follows:
 | *(preliminary)* | Cover page, Contents, Foreword, Introduction | Roman numeral pages |
 | 1 | **Scope** | Defines subject and limits; no requirements |
 | 2 | **Normative references** | Documents whose provisions are referenced normatively |
-| 3 | **Definitions** *(optional)* | Terms defined for this Recommendation |
+| 3 | **Definitions** *(optional)* | Terms defined for this Recommendation. Subdivided into 3.1 "Terms defined elsewhere" and 3.2 "Terms defined in this Recommendation" (if both are used). See term formatting below. |
 | 4 | **Abbreviations** *(optional)* | All abbreviations used in the text |
 | 5 | **Conventions** *(optional)* | Any particular notation used |
 | 6+ | **Text** | Body of the Recommendation |
 | Annex A+ | **Integral annexes** | Normative material (same approval as Recommendation) |
 | Annex (continues) | **Non-integral annexes** | Informative/supplementary (SG agreement, not full approval) |
 | *(last)* | **Index** *(optional)* | |
+
+### Term formatting (clause 3)
+
+Terms in clause 3 are formatted as **pseudo-subclauses**: they carry
+subclause-style numbering (3.1.1, 3.1.2, ...) but are not real heading
+paragraphs and do **not** appear in the table of contents.
+
+Each term follows this pattern:
+
+```
+<bold>3.1.N\tTERM NAME</bold>: definition text
+```
+
+- The number prefix (`3.1.N`) and term name are **bold**
+- A **tab** separates the number from the term name
+- The term name ends with a **colon** and space, followed by the definition
+  text (not bold)
+- The paragraph uses `body-text` style with a manually set tab stop at
+  1.5 cm (851 twips) — this tab stop is not part of the default
+  `Normal` style in the ITU-T template
+
+This format applies to both 3.1 "Terms defined elsewhere" and
+3.2 "Terms defined in this Recommendation".
 
 ### Subdivision numbering
 - Digits separated by periods: 1, 1.1, 1.1.1
