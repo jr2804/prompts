@@ -1,6 +1,6 @@
 ---
 name: itut-recommendations
-description: "ITU-T Recommendation structure, approval processes, amendment/corrigendum procedures, and ITU-T | ISO/IEC common text conventions. Use when the agent needs to understand how ITU-T Recommendations are structured (clause order, element types, annex conventions), approved (TAP/AAP), amended, or how joint ITU-T/ISO/IEC texts work. Sources: Rec. ITU-T A.1 (09/2019) + Rules for presentation of ITU-T | ISO/IEC common text (2014)."
+description: 'ITU-T Recommendation structure, approval processes, amendment/corrigendum procedures, and ITU-T | ISO/IEC common text conventions. Use when the agent needs to understand how ITU-T Recommendations are structured (clause order, element types, annex conventions), approved (TAP/AAP), amended, or how joint ITU-T/ISO/IEC texts work. Sources: Rec. ITU-T A.1 (09/2019) + Rules for presentation of ITU-T | ISO/IEC common text (2014).'
 ---
 
 # ITU-T Recommendations -- structure & approval
@@ -16,7 +16,7 @@ description: "ITU-T Recommendation structure, approval processes, amendment/corr
 | **Annex** (integral) | Material necessary for completeness | Same approval as Recommendation |
 | **Appendix** (non-integral) | Supplementary, not essential | Agreed by study group (not full approval) |
 
----
+______________________________________________________________________
 
 ## Recommendation clause structure
 
@@ -60,11 +60,12 @@ This format applies to both 3.1 "Terms defined elsewhere" and
 3.2 "Terms defined in this Recommendation".
 
 ### Subdivision numbering
+
 - Digits separated by periods: 1, 1.1, 1.1.1
 - No trailing period after single number
 - Do not create subclause 1.1 unless 1.2 also exists
 
----
+______________________________________________________________________
 
 ## Notes (from the Rules)
 
@@ -74,7 +75,7 @@ This format applies to both 3.1 "Terms defined elsewhere" and
   "NOTE 1 -- ". Located within table frame or above figure title.
 - Notes are indented from the main text margin.
 
----
+______________________________________________________________________
 
 ## Use of normative words
 
@@ -85,45 +86,51 @@ This format applies to both 3.1 "Terms defined elsewhere" and
 | **may** | Permission; indicates an action that is permitted but not required |
 | **need not** | Negative of "may" (avoid "may not") |
 
----
+______________________________________________________________________
 
 ## Figures and tables (from the Rules)
 
 ### Figures
+
 - Numbered with Arabic numerals, independent of clauses (e.g. Figure 1, Figure 2)
 - **Title below figure**, centred: "Figure x -- title"
 - Referenced as "see Figure 1" (uppercase "F")
 
 ### Tables
+
 - Numbered with Arabic numerals, independent of clauses (e.g. Table 1, Table 2)
 - **Title above table**, centred: "Table x -- title"
 - Columns framed, headings separated by horizontal line
 - Spanning pages: "(continued)" / "Table x (concluded)"
 
----
+______________________________________________________________________
 
 ## ITU-T | ISO/IEC common text
 
 When a Recommendation is jointly developed with ISO/IEC:
 
 ### Terminology
+
 - **Common text**: Identical text in both ITU-T Rec and ISO/IEC IS
 - **Identical Recommendations | International Standards**: Same text
 - **Paired Recommendations | International Standards**: Technically aligned but not identical ("twin text")
 
 ### Self-reference
+
 - In Scope/boilerplate: "this Recommendation | International Standard"
 - Elsewhere: use a capitalized descriptive term (e.g. "this Specification")
 
 ### Dual notation
+
 External references use ITU-T first: "see Rec. ITU-T X.882 | ISO/IEC 13712-3"
 
 ### Title
+
 - Introductory element: "Information technology"
 - Up to 3 elements, general to particular
 - First letter of each element capitalized
 
----
+______________________________________________________________________
 
 ## References
 

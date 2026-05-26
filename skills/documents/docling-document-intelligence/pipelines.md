@@ -5,7 +5,7 @@ and **VLM** (page images through a vision-language model). The `docling` CLI
 exposes both via `--pipeline standard` (default) and `--pipeline vlm`.
 The right choice depends on document type, hardware, and latency budget.
 
----
+______________________________________________________________________
 
 ## Decision matrix
 
@@ -20,7 +20,7 @@ The right choice depends on document type, hardware, and latency budget.
 | Apple Silicon / local dev | VLM (MLX) | MPS acceleration |
 | Speed-critical, accuracy secondary | Standard, no tables | Fastest path |
 
----
+______________________________________________________________________
 
 ## Pipeline 1: Standard PDF Pipeline
 
@@ -99,7 +99,7 @@ from docling.datamodel.pipeline_options import OcrMacOptions
 opts = PdfPipelineOptions(do_ocr=True, ocr_options=OcrMacOptions())
 ```
 
----
+______________________________________________________________________
 
 ## Pipeline 2: VLM Pipeline — local inference
 
@@ -163,7 +163,7 @@ pipeline_options = VlmPipelineOptions(
 )
 ```
 
----
+______________________________________________________________________
 
 ## Pipeline 3: VLM Pipeline — remote API
 
@@ -229,7 +229,7 @@ blocks outbound HTTP by default as a safety measure.
 | Ollama | `http://localhost:11434/v1/chat/completions` | Model: `ibm/granite-docling:258m` |
 | OpenAI-compatible cloud | Provider URL | Set Authorization header |
 
----
+______________________________________________________________________
 
 ## VLM install requirements
 
@@ -242,11 +242,13 @@ pip install torch transformers accelerate
 ```
 
 MLX (Apple Silicon only):
+
 ```bash
 pip install mlx mlx-lm
 ```
 
 vLLM backend (server-side):
+
 ```bash
 pip install vllm
 vllm serve ibm-granite/granite-docling-258M

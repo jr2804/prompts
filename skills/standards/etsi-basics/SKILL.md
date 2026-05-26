@@ -1,6 +1,6 @@
 ---
 name: etsi-basics
-description: "ETSI organisation overview, deliverable types, standards development lifecycle, and key roles. Use when the agent needs context about how ETSI works: Technical Committees, deliverable types (TS, ES, EN, HS, TR, EG, SR, GS), approval processes, the standards development lifecycle (Work Item through publication), or ETSI-specific terminology. Sources: ETSI Guide to Writing World Class Standards + ETSI Directives."
+description: 'ETSI organisation overview, deliverable types, standards development lifecycle, and key roles. Use when the agent needs context about how ETSI works: Technical Committees, deliverable types (TS, ES, EN, HS, TR, EG, SR, GS), approval processes, the standards development lifecycle (Work Item through publication), or ETSI-specific terminology. Sources: ETSI Guide to Writing World Class Standards + ETSI Directives.'
 ---
 
 # ETSI Basics
@@ -28,24 +28,28 @@ each year.
 | **GS** | Group Specification | Normative or informative | Industry Specification Group |
 
 **Key terms:**
+
 - **Normative** = prescriptive = how to comply with the standard
 - **Informative** = descriptive = helps with conceptual understanding
 - **Requirement** = the criteria to be fulfilled for compliance
 - **Provision** = collective term for requirements, recommendations, permissions
 
 ### Choosing type
+
 For normative provisions, focus on the approving stakeholders. Larger
 stakeholder groups mean more complex approval: EN > ES > TS. Prefer TS
 unless broader approval is needed. TS requires approval by just the
 Technical Committee.
 
 ### Numbering format
+
 `ETSI <type> <number>[-<part>]`:
+
 - ETSI TS 123 456
 - ETSI ES 201 999-1, ETSI ES 201 999-2 (multi-part)
 - ETSI EN 300 356-33-10 (sub-part)
 
----
+______________________________________________________________________
 
 ## Standards development lifecycle
 
@@ -64,7 +68,7 @@ Create Work Item -> Develop draft -> Validate & Review
 | **5. Approve & publish** | Process per deliverable type; web-based voting; feedback collection |
 | **6. Maintain & evolve** | Defect correction, alignment with related standards, planned revisions |
 
----
+______________________________________________________________________
 
 ## Key roles
 
@@ -78,7 +82,7 @@ Create Work Item -> Develop draft -> Validate & Review
 | **editHelp! Service** | Checks editing, English, refs, abbreviations, definitions |
 | **Specialist Task Force (STF)** | Funded experts for specific drafting tasks |
 
----
+______________________________________________________________________
 
 ## ETSI resources
 

@@ -15,7 +15,7 @@ license: Proprietary. LICENSE.txt has complete terms
 | Create from scratch (HTML) | Read [references/html2pptx.md](references/html2pptx.md) |
 | Create from scratch (PptxGenJS) | Read [references/pptxgenjs.md](references/pptxgenjs.md) |
 
----
+______________________________________________________________________
 
 ## Reading Content
 
@@ -30,7 +30,7 @@ python scripts/thumbnail.py presentation.pptx
 python scripts/unpack.py presentation.pptx unpacked/
 ```
 
----
+______________________________________________________________________
 
 ## Editing Workflow
 
@@ -39,7 +39,7 @@ python scripts/unpack.py presentation.pptx unpacked/
 1. Analyze template with `thumbnail.py`
 2. Unpack → manipulate slides → edit content → clean → pack
 
----
+______________________________________________________________________
 
 ## Creating from Scratch
 
@@ -48,34 +48,38 @@ Two approaches:
 - **HTML→PPTX** (via html2pptx.js): Read [references/html2pptx.md](references/html2pptx.md)
 - **PptxGenJS** (JavaScript library): Read [references/pptxgenjs.md](references/pptxgenjs.md)
 
----
+______________________________________________________________________
 
 ## Creating from a Template
 
 Detailed workflow using `inventory.py`, `rearrange.py`, and `replace.py`:
 
 1. **Extract template text AND create visual thumbnail grid**:
+
    ```bash
    python -m markitdown template.pptx > template-content.md
    python scripts/thumbnail.py template.pptx
    ```
 
 2. **Analyze template and save inventory**:
+
    ```bash
    python scripts/inventory.py working.pptx text-inventory.json
    ```
 
 3. **Duplicate, reorder, and delete slides**:
+
    ```bash
    python scripts/rearrange.py template.pptx working.pptx 0,34,34,50,52
    ```
 
 4. **Apply text replacements**:
+
    ```bash
    python scripts/replace.py working.pptx replacement-text.json output.pptx
    ```
 
----
+______________________________________________________________________
 
 ## Design Ideas
 
@@ -125,7 +129,7 @@ Detailed workflow using `inventory.py`, `rearrange.py`, and `replace.py`:
 - **Don't create text-only slides** — add images, icons, charts, or visual elements
 - **NEVER use accent lines under titles** — hallmark of AI-generated slides; use whitespace or background color instead
 
----
+______________________________________________________________________
 
 ## QA (Required)
 
@@ -157,7 +161,7 @@ Convert slides to images and inspect for overlapping elements, text overflow, co
 
 **Do not declare success until you've completed at least one fix-and-verify cycle.**
 
----
+______________________________________________________________________
 
 ## Scripts
 
@@ -174,7 +178,7 @@ Convert slides to images and inspect for overlapping elements, text overflow, co
 | `replace.py` | Apply text replacements to shapes |
 | `html2pptx.js` | Convert HTML slides to PowerPoint |
 
----
+______________________________________________________________________
 
 ## Converting to Images
 
@@ -193,7 +197,7 @@ To re-render specific slides after fixes:
 pdftoppm -jpeg -r 150 -f N -l N output.pdf slide-fixed
 ```
 
----
+______________________________________________________________________
 
 ## Dependencies
 

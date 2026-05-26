@@ -166,6 +166,7 @@ Fallback:   docx skill              (general python-docx guidance)
 ```
 
 Ancillary tools:
+
 - Draw.io MCP / `drawio` skill → SVG diagrams (follow Draw.io SVG export guidelines)
 - `teddi` / `teddi-cli` → unknown abbreviations and terms
 - `xleak` / `python-docx` → reading XLSX data for table inclusion
@@ -193,7 +194,7 @@ When an agent works on a specific contribution, the project root follows:
 
 | Prefix | Scope | Examples |
 |--------|-------|---------|
-| `sdo-`  | Common across all SDOs | `sdo-project-setup`, `sdo-writing-style`, `sdo-docx-formatting`, `sdo-docx-operations` |
+| `sdo-` | Common across all SDOs | `sdo-project-setup`, `sdo-writing-style`, `sdo-docx-formatting`, `sdo-docx-operations` |
 | `3gpp-` | 3GPP-specific | `3gpp-basics`, `3gpp-tdocs`, `3gpp-drafting` |
 | `etsi-` | ETSI-specific | `etsi-spec`, `etsi-basics`, `etsi-drafting` |
 | `itut-` | ITU-T-specific | `itut-basics`, `itut-contributions`, `itut-drafting`, `itut-patents` |

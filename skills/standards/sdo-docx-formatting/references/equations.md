@@ -12,6 +12,7 @@ Use a **single paragraph** with style `equation` containing
 ```
 
 The `equation` style must define two tab stops:
+
 1. **Centre-aligned** tab (positions the equation in the middle of the page)
 2. **Right-aligned** tab (positions the equation number at the right margin)
 

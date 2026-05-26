@@ -1,6 +1,6 @@
 ---
 name: itut-contributions
-description: "ITU-T contribution and TDoc submission procedures, deadlines, liaison statement format, and IPR requirements. Use when the agent needs to understand how to submit, format, or process ITU-T contributions (C-series documents), TDocs (Temporary Documents), or liaison statements. Covers submission deadlines, translation rules, patent/copyright declarations, and electronic posting. Sources: Rec. ITU-T A.1 (09/2019) clause 3."
+description: 'ITU-T contribution and TDoc submission procedures, deadlines, liaison statement format, and IPR requirements. Use when the agent needs to understand how to submit, format, or process ITU-T contributions (C-series documents), TDocs (Temporary Documents), or liaison statements. Covers submission deadlines, translation rules, patent/copyright declarations, and electronic posting. Sources: Rec. ITU-T A.1 (09/2019) clause 3.'
 ---
 
 # ITU-T Contributions & TDoc Procedures
@@ -8,6 +8,7 @@ description: "ITU-T contribution and TDoc submission procedures, deadlines, liai
 ## Contribution submission
 
 ### Who submits
+
 Member States and other duly authorized entities registered with a study group.
 
 ### Deadlines
@@ -19,22 +20,26 @@ Member States and other duly authorized entities registered with a study group.
 | < 12 calendar days | Not on agenda; not distributed; held for next meeting (exceptions: contributions of extreme importance at Director's discretion with meeting approval — e.g., urgent security vulnerabilities or regulatory deadlines requiring immediate action, as judged by the TSB Director) |
 
 ### Presentation
+
 Must follow ITU-T A.2 clause 2 rules. TSB Director may return non-compliant documents.
 
 ### Web posting
+
 Posted within 3 working days of receipt by TSB.
 
 ### Multiple study groups
+
 Submit to the primary study group. For others, send a single summary sheet
 (title, source, summary).
 
----
+______________________________________________________________________
 
 ## TDocs (Temporary Documents)
 
 Working documents produced during or between meetings.
 
 ### Content
+
 - Extracts from other study group reports
 - Chairman/rapporteur/drafting group reports
 - Chairman proposals, compilations, ad hoc group reports
@@ -49,10 +54,11 @@ Working documents produced during or between meetings.
 | Reports < 21 days before meeting | Posted >= 2 calendar days before discussion |
 
 ### Rapporteur TDoc requirement
+
 Rapporteurs must submit each draft new or revised Recommendation as a
 **separate TD** at least **six weeks** prior to the parent group's meeting.
 
----
+______________________________________________________________________
 
 ## Liaison statements
 
@@ -95,7 +101,7 @@ Contact:            John Jones, rapporteur for Q4/15
                     E-mail: jj@abcco.com
 ```
 
----
+______________________________________________________________________
 
 ## IPR and declarations
 
@@ -110,7 +116,7 @@ Contact:            John Jones, rapporteur for Q4/15
 - **Normative references to external docs**: Source document must be clearly
   identified; procedures per ITU-T A.5 or A.25 apply.
 
----
+______________________________________________________________________
 
 ## Translation
 
@@ -118,7 +124,7 @@ Contact:            John Jones, rapporteur for Q4/15
 - If study group works in original language: no translations
 - Contributions received between 12 days and 2 months: cannot be translated
 
----
+______________________________________________________________________
 
 ## References
 

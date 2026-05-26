@@ -42,22 +42,26 @@ SDO applies and use the example mappings in the table above as defaults.
 ## Conventions by domain
 
 ### Headings (critical rules)
+
 - **Never use MS Word automatic numbering** for sections. Use `<w:tab/>`
   between heading number and title.
 - Numbering: `N` → `N.M` → `N.M.P`. `Introduction` is numbered like any
   other section. `References` is **not** numbered.
 
 ### Enumerations (critical rules)
+
 - **Never use MS Word built-in list feature.** Prefer en-dash (`–`)
   enumerations with `<w:tab/>` after the bullet.
 - Styles: `enum-1`, `enum-2`, `enum-3` for hierarchy levels.
 
 ### Notes (critical rules)
+
 - Format: `NOTE\u00a0N:\t<text>` (uppercase NOTE, non-breaking space, real
   tab). Omit number for single notes.
 - Last note in a block → `note-main`; preceding notes → `note-continuation`.
 
 ### Tables and Figures (critical rules)
+
 - Table caption **above**: `Table\u00a0N: <text>` with `{SEQ Table \* ARABIC}`
   field; bookmark `tbl_<name>` around the number part only.
 - Figure caption **below**: `Figure\u00a0N: <text>` with `{SEQ Figure \* ARABIC}`
@@ -65,23 +69,26 @@ SDO applies and use the example mappings in the table above as defaults.
 - **Never hard-code numbers.** Cross-ref with `{REF bookmark}`.
 
 ### Citations (critical rules)
+
 - Each entry: `[N]\t<text>` using `reference-entry` style and `{SEQ Ref \* ARABIC}`
   field. Bookmark `ref_<name>` around the sequence field only.
 - `References` is the **last** section, after annexes, unnumbered.
 
 ### Text formatting (critical rules)
+
 - Use `body-text` for paragraphs, `code-text` for inline code/filenames.
 - Non-breaking spaces between number+unit and Figure/Table+number.
 - Straight quotes only (`"`, `'`), never curly/typographic.
 
 ### Equations (critical rules)
+
 - Display equations: single paragraph with style `equation`, structure
   `\t<equation>\t(<SEQ EQ>)`.
 - Do **not** hard-code equation numbers. Use `{SEQ EQ \* ARABIC}`.
 - Bookmark `EQ_<name>` around the numbered label for cross-referencing.
 - Inline equations mixed with body text use `oMath` runs, no numbering.
 
----
+______________________________________________________________________
 
 Full details in reference files:
 

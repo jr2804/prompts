@@ -51,6 +51,7 @@ sections: [{
 | A4 (default) | 11,906 | 16,838 | 9,026 |
 
 **Landscape orientation:** docx-js swaps width/height internally, so pass portrait dimensions and let it handle the swap:
+
 ```javascript
 size: {
   width: 12240,   // Pass SHORT edge as width
@@ -258,6 +259,7 @@ new Table({
 | A4 | 11,906 - 2,880 = 9,026 DXA |
 
 **Width rules:**
+
 - **Always use `WidthType.DXA`** — never `WidthType.PERCENTAGE` (incompatible with Google Docs)
 - Table width must equal the sum of `columnWidths`
 - Cell `width` must match corresponding `columnWidth`

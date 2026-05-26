@@ -1,6 +1,6 @@
 ---
 name: 3gpp-drafting
-description: "3GPP-specific TDoc authoring conventions: metadata schema, template substitution, revision workflow, DOCX property sync, project layout, and 3GPP style-name mapping. Use when preparing, updating, or validating 3GPP TDoc .docx files for meeting submissions. Delegates formatting rules to sdo-docx-formatting and officecli operations to sdo-docx-operations."
+description: '3GPP-specific TDoc authoring conventions: metadata schema, template substitution, revision workflow, DOCX property sync, project layout, and 3GPP style-name mapping. Use when preparing, updating, or validating 3GPP TDoc .docx files for meeting submissions. Delegates formatting rules to sdo-docx-formatting and officecli operations to sdo-docx-operations.'
 ---
 
 # 3GPP TDoc Drafting
@@ -32,7 +32,7 @@ operations (tab-run injection, field codes, bookmarks), see
 > universal project prompt, and `set_docx_props.py` (now generalized with a
 > `--props` parameter). Load `sdo-project-setup` for these common functions.
 
----
+______________________________________________________________________
 
 ## 3GPP style-name mapping
 

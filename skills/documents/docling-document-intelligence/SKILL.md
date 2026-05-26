@@ -14,7 +14,7 @@ license: MIT
 compatibility: Requires Python 3.10+, docling>=2.81.0, docling-core>=2.67.1
 metadata:
   author: docling-project
-  version: "2.0"
+  version: '2.0'
   upstream: https://github.com/docling-project/docling
 allowed-tools: Bash(docling:*) Bash(uv:*)
 ---
@@ -31,15 +31,15 @@ VLM remote-API endpoint configuration, hybrid `force_backend_text` mode).
 
 ## Scope
 
-| Task                                          | Covered           |
+| Task | Covered |
 | --------------------------------------------- | ----------------- |
-| Parse PDF / DOCX / PPTX / HTML / image        | ✅                |
-| Convert to Markdown                           | ✅                |
-| Export as DoclingDocument JSON                | ✅                |
-| Chunk for RAG (hybrid: heading + token)       | ✅ (Python API)   |
-| Analyze structure (headings, tables, figures) | ✅ (Python API)   |
-| OCR for scanned PDFs                          | ✅ (auto-enabled) |
-| Multi-source batch conversion                 | ✅                |
+| Parse PDF / DOCX / PPTX / HTML / image | ✅ |
+| Convert to Markdown | ✅ |
+| Export as DoclingDocument JSON | ✅ |
+| Chunk for RAG (hybrid: heading + token) | ✅ (Python API) |
+| Analyze structure (headings, tables, figures) | ✅ (Python API) |
+| OCR for scanned PDFs | ✅ (auto-enabled) |
+| Multi-source batch conversion | ✅ |
 
 ## Step-by-Step Instructions
 
@@ -57,12 +57,12 @@ docling https://example.com/a.pdf
 
 Docling has two pipeline families. Use this table to pick the right one:
 
-| Document type                          | Recommended pipeline  | CLI flag              |
+| Document type | Recommended pipeline | CLI flag |
 | -------------------------------------- | --------------------- | --------------------- |
-| Born-digital PDF (selectable text)     | Standard (default)    | `--pipeline standard` |
-| Scanned / image-only PDF               | Standard + OCR (auto) | `--pipeline standard` |
-| Complex layout, multi-column, formulas | VLM                   | `--pipeline vlm`      |
-| Handwriting                            | VLM                   | `--pipeline vlm`      |
+| Born-digital PDF (selectable text) | Standard (default) | `--pipeline standard` |
+| Scanned / image-only PDF | Standard + OCR (auto) | `--pipeline standard` |
+| Complex layout, multi-column, formulas | VLM | `--pipeline vlm` |
+| Handwriting | VLM | `--pipeline vlm` |
 
 **Standard pipeline** — no GPU needed; fast; OCR enabled automatically for scanned pages.
 **VLM pipeline** — needs GPU; slower; higher fidelity on complex layouts and handwriting.
@@ -345,29 +345,29 @@ so future runs on similar documents start closer to the right pipeline.
 
 If `scripts/docling-evaluate.py` cannot run, still verify:
 
-| Check                                | Action if bad                                                |
+| Check | Action if bad |
 | ------------------------------------ | ------------------------------------------------------------ |
-| Page count matches source (roughly)  | Re-run; try `--pipeline vlm` if layout is complex            |
-| Markdown is not near-empty           | Enable OCR / VLM                                             |
-| Tables missing when visually obvious | Remove `--no-tables`; try `--pipeline vlm`                   |
-| `\ufffd` replacement characters      | Different `--ocr-engine` or `--pipeline vlm`                 |
-| Same line repeated many times        | `--pipeline vlm` or hybrid `force_backend_text` (Python API) |
+| Page count matches source (roughly) | Re-run; try `--pipeline vlm` if layout is complex |
+| Markdown is not near-empty | Enable OCR / VLM |
+| Tables missing when visually obvious | Remove `--no-tables`; try `--pipeline vlm` |
+| `\ufffd` replacement characters | Different `--ocr-engine` or `--pipeline vlm` |
+| Same line repeated many times | `--pipeline vlm` or hybrid `force_backend_text` (Python API) |
 
 ## Common Edge Cases
 
-| Situation                        | Handling                                                                                    |
+| Situation | Handling |
 | -------------------------------- | ------------------------------------------------------------------------------------------- |
-| Scanned / image-only PDF         | Standard pipeline with OCR, or `--pipeline vlm` for best quality                            |
-| Password-protected PDF           | `--pdf-password PASSWORD`; will raise `ConversionError` if wrong                            |
-| Very large document (500+ pages) | Standard pipeline with `--no-tables` for speed                                              |
-| Complex layout / multi-column    | `--pipeline vlm`; standard may misorder reading flow                                        |
-| Handwriting or formulas          | `--pipeline vlm` only — standard OCR will not handle these                                  |
-| URL behind auth                  | Pre-download to temp file; pass local path                                                  |
-| Tables with merged cells         | `table.export_to_markdown()` handles spans; VLM often more accurate                         |
-| Non-UTF-8 encoding               | Docling normalises internally; no special handling needed                                   |
-| VLM hallucinating text           | `force_backend_text=True` via Python API for hybrid mode                                    |
-| VLM API call blocked             | `--enable-remote-services` (CLI) or `enable_remote_services=True` (Python)                  |
-| Apple Silicon                    | `--vlm-model granite_docling` with MLX backend, or `GRANITEDOCLING_MLX` preset (Python API) |
+| Scanned / image-only PDF | Standard pipeline with OCR, or `--pipeline vlm` for best quality |
+| Password-protected PDF | `--pdf-password PASSWORD`; will raise `ConversionError` if wrong |
+| Very large document (500+ pages) | Standard pipeline with `--no-tables` for speed |
+| Complex layout / multi-column | `--pipeline vlm`; standard may misorder reading flow |
+| Handwriting or formulas | `--pipeline vlm` only — standard OCR will not handle these |
+| URL behind auth | Pre-download to temp file; pass local path |
+| Tables with merged cells | `table.export_to_markdown()` handles spans; VLM often more accurate |
+| Non-UTF-8 encoding | Docling normalises internally; no special handling needed |
+| VLM hallucinating text | `force_backend_text=True` via Python API for hybrid mode |
+| VLM API call blocked | `--enable-remote-services` (CLI) or `enable_remote_services=True` (Python) |
+| Apple Silicon | `--vlm-model granite_docling` with MLX backend, or `GRANITEDOCLING_MLX` preset (Python API) |
 
 ## Pipeline reference
 

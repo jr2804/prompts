@@ -619,6 +619,7 @@ The validator checks that the document text matches the original after reverting
 ```
 
 **Deleting entire paragraphs/list items** — when removing ALL content from a paragraph, also mark the paragraph mark as deleted so it merges with the next paragraph. Add `<w:del/>` inside `<w:pPr><w:rPr>`:
+
 ```xml
 <w:p>
   <w:pPr>
@@ -632,9 +633,11 @@ The validator checks that the document text matches the original after reverting
   </w:del>
 </w:p>
 ```
+
 Without the `<w:del/>` in `<w:pPr><w:rPr>`, accepting changes leaves an empty paragraph/list item.
 
 **Rejecting another author's insertion** — nest deletion inside their insertion:
+
 ```xml
 <w:ins w:author="Jane" w:id="5">
   <w:del w:author="Claude" w:id="10">
@@ -644,6 +647,7 @@ Without the `<w:del/>` in `<w:pPr><w:rPr>`, accepting changes leaves an empty pa
 ```
 
 **Restoring another author's deletion** — add insertion after (don't modify their deletion):
+
 ```xml
 <w:del w:author="Jane" w:id="5">
   <w:r><w:delText>deleted text</w:delText></w:r>

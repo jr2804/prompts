@@ -60,21 +60,92 @@ that breaks when the document is revised. Always inject field codes via
 `officecli raw-set`. See `references/field-code-patterns.md` for OOXML
 snippets.
 
-## 5. `paraId` targeting is unreliable
+## 5. `paraId` targeting requires the `w14:` namespace prefix
 
 XPath like `//w:p[@w:paraId='101C5D24']` matches zero elements because
-`paraId` is in the `w14:` namespace, not auto-registered. Consequence: the
-command silently affects 0 elements and reports success.
+`paraId` is in the `w14:` namespace, not `w:`. Use `@w14:paraId` instead:
 
-**Workaround -- use style-based positional XPath:**
+```bash
+officecli raw-set doc.docx /document \
+  --xpath '//w:p[@w14:paraId="101C5D24"]' \
+  --action replace --xml '<w:p ...>...</w:p>'
+```
+
+This works reliably in officecli `raw-set`. The `w14:` prefix is
+auto-registered by officecli's XPath engine.
+
+**Style-based positional XPath** is still preferred for multi-step edits
+(more readable, survives paragraph reordering):
 
 - `(//w:p[w:pPr/w:pStyle/@w:val='Heading1'])[N]/w:r[1]`
-- `(//w:p[w:pPr/w:pStyle/@w:val='B1'])[N]/w:r[1]`
+- `(//w:p[w:pPr/w:pStyle/@w:val='enumlev1'])[N]/w:r[1]`
 - `//w:p[starts-with(normalize-space(.),'Target text')]/w:r[1]`
 
-Always verify match count first with `officecli query <doc> "paragraph[style=...]"`.
+## 8. `officecli batch` stdin redirect and command-line length limits
 
-## 6. `raw-set --action replace --xml ""` is destructive
+**Problem 1 — stdin conflict:** `officecli batch <doc> --input -` fails when
+stdin is already redirected (e.g., from `subprocess.run(input=...)`). The
+CLI detects the conflict and ignores the input:
+
+```
+Warning: batch is reading from --input but stdin is also redirected; stdin ignored.
+```
+
+**Solution:** use `--commands` for inline JSON (≤ ~20 KB), or write to a
+temp file and use `--input <file>` for large payloads:
+
+```python
+import subprocess, json, tempfile, pathlib
+
+def run_batch(doc, commands, env):
+    cmd_json = json.dumps(commands)
+    if len(cmd_json) > 20000:          # Windows ~32 KB command-line limit
+        tmp = pathlib.Path(tempfile.mktemp(suffix='.json'))
+        tmp.write_text(cmd_json, encoding='utf-8')
+        args = ['officecli', 'batch', doc, '--input', str(tmp), '--json']
+    else:
+        tmp = None
+        args = ['officecli', 'batch', doc, '--commands', cmd_json, '--json']
+    try:
+        r = subprocess.run(args, capture_output=True, text=True, env=env)
+        return json.loads(r.stdout)
+    finally:
+        if tmp and tmp.exists(): tmp.unlink()
+```
+
+**Problem 2 — Windows CLI length limit:** `--commands` with large replacement
+XML (e.g. full paragraphs) can exceed Windows' ~32 KB `CreateProcess` limit
+and raise `FileNotFoundError: [WinError 206] The filename or extension is too long`. The 20 KB threshold above gives safe headroom.
+
+## 9. Self-closing `<w:p/>` paragraphs break naive paragraph extraction
+
+Documents with tracked changes often contain empty self-closing paragraph
+marks such as `<w:p w14:paraId="AAA" .../>` (no content, no `</w:p>`).
+
+The standard regex `<w:p [^>]*w14:paraId="([^"]+)"[^>]*>.*?</w:p>` matches
+the self-closing tag as the _opener_ and then captures the **entire next
+paragraph** as its body — silently duplicating content.
+
+**Safe extraction function:**
+
+```python
+def extract_paragraphs(xml):
+    """Return [(paraId, full_xml)] handling self-closing <w:p/> correctly."""
+    results = []
+    for m in re.finditer(r'<w:p [^>]*w14:paraId="([^"]+)"[^>]*>', xml, re.DOTALL):
+        pid = m.group(1)
+        tag_end = m.end() - 1          # position of final '>'
+        if xml[tag_end - 1] == '/':    # self-closing: ends with '/>'  
+            results.append((pid, xml[m.start():m.end() - 1] + '/>'))
+        else:
+            close = xml.find('</w:p>', m.end())
+            if close >= 0:
+                results.append((pid, xml[m.start():close + 6]))
+    return results
+```
+
+Self-closing paragraphs contain no runs, so they are auto-skipped by any
+`<w:t>`-based text scan.
 
 An empty XML string replaces the matched element with nothing, permanently
 deleting it -- with no undo. This mistake occurred during document
@@ -84,3 +155,16 @@ paragraph.
 **Safe inspection alternative:** use `officecli get <doc> "/body/p[N]" --depth 5`
 or `officecli view <doc> annotated`. Never use `raw-set --action replace`
 for inspection.
+
+## 10. `raw-set` replaces only the single matched element
+
+When the XPath `//w:p[@w14:paraId="X"]` matches a self-closing
+`<w:p .../>`, `raw-set` replaces **only that one element**. If the
+replacement XML string accidentally contains two `<w:p>` elements (e.g.
+because a naive extractor bundled a self-closing `<w:p/>` with the following
+real paragraph), `raw-set` inserts both — duplicating the following paragraph
+and introducing duplicate `w:id` values on all its `<w:ins>` / `<w:del>`
+elements.
+
+Always validate that the replacement XML contains **exactly one** top-level
+element matching the XPath target before executing `raw-set`.

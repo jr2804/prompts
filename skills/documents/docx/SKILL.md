@@ -52,7 +52,7 @@ To produce a clean document with all tracked changes accepted (requires LibreOff
 python scripts/accept_changes.py input.docx output.docx
 ```
 
----
+______________________________________________________________________
 
 ## Creating New Documents
 
@@ -64,7 +64,7 @@ Generate .docx files with JavaScript. See **references/docx-js.md** for the comp
 2. Create a JavaScript/TypeScript file using Document, Paragraph, TextRun components.
 3. Validate: `python scripts/validate.py --original <any_existing.docx> unpacked/` or after packing.
 
----
+______________________________________________________________________
 
 ## Editing Existing Documents
 
@@ -125,13 +125,15 @@ python scripts/pack.py unpacked/ output.docx --original document.docx
 Validates with auto-repair, condenses XML, and creates DOCX. Use `--validate false` to skip.
 
 **Auto-repair will fix:**
+
 - `durableId` >= 0x7FFFFFFF (regenerates valid ID)
 - Missing `xml:space="preserve"` on `<w:t>` with whitespace
 
 **Auto-repair won't fix:**
+
 - Malformed XML, invalid element nesting, missing relationships, schema violations
 
----
+______________________________________________________________________
 
 ## Redlining Workflow for Document Review
 
@@ -154,7 +156,7 @@ Only mark text that actually changes. Repeating unchanged text makes edits harde
 5. **Pack**: `python scripts/pack.py dir reviewed.docx --original file.docx`
 6. **Final verification**: `pandoc --track-changes=all reviewed.docx -o verification.md`
 
----
+______________________________________________________________________
 
 ## Dependencies
 

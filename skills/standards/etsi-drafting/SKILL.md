@@ -1,6 +1,6 @@
 ---
 name: etsi-drafting
-description: "ETSI-specific deliverable drafting conventions: document structure, clause ordering, requirements writing (shall/should/may), figures/tables/equations, annexes, and ETSI style-name mapping. Use when preparing or editing ETSI deliverable .docx files (TS, ES, EN, TR, EG, SR, GS). Delegates formatting rules to sdo-docx-formatting and officecli operations to sdo-docx-operations."
+description: 'ETSI-specific deliverable drafting conventions: document structure, clause ordering, requirements writing (shall/should/may), figures/tables/equations, annexes, and ETSI style-name mapping. Use when preparing or editing ETSI deliverable .docx files (TS, ES, EN, TR, EG, SR, GS). Delegates formatting rules to sdo-docx-formatting and officecli operations to sdo-docx-operations.'
 ---
 
 # ETSI Deliverable Drafting
@@ -19,13 +19,14 @@ all required styles and structural elements. Always start from the appropriate
 skeleton for the deliverable type being drafted. Do not add new styles or
 modify existing ones.
 
----
+______________________________________________________________________
 
 ## ETSI deliverable structure
 
 Per the ETSI Drafting Rules (EDR), an ETSI deliverable follows this order:
 
 **Unnumbered preliminary elements (informative):**
+
 - Cover page (title, deliverable type, version, date, logos)
 - Contents (generated)
 - Intellectual Property Rights (provided by Secretariat -- do not modify)
@@ -37,20 +38,22 @@ Per the ETSI Drafting Rules (EDR), an ETSI deliverable follows this order:
 - Introduction (optional)
 
 **Numbered core:**
+
 1. Scope
 2. References (2.1 Normative, 2.2 Informative)
 3. Definitions of terms, abbreviations and symbols
    (3.1 Terms, 3.2 Symbols, 3.3 Abbreviations)
-4+ Technical content
+   4+ Technical content
 
 **Supplementary:**
+
 - Annex A, B, C... (normative): title -- integral part of the deliverable
 - Annex (continued lettering) (informative): title -- non-integral
 - Bibliography (optional)
 - Change history (required for EN HS; optional otherwise)
 - History (provided by Secretariat)
 
----
+______________________________________________________________________
 
 ## Key drafting rules
 
@@ -71,6 +74,7 @@ Each requirement should be: necessary, unambiguous, complete, precise,
 well-structured, consistent, and testable.
 
 ### Clause numbering
+
 - Arabic numerals from 1 (for Scope)
 - Up to 6 heading levels (e.g. 5.1, 5.1.1, 5.1.1.1, ...)
 - If subdivisions exist, at least two at each level
@@ -80,11 +84,14 @@ well-structured, consistent, and testable.
 - Automatic numbering may be used with proper ETSI styles
 
 ### Scope
+
 Worded as statements of fact:
+
 - "The present document specifies..." / "establishes..." / "gives guidelines for..."
 - "The present document is applicable to..."
 
 ### References
+
 - Normative references (2.1): must be publicly available in English
 - Prefer specific (dated) references
 - Non-specific (undated) allowed only if referring TC controls the document
@@ -92,23 +99,26 @@ Worded as statements of fact:
   (e.g. 3GPP TS 23.040 -> ETSI TS 123 040)
 
 ### Figures and tables
+
 - Numbered with Arabic numerals from 1
 - Title below figure: "Figure N: title"
 - Title above table: "Table N: title"
 - Notes within the figure/table frame
 
 ### Notes
+
 - Integrated in text: "NOTE: " or "NOTE N: " for multiple
 - Notes shall NOT contain requirements (except notes to tables/figures)
 - Examples: "EXAMPLE: " or "EXAMPLE N: "
 - Avoid footnotes; if used, shall not contain requirements
 
 ### Neutrality
+
 Do not promote or endorse services, products, or technologies of one
 company over another. If only one product/technology is available and
 needed, follow the rules in EDR clause 4 (copyright provisions).
 
----
+______________________________________________________________________
 
 ## ETSI style-name mapping
 
@@ -142,7 +152,7 @@ as 3GPP styles.
 > elements (front cover, IPR clause, etc.) that are handled by the
 > Secretariat.
 
----
+______________________________________________________________________
 
 ## References
 

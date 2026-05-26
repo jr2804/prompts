@@ -1,6 +1,6 @@
 ---
 name: itut-drafting
-description: "ITU-T-specific contribution document drafting: template structure, header table fields, style-name mapping, equation conventions, and batch workflows. Use when preparing or editing ITU-T contribution .docx files (C-series or TD-series). Delegates formatting rules to sdo-docx-formatting and officecli operations to sdo-docx-operations."
+description: 'ITU-T-specific contribution document drafting: template structure, header table fields, style-name mapping, equation conventions, and batch workflows. Use when preparing or editing ITU-T contribution .docx files (C-series or TD-series). Delegates formatting rules to sdo-docx-formatting and officecli operations to sdo-docx-operations.'
 ---
 
 # ITU-T Contribution Drafting
@@ -16,6 +16,7 @@ operations (tab-run injection, field codes, bookmarks), see
 These key constraints are inlined here to reduce cross-referencing:
 
 **From `sdo-docx-formatting`:**
+
 - Apply formatting through **named styles** from the template, never manual
   overrides (bold, italic, font size, colour).
 - Keep numbering **update-safe** — use SEQ fields and bookmarks, never
@@ -26,6 +27,7 @@ These key constraints are inlined here to reduce cross-referencing:
   (heading number+title, enumeration bullet+text, note label+text).
 
 **From `sdo-docx-operations`:**
+
 - Open in resident mode (`officecli open <doc>`) before multi-step edits;
   close at end.
 - Prefer style/ordinal or explicit XPath targeting, not paraId targeting.
@@ -42,7 +44,7 @@ These key constraints are inlined here to reduce cross-referencing:
   predefined styles, and placeholder content. Do **not** modify the original;
   always work on a copy.
 
----
+______________________________________________________________________
 
 ## ITU-T style-name mapping
 
@@ -79,7 +81,7 @@ Additional ITU-T-specific styles (no abstract equivalent):
 | `Headingb` | Sub-headings within a proposed clause block (not auto-numbered) |
 | `TSBHeaderSummary` | Abstract table cell content |
 
----
+______________________________________________________________________
 
 ## Template structure
 
@@ -129,7 +131,7 @@ content goes after this.
 > If absent, use `Normal` for body paragraphs. Always verify with
 > `officecli get <doc> /styles --depth 1` on any new template.
 
----
+______________________________________________________________________
 
 ## Equation conventions
 
@@ -195,7 +197,7 @@ If more are needed, split into sequential batch calls.
 | `\tag{label}` | Put label in the same paragraph with tab |
 | `\mathcal{L}` | `\mathit{L}` |
 
----
+______________________________________________________________________
 
 ## Term formatting (clause 3 Definitions)
 
@@ -205,7 +207,9 @@ formatting:
 
 - Numbered like subclauses (3.1.1, 3.1.2, ...) but are NOT heading
   paragraphs — they do NOT appear in the table of contents
+
 - Style: `Normal` (body-text style, fallback if `Body Text` absent)
+
 - Each term is a single paragraph in the format:
 
   `<bold>3.1.N\tTERM NAME</bold>: definition text`
@@ -284,7 +288,7 @@ A `Note`-style paragraph that belongs to a term (e.g., clarifying a
 definition) stays after the term paragraph with style `Note`. These are
 not pseudo-subclauses — use the standard note formatting convention.
 
----
+______________________________________________________________________
 
 ## Table and figure numbering (per-clause counters)
 
@@ -300,6 +304,7 @@ and figures. This differs from the generic `sdo-docx-formatting` convention
 | Tables | `TAB<N>` where N = clause number | `TAB_` | `TableNoTitle` (`Table_No & title`) |
 
 Examples:
+
 - Clause 6 figures: `SEQ FIG6`, bookmarks `FIG_EQUIPMENT_*`
 - Clause 8 tables: `SEQ TAB8`, bookmarks `TAB_SETUP_*`
 
@@ -320,6 +325,7 @@ Table\u00a0<N>-{SEQ TAB<N>}: caption text
 
 Use `FIG_` / `TAB_` prefix followed by a short descriptive name in
 UPPER_SNAKE_CASE. Follow the naming scheme already used in the document:
+
 - Look at existing bookmarks in nearby clauses for the naming pattern
 - Choose a 1–2 word description that fits the topic
 - Examples: `FIG_EQUIPMENT_RRS_SP`, `TAB_SIGNALS_ACCURACYMEASUREMENTS`
@@ -354,6 +360,7 @@ When asked to "fix table/figure numbers in clause N", follow this workflow:
 
 1. **Analyse**: Scan all figure/table captions in the clause. For each,
    check:
+
    - Does it have a `SEQ FIG<N>` / `SEQ TAB<N>` field?
    - Does it have a bookmark with `FIG_` / `TAB_` prefix?
    - Is the number hardcoded (no field) or auto-numbered?
@@ -380,6 +387,7 @@ When asked to "fix table/figure numbers in clause N", follow this workflow:
 6. **Rebuild captions**: Use `raw-set` with `--action replace` targeting
    `//w:p[@w14:paraId="PARAID"]` to replace each caption paragraph with
    a correctly structured one. The replacement XML must include:
+
    - `w:pPr` with the correct style (`FigureNotitle0` / `TableNoTitle`)
    - Bookmark start/end around the number
    - SEQ field (begin/instrText/separate/result/end)
@@ -389,6 +397,7 @@ When asked to "fix table/figure numbers in clause N", follow this workflow:
    SEQ and REF fields.
 
 8. **Verify**: Check field results in the raw XML:
+
    ```bash
    officecli raw <doc> /document | grep -A1 'fldCharType="separate"'
    ```
@@ -402,7 +411,7 @@ When asked to "fix table/figure numbers in clause N", follow this workflow:
 | Caption shows empty number | `officecli refresh` didn't update the field | Re-run `officecli refresh`; check raw XML for result |
 | Bookmark name doesn't match nearby pattern | Newly invented name inconsistent with document | Review existing bookmarks in clause; match the naming scheme |
 
----
+______________________________________________________________________
 
 ## Heading conventions (ITU-T-specific)
 
@@ -414,7 +423,7 @@ When asked to "fix table/figure numbers in clause N", follow this workflow:
   subsection labels `"a)\tUnconstrained least-squares fit"`). These appear
   in the TOC as `Heading_b` entries but do NOT get automatic numbering.
 
----
+______________________________________________________________________
 
 ## Batch workflow patterns
 
@@ -443,7 +452,7 @@ When asked to "fix table/figure numbers in clause N", follow this workflow:
 Text inside a proposed new/amended clause uses `"ind.left":"720"`
 (720 twips = 0.5 inch). Sub-items use `"ind.left":"1080"`.
 
----
+______________________________________________________________________
 
 ## Cross-references
 

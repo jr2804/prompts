@@ -10,12 +10,12 @@ A modular skill family for agent-assisted software development workflows. Each s
 
 ## Skill Family Members
 
-| Skill                           | Purpose             | When to Use                                                 |
+| Skill | Purpose | When to Use |
 | ------------------------------- | ------------------- | ----------------------------------------------------------- |
-| **using-git-worktrees**         | Workspace isolation | Starting feature work that needs clean branch environment   |
-| **dispatching-parallel-agents** | Parallel debugging  | 2+ completely independent failures across different domains |
-| **subagent-driven-development** | Structured workflow | Multi-task implementation with integrated two-stage review  |
-| **requesting-code-review**      | Standalone review   | Ad-hoc reviews outside structured workflows                 |
+| **using-git-worktrees** | Workspace isolation | Starting feature work that needs clean branch environment |
+| **dispatching-parallel-agents** | Parallel debugging | 2+ completely independent failures across different domains |
+| **subagent-driven-development** | Structured workflow | Multi-task implementation with integrated two-stage review |
+| **requesting-code-review** | Standalone review | Ad-hoc reviews outside structured workflows |
 
 ## Common Patterns
 

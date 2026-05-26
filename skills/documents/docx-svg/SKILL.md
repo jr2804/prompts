@@ -22,14 +22,14 @@ Microsoft Word supports SVG images in the OOXML format, but typical programmatic
 tools (python-docx, docxtpl) do **not** recognise them out of the box. This
 skill provides **two approaches**, in order of preference:
 
-| Priority         | Tool                                   | When to use                                                            |
+| Priority | Tool | When to use |
 | ---------------- | -------------------------------------- | ---------------------------------------------------------------------- |
-| **1. Preferred** | `officecli`                            | Always, when available in the environment                              |
-| **2. Fallback**  | Python monkey-patch (`scripts/svg.py`) | When officecli is not installed, not reachable, or fails version check |
+| **1. Preferred** | `officecli` | Always, when available in the environment |
+| **2. Fallback** | Python monkey-patch (`scripts/svg.py`) | When officecli is not installed, not reachable, or fails version check |
 
 If `officecli` is present but older than v1.0.64, do not use it. Instead, proceed with the Python fallback. Do not attempt to use a partial or outdated officecli installation.
 
----
+______________________________________________________________________
 
 ## Strategy: check officecli first
 
@@ -42,13 +42,14 @@ officecli --version
 If it returns a version **v1.0.64 or later**: **use officecli** (Section 1 below).
 If not found, or the version is older than v1.0.64: **use the Python fallback** (Section 2 below).
 
----
+______________________________________________________________________
 
 ## Technical Context: How it works (OOXML)
 
 When inserting an SVG, Word expects an `a:ext` block within the `a:blip` element. Both `officecli` and `scripts/svg.py` generate this automatically.
 
 **Structure Reference (for your awareness):**
+
 ```xml
 <a:blip r:embed="rId1">
   <a:extLst>
@@ -58,10 +59,11 @@ When inserting an SVG, Word expects an `a:ext` block within the `a:blip` element
   </a:extLst>
 </a:blip>
 ```
-*   `rId1` points to a PNG/JPEG fallback (optional in modern Word, but `officecli` handles this if needed).
-*   `rId2` points to the actual `.svg` file in `word/media/`.
 
----
+- `rId1` points to a PNG/JPEG fallback (optional in modern Word, but `officecli` handles this if needed).
+- `rId2` points to the actual `.svg` file in `word/media/`.
+
+______________________________________________________________________
 
 ## Section 1: Preferred -- officecli
 
@@ -114,7 +116,7 @@ officecli help docx image
 officecli help docx picture
 ```
 
----
+______________________________________________________________________
 
 ## Section 2: Fallback -- Python monkey-patch
 
@@ -183,7 +185,7 @@ from scripts.svg import is_svg
 assert is_svg("icon.svg")
 ```
 
----
+______________________________________________________________________
 
 ## How the Python fallback works
 

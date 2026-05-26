@@ -1,4 +1,5 @@
 # ETSI Basics -- deliverable types and lifecycle
+
 Extracted from: ETSI "A Guide to Writing World Class Standards" + ETSI Directives (EDR)
 
 ## ETSI organisation
@@ -12,11 +13,13 @@ communications technologies (ICT).
 
 A standard is a collection of the minimum requirements necessary for
 something to:
+
 - Co-exist and interoperate correctly with another
 - Meet national and international regulations
 - Operate safely without causing harm to people or equipment
 
 ### World class standard attributes
+
 - Well-defined objectives responding to real needs in a timely manner
 - Complete and accurate technical content
 - Easy to understand and implement
@@ -24,7 +27,7 @@ something to:
 - Validated
 - Well-maintained
 
----
+______________________________________________________________________
 
 ## ETSI deliverable types
 
@@ -41,6 +44,7 @@ something to:
 | **GS** | Group Specification | Normative or informative | Responsible Industry Specification Group (ISG) |
 
 ### Key distinction
+
 - **Normative** = prescriptive = tells how to comply with the standard
 - **Informative** = descriptive = helps with conceptual understanding
 - **Requirement** = the criteria to be fulfilled to comply with the standard
@@ -48,6 +52,7 @@ something to:
   permissible actions
 
 ### Choosing the right type
+
 When deciding on a deliverable type with normative provisions, focus on
 the stakeholders who will approve it. The approval process is more complex
 and time-consuming for larger stakeholder groups (EN > ES > TS). Use TS
@@ -55,7 +60,9 @@ unless broader approval is necessary. TS requires approval by just the
 Technical Committee that created it.
 
 ### Deliverable numbering
+
 ETSI deliverable numbers consist of the type prefix + number:
+
 - ETSI TS 123 456
 - ETSI ES 201 999
 - ETSI EN 300 356
@@ -63,7 +70,7 @@ ETSI deliverable numbers consist of the type prefix + number:
 Multi-part: ETSI ES 201 999-1, ETSI ES 201 999-2
 Sub-parts: ETSI EN 300 356-33-10
 
----
+______________________________________________________________________
 
 ## Standards development lifecycle
 
@@ -89,6 +96,7 @@ Work Item -> Draft -> Validate & Review -> Editorial Check
    alignment with related standards
 
 ### Work Item proposal considerations
+
 - Is the document normative or informative?
 - What type of deliverable (EN, ES, TS, etc.)?
 - Title: concise indication of content
@@ -98,7 +106,7 @@ Work Item -> Draft -> Validate & Review -> Editorial Check
 - Validation activities needed (test specs, conformance tests)?
 - Who is responsible (committee, working group, rapporteur, STF)?
 
----
+______________________________________________________________________
 
 ## Key roles
 
@@ -112,7 +120,7 @@ Work Item -> Draft -> Validate & Review -> Editorial Check
 | **editHelp! Service** | Checks editing, English, references, abbreviations, definitions |
 | **Specialist Task Force (STF)** | Funded experts for specific drafting tasks |
 
----
+______________________________________________________________________
 
 ## Harmonised Standards
 
@@ -135,7 +143,7 @@ A specific type of TR that provides technical, legal and economic
 background to new radio systems/services/applications. Advises on need
 for spectrum allocation or regulatory change.
 
----
+______________________________________________________________________
 
 ## ETSI resources
 

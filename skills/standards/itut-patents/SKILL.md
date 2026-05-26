@@ -1,6 +1,6 @@
 ---
 name: itut-patents
-description: "ITU-T patent policy, IPR disclosure, and licensing declarations for standardization contributors. Covers the Common Patent Policy for ITU-T/ITU-R/ISO/IEC (2022), the three licensing options (RF, RAND, refusal), Patent Statement and Licensing Declaration Forms (individual and general), disclosure obligations at meetings and after approval, the ITU Patent Information database, cover sheet notification text, and ITU neutrality principles. Use when the agent needs to understand patent disclosure requirements, fill in declaration forms, add patent notices to Recommendation drafts, or handle SEP-related procedures during ITU-T standards development."
+description: ITU-T patent policy, IPR disclosure, and licensing declarations for standardization contributors. Covers the Common Patent Policy for ITU-T/ITU-R/ISO/IEC (2022), the three licensing options (RF, RAND, refusal), Patent Statement and Licensing Declaration Forms (individual and general), disclosure obligations at meetings and after approval, the ITU Patent Information database, cover sheet notification text, and ITU neutrality principles. Use when the agent needs to understand patent disclosure requirements, fill in declaration forms, add patent notices to Recommendation drafts, or handle SEP-related procedures during ITU-T standards development.
 ---
 
 # ITU-T Patent Policy and IPR Procedures

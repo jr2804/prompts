@@ -44,11 +44,12 @@ When rules conflict:
 - In standards documents, prefer straight ASCII quotes and apostrophes.
   Avoid curly quotes, smart apostrophes, and single-character ellipses.
 
----
+______________________________________________________________________
 
 ## Core rules
 
 Rules grouped by concern for incremental application:
+
 - **Content Integrity** (1, 3, 4): anchor to context, be specific, verify facts
 - **Style & Voice** (5, 6, 7, 8): plain words, coherent reference, no performance, calibrated stance
 - **Structure** (2, 9, 11, 12, 13): fit format, show before generalizing, develop thought, choose shape, avoid catalog prose
@@ -74,6 +75,7 @@ Each paragraph of three or more sentences (excluding transitional paragraphs)
 should carry at least one concrete anchor:
 
 **What counts:**
+
 - A proper noun the reader could look up (spec name, organization)
 - A specific number that is not only a date or version
 - A direct quote from a referenced specification
@@ -81,6 +83,7 @@ should carry at least one concrete anchor:
 - A checkable detail
 
 **What does not count:**
+
 - `many`, `various`, `several`, `a lot of`
 - `in ways that mattered`, `meaningful changes`, `broad implications`
 - `the standard approach`, `the usual pattern`, `as is often the case`
@@ -105,8 +108,7 @@ procedures, prefer fewer verified facts to many guessed ones.
 
 Do not chase synonyms for basic words like `problem`, `change`, `system`,
 `work`, or `test`. Repeat the ordinary word when it is the right word.
-Prefer `we changed it` to `the implementation of the change`, `latency
-dropped` to `a reduction in latency was observed`.
+Prefer `we changed it` to `the implementation of the change`, `latency dropped` to `a reduction in latency was observed`.
 
 ### 6. Cohere through reference, not label spam
 
@@ -144,6 +146,7 @@ Usually the order should be:
 ### 10. Watch regularity
 
 Watch for repeated use of the same moves:
+
 - Parallel enumeration and reflexive three-part cadence inside sentences
 - Multiple sentences doing hidden list work even without bullets
 - Concession-plus-positive rhythm (`not X, but Y`; `may sound X, but Y`)
@@ -180,42 +183,42 @@ Re-read as a first-time reader. Cut anything that is auditioning. Cut
 sentences whose only job is to announce the next sentence. Collapse
 paragraphs that restate each other. Most edits should make the text shorter.
 
----
+______________________________________________________________________
 
 ## Required checks
 
 For short pieces (up to ~150 words), run checks 1-5, 7, and 10. For longer
 pieces, run all checks.
 
-1. **Register fit.** Does the format and level of structure match a formal
-   standards document?
-2. **Concrete-anchor audit.** For each substantial paragraph, point to one
-   concrete anchor.
-3. **Fact discipline.** Pick the three most fragile factual claims. If you
-   cannot vouch for them, attribute them, soften them, or cut them.
-4. **Source-fit check.** Check every exact quote, close paraphrase, public
-   metric, planned/future event, and causal claim. Do not keep `X caused Y`
-   unless the source supports the relationship.
-5. **Regularity tripwire.** Name the single most repeated visible pattern.
-   If the same move appears 3+ times, rewrite at least one occurrence.
-6. **Repeated-frame check.** If a central metaphor, contrast, or wording
-   family appears throughout the piece, decide whether it is a useful
-   motif or a too-neat scaffold.
-7. **Stance and voice.** Standards documents aim at neutrality: did you
-   keep it neutral? If a view is called for, is it backed by evidence?
-8. **Developed thought.** For any piece >4 paragraphs, identify one place
-   where the prose pauses, doubles back, or notices a concrete detail off
-   the main line.
-9. **Shape and spine.** State the organizing principle and controlling
-   claim. If the shape is `starting state -> changes -> verdict`, or
-   paragraphs map one-to-one with named topics, restructure.
+01. **Register fit.** Does the format and level of structure match a formal
+    standards document?
+02. **Concrete-anchor audit.** For each substantial paragraph, point to one
+    concrete anchor.
+03. **Fact discipline.** Pick the three most fragile factual claims. If you
+    cannot vouch for them, attribute them, soften them, or cut them.
+04. **Source-fit check.** Check every exact quote, close paraphrase, public
+    metric, planned/future event, and causal claim. Do not keep `X caused Y`
+    unless the source supports the relationship.
+05. **Regularity tripwire.** Name the single most repeated visible pattern.
+    If the same move appears 3+ times, rewrite at least one occurrence.
+06. **Repeated-frame check.** If a central metaphor, contrast, or wording
+    family appears throughout the piece, decide whether it is a useful
+    motif or a too-neat scaffold.
+07. **Stance and voice.** Standards documents aim at neutrality: did you
+    keep it neutral? If a view is called for, is it backed by evidence?
+08. **Developed thought.** For any piece >4 paragraphs, identify one place
+    where the prose pauses, doubles back, or notices a concrete detail off
+    the main line.
+09. **Shape and spine.** State the organizing principle and controlling
+    claim. If the shape is `starting state -> changes -> verdict`, or
+    paragraphs map one-to-one with named topics, restructure.
 10. **Over-correction.** Did you add fake-human moves -- typos, slang,
     forced asides -- just to break a pattern?
 
 These are tripwires, not goals. Use them to catch genericity, visible
 regularity, and modular structure, not to manufacture variation.
 
----
+______________________________________________________________________
 
 ## Useful corrections
 
@@ -227,7 +230,7 @@ regularity, and modular structure, not to manufacture variation.
 | Vague attribution | `Research suggests this approach works well.` -> `TS 26.131 defines the requirement as -64 dBm0 for send direction idle noise.` |
 | Causal overreach | `The codec drove the noise floor higher.` -> `After encoding, the noise floor increased by 3 dB relative to the PCM input.` |
 
----
+______________________________________________________________________
 
 ## Cross-references
 

@@ -49,6 +49,14 @@ uv run scripts/fix_note_tabs.py --doc <doc> --notes assets/specs/fix_note_tabs.e
 - Always keep bookmark names and IDs unique.
 - Always preserve non-breaking spaces and explicit tab runs where required.
 - Keep scripts platform-independent and executable via `uv run`.
+- Always use `uv run python`, never bare `python`.
+- Use `extract_paragraphs()` from `references/raw-xml-manipulation.md`
+  — never the naive `<w:p ...>.*?</w:p>` regex (breaks on self-closing `<w:p/>`).
+- When extracting `<w:rPr>`, use balanced `<w:rPr>` token matching
+  — never `find('<w:rPr', ...)` which also matches `<w:rPrChange>`.
+- Validate replacement XML with `validate_para_xml()` before batching.
+- Check for `' REF REF_' in pxml` before tag-scanning to avoid
+  double-replacement after a paragraph is already fixed.
 
 ## References
 
@@ -57,6 +65,7 @@ uv run scripts/fix_note_tabs.py --doc <doc> --notes assets/specs/fix_note_tabs.e
 - [references/xpath-patterns.md](references/xpath-patterns.md)
 - [references/field-code-patterns.md](references/field-code-patterns.md)
 - [references/tracked-changes.md](references/tracked-changes.md)
+- [references/raw-xml-manipulation.md](references/raw-xml-manipulation.md)
 
 ## Cross-references
 

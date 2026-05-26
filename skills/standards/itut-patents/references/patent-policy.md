@@ -2,6 +2,7 @@
 
 Reference distillation of the Common Patent Policy and its implementation
 guidelines. Sources:
+
 - Guidelines for Implementation of the Common Patent Policy for
   ITU-T/ITU-R/ISO/IEC (Edition 5.0, 16 December 2022)
 - "Understanding Patents, Competition and Standardization in an
@@ -17,6 +18,7 @@ guidelines. Sources:
 
 2. **Three licensing scenarios** when a Recommendation | Deliverable is
    developed and patent information has been disclosed:
+
    - **2.1 (RF / Free of Charge)**: Patent holder negotiates licences free of
      charge on a non-discriminatory basis on reasonable terms and conditions.
    - **2.2 (RAND)**: Patent holder negotiates licences on a non-discriminatory
@@ -156,6 +158,7 @@ All new and revised ITU-T Recommendations shall include:
 ## ITU neutrality principles
 
 ITU does not:
+
 - Evaluate patent relevance or essentiality
 - Interfere with licensing negotiations
 - Settle disputes between patent holders and implementers
@@ -168,6 +171,7 @@ approach of other major SDOs (ANSI, IEEE, CEN/CENELEC).
 ## Software copyright and marks
 
 In addition to the Patent Policy, ITU has adopted:
+
 - **Software Copyright Guidelines**: For source code included in
   Recommendations.
 - **Guidelines on Marks**: For trademarks, service marks, and certification

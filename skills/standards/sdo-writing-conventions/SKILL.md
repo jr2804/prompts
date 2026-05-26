@@ -1,6 +1,6 @@
 ---
 name: sdo-writing-conventions
-description: "Mechanical writing conventions for formal standards documents across all SDOs (3GPP, ETSI, ITU-T). Use when drafting or revising text to ensure consistent spelling (-ize/-ise), hyphenation, number formatting, capitalization, abbreviations, list formatting, proper names, and non-discriminatory language. Complements sdo-writing-style (prose quality) with mechanical correctness rules. Sources: ITU English Language Style Guide (2024)."
+description: 'Mechanical writing conventions for formal standards documents across all SDOs (3GPP, ETSI, ITU-T). Use when drafting or revising text to ensure consistent spelling (-ize/-ise), hyphenation, number formatting, capitalization, abbreviations, list formatting, proper names, and non-discriminatory language. Complements sdo-writing-style (prose quality) with mechanical correctness rules. Sources: ITU English Language Style Guide (2024).'
 ---
 
 # SDO Writing Conventions
@@ -37,15 +37,16 @@ For the full rule set, see:
 - [references/writing-conventions.md](references/writing-conventions.md) -- 11-section extract from the ITU English Language Style Guide
 
 Sections:
-1. Written style (clarity, simplicity)
-2. Spelling (-ize/-ise/-yse, telecommunication(s), ICT(s), compounds, plurals, foreign words)
-3. Hyphens (permanent, temporary, prefixes, compound adjectives)
-4. Punctuation (Oxford comma, spaces)
-5. Adjectives (position affecting meaning: concerned, involved, present, responsible)
-6. Numbers (spell-out rules, dates, ranges, decimals, ordinals, serial numbers)
-7. Proper names (countries, organizations, conferences)
-8. Capitalization (general vs specific, always/never capitalized lists)
-9. Abbreviations and acronyms (plurals, articles, common forms)
+
+01. Written style (clarity, simplicity)
+02. Spelling (-ize/-ise/-yse, telecommunication(s), ICT(s), compounds, plurals, foreign words)
+03. Hyphens (permanent, temporary, prefixes, compound adjectives)
+04. Punctuation (Oxford comma, spaces)
+05. Adjectives (position affecting meaning: concerned, involved, present, responsible)
+06. Numbers (spell-out rules, dates, ranges, decimals, ordinals, serial numbers)
+07. Proper names (countries, organizations, conferences)
+08. Capitalization (general vs specific, always/never capitalized lists)
+09. Abbreviations and acronyms (plurals, articles, common forms)
 10. Layout (paragraph numbering, headings, list formats A/B/C, neutral order)
 11. Non-discriminatory language (gender-neutral, disability-inclusive)
 

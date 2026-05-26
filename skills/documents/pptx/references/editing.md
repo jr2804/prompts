@@ -5,15 +5,18 @@
 When using an existing presentation as a template:
 
 1. **Analyze existing slides**:
+
    ```bash
    python scripts/thumbnail.py template.pptx
    python -m markitdown template.pptx
    ```
+
    Review `thumbnails.jpg` to see layouts, and markitdown output to see placeholder text.
 
 2. **Plan slide mapping**: For each content section, choose a template slide.
 
    ⚠️ **USE VARIED LAYOUTS** — monotonous presentations are a common failure mode. Don't default to basic title + bullet slides. Actively seek out:
+
    - Multi-column layouts (2-column, 3-column)
    - Image + text combinations
    - Full-bleed images with text overlay
@@ -29,6 +32,7 @@ When using an existing presentation as a template:
 3. **Unpack**: `python scripts/office/unpack.py template.pptx unpacked/`
 
 4. **Build presentation** (do this yourself, not with subagents):
+
    - Delete unwanted slides (remove from `<p:sldIdLst>`)
    - Duplicate slides you want to reuse (`add_slide.py`)
    - Reorder slides in `<p:sldIdLst>`
@@ -41,7 +45,7 @@ When using an existing presentation as a template:
 
 7. **Pack**: `python scripts/office/pack.py unpacked/ output.pptx --original template.pptx`
 
----
+______________________________________________________________________
 
 ## Scripts
 
@@ -96,7 +100,7 @@ Creates `thumbnails.jpg` with slide filenames as labels. Default 3 columns, max 
 
 **Use for template analysis only** (choosing layouts). For visual QA, use `soffice` + `pdftoppm` to create full-resolution individual slide images—see SKILL.md.
 
----
+______________________________________________________________________
 
 ## Slide Operations
 
@@ -108,16 +112,18 @@ Slide order is in `ppt/presentation.xml` → `<p:sldIdLst>`.
 
 **Add**: Use `add_slide.py`. Never manually copy slide files—the script handles notes references, Content_Types.xml, and relationship IDs that manual copying misses.
 
----
+______________________________________________________________________
 
 ## Editing Content
 
 **Subagents:** If available, use them here (after completing step 4). Each slide is a separate XML file, so subagents can edit in parallel. In your prompt to subagents, include:
+
 - The slide file path(s) to edit
 - **"Use the Edit tool for all changes"**
 - The formatting rules and common pitfalls below
 
 For each slide:
+
 1. Read the slide's XML
 2. Identify ALL placeholder content—text, images, charts, icons, captions
 3. Replace each placeholder with final content
@@ -133,18 +139,20 @@ For each slide:
 - **Never use unicode bullets (•)**: Use proper list formatting with `<a:buChar>` or `<a:buAutoNum>`
 - **Bullet consistency**: Let bullets inherit from the layout. Only specify `<a:buChar>` or `<a:buNone>`.
 
----
+______________________________________________________________________
 
 ## Common Pitfalls
 
 ### Template Adaptation
 
 When source content has fewer items than the template:
+
 - **Remove excess elements entirely** (images, shapes, text boxes), don't just clear text
 - Check for orphaned visuals after clearing text content
 - Run visual QA to catch mismatched counts
 
 When replacing text with different length content:
+
 - **Shorter replacements**: Usually safe
 - **Longer replacements**: May overflow or wrap unexpectedly
 - Test with visual QA after text changes
@@ -157,6 +165,7 @@ When replacing text with different length content:
 If source has multiple items (numbered lists, multiple sections), create separate `<a:p>` elements for each — **never concatenate into one string**.
 
 **❌ WRONG** — all items in one paragraph:
+
 ```xml
 <a:p>
   <a:r><a:rPr .../><a:t>Step 1: Do the first thing. Step 2: Do the second thing.</a:t></a:r>
@@ -164,6 +173,7 @@ If source has multiple items (numbered lists, multiple sections), create separat
 ```
 
 **✅ CORRECT** — separate paragraphs with bold headers:
+
 ```xml
 <a:p>
   <a:pPr algn="l"><a:lnSpc><a:spcPts val="3919"/></a:lnSpc></a:pPr>

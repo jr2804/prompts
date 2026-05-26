@@ -1,6 +1,6 @@
 ---
 name: xlsx
-description: "Use this skill any time a spreadsheet file is the primary input or output. This means any task where the user wants to: open, read, edit, or fix an existing .xlsx, .xlsm, .csv, or .tsv file; create a new spreadsheet from scratch or from other data sources; or convert between tabular file formats. Trigger especially when the user references a spreadsheet file by name or path and wants something done to it or produced from it. Do NOT trigger when the primary deliverable is a Word document, HTML report, standalone Python script, or Google Sheets API integration."
+description: 'Use this skill any time a spreadsheet file is the primary input or output. This means any task where the user wants to: open, read, edit, or fix an existing .xlsx, .xlsm, .csv, or .tsv file; create a new spreadsheet from scratch or from other data sources; or convert between tabular file formats. Trigger especially when the user references a spreadsheet file by name or path and wants something done to it or produced from it. Do NOT trigger when the primary deliverable is a Word document, HTML report, standalone Python script, or Google Sheets API integration.'
 license: Proprietary. LICENSE.txt has complete terms
 ---
 
@@ -9,12 +9,15 @@ license: Proprietary. LICENSE.txt has complete terms
 ## All Excel files
 
 ### Professional Font
+
 - Use a consistent, professional font (e.g., Arial, Times New Roman) for all deliverables unless otherwise instructed by the user
 
 ### Zero Formula Errors
+
 - Every Excel model MUST be delivered with ZERO formula errors (#REF!, #DIV/0!, #VALUE!, #N/A, #NAME?)
 
 ### Preserve Existing Templates (when updating templates)
+
 - Study and EXACTLY match existing format, style, and conventions when modifying files
 - Never impose standardized formatting on files with established patterns
 - Existing template conventions ALWAYS override these guidelines
@@ -22,6 +25,7 @@ license: Proprietary. LICENSE.txt has complete terms
 ## Financial models
 
 ### Color Coding Standards
+
 Unless otherwise stated by the user or existing template
 
 - **Blue text (RGB: 0,0,255)**: Hardcoded inputs, and numbers users will change for scenarios
@@ -43,7 +47,7 @@ Unless otherwise stated by the user or existing template
 
 - Place ALL assumptions in separate assumption cells
 - Use cell references instead of hardcoded values in formulas
-- Example: Use =B5*(1+$B$6) instead of =B5*1.05
+- Example: Use =B5\*(1+$B$6) instead of =B5\*1.05
 
 # XLSX creation, editing, and analysis
 
@@ -65,12 +69,14 @@ all_sheets = pd.read_excel('file.xlsx', sheet_name=None)
 **Always use Excel formulas instead of calculating values in Python and hardcoding them.**
 
 ### ❌ WRONG
+
 ```python
 total = df['Sales'].sum()
 sheet['B10'] = total  # Hardcodes 5000
 ```
 
 ### ✅ CORRECT
+
 ```python
 sheet['B10'] = '=SUM(B2:B9)'
 ```
@@ -120,6 +126,7 @@ python scripts/recalc.py <excel_file> [timeout_seconds]
 ```
 
 The script:
+
 - Automatically sets up LibreOffice macro on first run
 - Recalculates all formulas in all sheets
 - Scans ALL cells for Excel errors
@@ -136,10 +143,12 @@ The script:
 ## Best Practices
 
 ### Library Selection
+
 - **pandas**: Best for data analysis, bulk operations, and simple data export
 - **openpyxl**: Best for complex formatting, formulas, and Excel-specific features
 
 ### Working with openpyxl
+
 - Cell indices are 1-based
 - Use `data_only=True` to read calculated values
 - **Warning**: If opened with `data_only=True` and saved, formulas are permanently lost

@@ -11,7 +11,7 @@ Generated: 2026-05-21. 21 skills reviewed across 3 SDOs + common layer.
 | **3. Drafting** | 1 skill | 1 skill | 1 skill | -- |
 | **Total** | 9 | 4 | 3 | 5 = **21** |
 
----
+______________________________________________________________________
 
 ## A. Missing skills (planned, not yet created)
 
@@ -24,7 +24,7 @@ Generated: 2026-05-21. 21 skills reviewed across 3 SDOs + common layer.
 | `3gpp-spec-retrieval` | 3GPP | **Low** | Parallel to `etsi-spec`. 3GPP has FTP access patterns in `3gpp-specifications` but no dedicated retrieval script. |
 | `itut-spec-retrieval` | ITU-T | **Low** | Parallel to `etsi-spec`. ITU-T Recommendations are accessible via handle.itu.int URLs. |
 
----
+______________________________________________________________________
 
 ## B. Cross-reference gaps
 
@@ -35,10 +35,10 @@ Generated: 2026-05-21. 21 skills reviewed across 3 SDOs + common layer.
 | `sdo-docx-formatting` | `3gpp-drafting` | Should reference it (already references `etsi-drafting` and `itut-drafting` but missing 3GPP) |
 
 Older Layer 2 skills (`3gpp-*` reference skills) use `@skill-name` format
-rather than `\`skill-name\`` -- these are not machine-detectable and should
+rather than `\`skill-name\`\` -- these are not machine-detectable and should
 be updated for consistency with the newer skills.
 
----
+______________________________________________________________________
 
 ## C. Capability coverage by SDO
 
@@ -59,7 +59,7 @@ be updated for consistency with the newer skills.
 | Drafting template | Tdoc_Template.docx | template.docx | **missing** |
 | Project setup | `sdo-project-setup` | `sdo-project-setup` | `sdo-project-setup` |
 
----
+______________________________________________________________________
 
 ## D. Feature completeness of existing skills
 
@@ -77,15 +77,7 @@ be updated for consistency with the newer skills.
 
 | Skill | Depth | Gaps |
 |-------|-------|------|
-| `3gpp-basics` | High -- comprehensive | Uses `@skill-name` refs (not `\`skill-name\``) |
-| `3gpp-working-groups` | High -- TBIDs, hierarchy | Uses `@skill-name` refs |
-| `3gpp-meetings` | High -- identifiers, scheduling | Uses `@skill-name` refs |
-| `3gpp-tdocs` | High -- patterns, FTP, metadata | Uses `@skill-name` refs |
-| `3gpp-releases` | High -- versioning, freeze | Uses `@skill-name` refs |
-| `3gpp-specifications` | High -- TS/TR, FTP structure | Uses `@skill-name` refs |
-| `3gpp-portal-auth` | High -- EOL, AJAX | Uses `@skill-name` refs |
-| `3gpp-change-request` | High -- workflow, status | Has `workflow.md`; uses `@skill-name` refs |
-| `3gpp-drafting` | High -- template, metadata, revision, styles | Missing: no reference from `sdo-docx-formatting` back to this skill |
+| `3gpp-basics` | High -- comprehensive | Uses `@skill-name` refs (not `\`skill-name\``) | | `3gpp-working-groups`| High -- TBIDs, hierarchy | Uses`@skill-name`refs | |`3gpp-meetings`| High -- identifiers, scheduling | Uses`@skill-name`refs | |`3gpp-tdocs`| High -- patterns, FTP, metadata | Uses`@skill-name`refs | |`3gpp-releases`| High -- versioning, freeze | Uses`@skill-name`refs | |`3gpp-specifications`| High -- TS/TR, FTP structure | Uses`@skill-name`refs | |`3gpp-portal-auth`| High -- EOL, AJAX | Uses`@skill-name`refs | |`3gpp-change-request`| High -- workflow, status | Has`workflow.md`; uses `@skill-name`refs | |`3gpp-drafting`| High -- template, metadata, revision, styles | Missing: no reference from`sdo-docx-formatting\` back to this skill |
 
 ### ITU-T layer
 
@@ -94,7 +86,7 @@ be updated for consistency with the newer skills.
 | `itut-basics` | High -- A.1 extract | None |
 | `itut-contributions` | High -- A.1 clause 3 extract | None |
 | `itut-recommendations` | High -- Rules extract | None |
-| `itut-drafting` | High -- template, styles, equations, batch | References missing `itut-meetings`; uses `\`body-text\`` etc. as internal refs (not skills) |
+| `itut-drafting` | High -- template, styles, equations, batch | References missing `itut-meetings`; uses `\`body-text\`\` etc. as internal refs (not skills) |
 
 ### ETSI layer
 
@@ -104,7 +96,7 @@ be updated for consistency with the newer skills.
 | `etsi-drafting` | High -- EDR extract + style table | Missing: no .docx template asset. Style names based on 3GPP pool (likely correct but unverified). |
 | `etsi-spec` | High -- metadata script | None |
 
----
+______________________________________________________________________
 
 ## E. SDO-specific drafting completeness
 
@@ -130,7 +122,7 @@ All 16 abstract names from `sdo-docx-formatting` are mapped in all three
 drafting skills. The ETSI mapping is identical to 3GPP for the shared pool
 (confirmed by the EDR's reliance on the same style names).
 
----
+______________________________________________________________________
 
 ## F. Recommendations
 
@@ -148,29 +140,31 @@ drafting skills. The ETSI mapping is identical to 3GPP for the shared pool
 ### Medium-term (round out coverage)
 
 6. Create `itut-meetings` -- meeting procedures from A.1
-7. Update 3GPP reference skills (`@skill-name` -> `\`skill-name\``) for consistency
+7. Update 3GPP reference skills (`@skill-name` -> `\`skill-name\`\`) for consistency
 
 ### Low priority (nice to have)
 
-8. Create `3gpp-spec-retrieval` with Python script (parallel to `etsi-spec`)
-9. Create `itut-spec-retrieval` with Python script
+08. Create `3gpp-spec-retrieval` with Python script (parallel to `etsi-spec`)
+09. Create `itut-spec-retrieval` with Python script
 10. Create `etsi-work-items` for Work Item lifecycle detail
 
 ### Completed
 
 - **`itut-patents`** -- created 2025-05-22 from Common Patent Policy Guidelines (2022) + ITU patents book Ch.15. Patent policy, IPR disclosure, 3 licensing options, declaration forms, database, neutrality principles.
 
----
+______________________________________________________________________
 
 ## Overall assessment
 
 **Strengths:**
+
 - All three SDOs have complete Layer 1 (common) + Layer 3 (drafting) coverage
 - Style-name mapping is consistent and complete across all drafting skills
 - ITU-T has good depth despite having fewer skills than 3GPP
 - The 5 common skills are high-quality with scripts, schemas, and reference files
 
 **Weaknesses:**
+
 - ETSI has only 3 skills vs. 9 for 3GPP and 4 for ITU-T
 - 3GPP reference skills use inconsistent cross-reference format
 - Cross-reference accuracy has minor issues (1 missing, 1 incomplete)
