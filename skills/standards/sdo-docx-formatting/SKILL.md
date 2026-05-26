@@ -74,6 +74,13 @@ SDO applies and use the example mappings in the table above as defaults.
 - Non-breaking spaces between number+unit and Figure/Table+number.
 - Straight quotes only (`"`, `'`), never curly/typographic.
 
+### Equations (critical rules)
+- Display equations: single paragraph with style `equation`, structure
+  `\t<equation>\t(<SEQ EQ>)`.
+- Do **not** hard-code equation numbers. Use `{SEQ EQ \* ARABIC}`.
+- Bookmark `EQ_<name>` around the numbered label for cross-referencing.
+- Inline equations mixed with body text use `oMath` runs, no numbering.
+
 ---
 
 Full details in reference files:
@@ -82,6 +89,7 @@ Full details in reference files:
 - [references/enumerations.md](references/enumerations.md)
 - [references/notes.md](references/notes.md)
 - [references/tables-figures.md](references/tables-figures.md)
+- [references/equations.md](references/equations.md)
 - [references/citations.md](references/citations.md)
 - [references/text-formatting.md](references/text-formatting.md)
 

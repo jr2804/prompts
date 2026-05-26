@@ -136,20 +136,26 @@ content goes after this.
 ### Display equations (numbered, standalone)
 
 Use a **single paragraph** with style `Equation` containing
-`\t[inline equation]\t(7-X)`. The `Equation` style has two tab stops:
-first centred (for the equation), second right-aligned (for the label).
-This centres the equation and right-aligns the label on the same line.
-Set paragraph `alignment: left` so the tab stops (not paragraph
-justification) control positioning — `left` here means "do not
-centre-justify the paragraph itself," not "left-align the equation."
+`\t[equation]\t(<SEQ EQ>)`. The `Equation` style has two tab stops:
+first centred at 4820 (for the equation), second right-aligned at 9639
+(for the label). This centres the equation and right-aligns the label
+on the same line. Set paragraph `alignment: left` so the tab stops
+(not paragraph justification) control positioning — `left` here means
+"do not centre-justify the paragraph itself," not "left-align the
+equation."
 
 Target structure:
 
 ```
 [p intro sentence]
-[p style=Equation]  <- \t + inline oMath + \t(7-X)  -- one paragraph
-[p ind.left=720]    <- "where..." annotation paragraph
+[p style=Equation]  <- \t + oMath + \t + (EQ_seq_result)  -- one paragraph
+[p style=Equation_legend]  <- "where..." annotation paragraph
 ```
+
+**Numbering:** Do NOT hard-code equation numbers. Use `{SEQ EQ \* ARABIC}`
+for automatic numbering. Wrap the label `(SEQ)` in a bookmark named
+`EQ_<short_name>` (e.g., `EQ_MOSK`, `EQ_XPLUS`). Cross-reference in body
+text with `{REF EQ_<short_name>}`.
 
 Build with officecli in order:
 
@@ -160,7 +166,11 @@ Build with officecli in order:
   { "command": "add", "parent": "/body/p[@paraId=XXXX]", "type": "equation",
     "props": { "mode": "inline", "formula": "..." } },
   { "command": "add", "parent": "/body/p[@paraId=XXXX]", "type": "run",
-    "props": { "text": "\t(7-A)" } }
+    "props": { "text": "\t(" } },
+  { "command": "add", "parent": "/body/p[@paraId=XXXX]", "type": "field",
+    "props": { "code": "SEQ EQ \\* ARABIC", "bookmark": "EQ_NAME" } },
+  { "command": "add", "parent": "/body/p[@paraId=XXXX]", "type": "run",
+    "props": { "text": ")" } }
 ]
 ```
 
