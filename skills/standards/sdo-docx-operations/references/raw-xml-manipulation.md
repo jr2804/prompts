@@ -201,6 +201,38 @@ ______________________________________________________________________
 
 ## 4. Span replacement strategy
 
+### Split-character anti-pattern
+
+Tracked changes by certain authors systematically split words into
+individual character runs, each in its own `<w:r>` (often within separate
+`<w:ins>` blocks). Example: "chapter" becomes `<w:t>c</w:t>` in one ins
+and `<w:t xml:space="preserve">hapter </w:t>` in the next ins.
+
+**Detection:** regex `<w:t[^>]*>([^<]*chapter[^<]*)</w:t>` will NOT match
+because "chapter" never appears in a single `<w:t>`. Instead, test the
+concatenated text:
+
+```python
+contiguous = bool(re.search(r'<w:t[^>]*>([^<]*chapter[^<]*)</w:t>', pxml))
+if not contiguous and 'chapter' in ''.join(re.findall(r'<w:t[^>]*>([^<]*)</w:t>', pxml)):
+    # word is split — fix both runs individually
+```
+
+**Fix approach:** find both contributing runs and modify their `<w:t>`
+content individually. Example for "chapter" → "clause":
+
+```python
+# Replace the single-char "c" run
+old_c = '<w:t>c</w:t>'; new_c = '<w:t>cl</w:t>'
+# Replace the "hapter " run (may have xml:space attr)
+p2 = p2.replace('<w:t xml:space="preserve">hapter ','<w:t xml:space="preserve">ause ',1)
+```
+
+If both runs are in separate `<w:ins>` blocks, the replacement still works
+because each run is modified in-place — the `<w:ins>` wrappers stay intact.
+
+### Multi-run span replacement (standard pattern)
+
 To replace a `[TAG]` pattern that may span multiple runs (possibly split
 across separate `<w:ins>` elements):
 

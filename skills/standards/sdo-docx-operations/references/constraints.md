@@ -156,6 +156,43 @@ paragraph.
 or `officecli view <doc> annotated`. Never use `raw-set --action replace`
 for inspection.
 
+## 6. Heading separator patterns (tab between number and title)
+
+Headings must have exactly one `<w:tab/>` between the heading number and
+the title text, with no extra space runs. Two common defects require
+correction:
+
+**Pattern A — `<w:tab/>` followed by a space-only run (remove it):**
+
+```xml
+<!-- BROKEN: space run after tab -->
+<w:r><w:tab/></w:r>
+<w:r w:rsidRPr="006E4971"><w:t xml:space="preserve"> </w:t></w:r>  <!-- REMOVE THIS -->
+<w:r><w:t>Loudness Rating</w:t></w:r>
+```
+
+Fix: locate and delete the space-only run that immediately follows the
+`<w:tab/>` run. Detect with:
+`<w:tab\s*/>\s*</w:r>\s*(<w:r(?:\s[^>]*)?>\s*(?:<w:rPr>.*?</w:rPr>)?\s*<w:t\s+xml:space="preserve">\s+</w:t>\s*</w:r>)`
+
+Also check for trailing space in the numbering text itself (e.g.
+`<w:t xml:space="preserve">11.2 </w:t>` where "11.2 " should be "11.2").
+
+**Pattern B — Missing `<w:tab/>` (insert it):**
+
+```xml
+<!-- BROKEN: title text directly follows numbering run -->
+<w:r w:rsidRPr="00E44759"><w:t>Test method</w:t></w:r>
+
+<!-- FIXED: <w:tab/> inserted before <w:t> -->
+<w:r w:rsidRPr="00E44759"><w:tab/><w:t>Test method</w:t></w:r>
+```
+
+Find the first non-numeric/not-dot `<w:t>` after the numbering runs and
+insert `<w:tab/>` before its text content. For paragraphs entirely within
+`<w:ins>` blocks (all content tracked as insertion), the replacement stays
+within the existing revision context — no new `<w:del>`/`<w:ins>` needed.
+
 ## 10. `raw-set` replaces only the single matched element
 
 When the XPath `//w:p[@w14:paraId="X"]` matches a self-closing
