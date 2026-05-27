@@ -281,6 +281,19 @@ like 3.21.2.41.
 - Composite headings: capital on each part: "The changing telecommunication
   environment: Ways and means of enhancing the Union's relevance"
 
+### Internal cross-references
+
+Use **"clause"** (not "chapter" or "section") when referring to parts of
+an ITU-T Recommendation or contribution document. Examples:
+
+- "as described in clause 8" (NOT "chapter 8")
+- "see clause 7.2" (NOT "section 7.2")
+- "according to clause 10.5.2" (NOT "section 10.5.2")
+
+"Chapter" and "section" are editorial artefacts from word processors, not
+part of the ITU-T document model. Use "clause" consistently in all internal
+cross-references.
+
 ### Lists -- three formats (be consistent within a document)
 
 **Format A** (items < 1 sentence): lower case, full stop only on last item
