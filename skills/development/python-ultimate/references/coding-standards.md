@@ -249,7 +249,8 @@ ______________________________________________________________________
 | ---- | ----------------- | ----- |
 | CLI | typer | Type hints for CLI |
 | Terminal formatting | rich | Beautiful terminal output |
-| Data models | pydantic | Validation and serialization |
+| Data models — validation / serialization | pydantic | API boundaries, user input, config files |
+| Data models — simple containers | `@dataclass` (stdlib) | Internal DTOs, lightweight structs |
 | App settings | pydantic-settings | Use BaseSettings for config |
 | Database | oxyde | SQL backend for pydantic models |
 | Testing | pytest | Testing framework |
@@ -257,6 +258,100 @@ ______________________________________________________________________
 | Excel reading | pandas + python-calamine | Fast Excel reading |
 | Excel writing | xlsxwriter | Excel output |
 | Type checking | ty | Static type checking |
+
+______________________________________________________________________
+
+## 8.5. Data Modeling — Dataclass vs. Pydantic
+
+Choose the right tool based on **what the data does**, not just what it holds.
+
+### Decision Framework
+
+| Use case | Use | Why |
+|----------|-----|-----|
+| Internal DTOs, geometric points, intermediate structs | `@dataclass` | Stdlib, zero deps, minimal overhead, immutable with `frozen=True` |
+| API request/response models, user input, config files | `pydantic.BaseModel` | Runtime validation, type coercion, JSON serialization, clear error messages |
+| Environment / file-based configuration | `pydantic-settings.BaseSettings` | Declarative env mapping, `.env` support, nested overrides |
+| Dictionary-like structures with fixed keys | `TypedDict` | Lightweight typing for dict interfaces where you don't need a class |
+
+### Rules
+
+1. **Default to `@dataclass` for purely internal data.** If the data never crosses a trust boundary (user input, network, file), does not need JSON serialization, and does not need runtime validation, use `@dataclass`. It is faster, has no extra dependency, and `frozen=True` gives you value semantics for free.
+
+2. **Use `pydantic` at trust boundaries.** Any time data comes from outside the program (HTTP request, CLI args parsed to a model, config file, database row), use `pydantic.BaseModel` so invalid data fails loudly and early with a descriptive error.
+
+3. **Don't mix the two for the same concept.** If a type starts as `@dataclass` and later needs validation, convert it to `pydantic.BaseModel` rather than bolting on manual `__post_init__` validation in a dataclass.
+
+### Examples
+
+```python
+from dataclasses import dataclass
+
+# CORRECT — lightweight internal point, never leaves the process
+@dataclass(frozen=True, slots=True)
+class Point:
+    x: float
+    y: float
+```
+
+```python
+from pydantic import BaseModel, Field, EmailStr
+
+# CORRECT — user-facing data with validation at a trust boundary
+class UserRegistration(BaseModel):
+    name: str = Field(min_length=1, max_length=100)
+    email: EmailStr
+    age: int = Field(ge=0, le=150)
+```
+
+```python
+from dataclasses import dataclass
+
+# CORRECT — CLI parameter bundle, validated by Typer before reaching this struct
+@dataclass
+class RenderOptions:
+    width: int
+    height: int
+    output_file: Path
+```
+
+```python
+from typing import TypedDict
+
+# CORRECT — dict-shaped data from an external JSON API you don't control
+class GithubRepo(TypedDict):
+    id: int
+    name: str
+    full_name: str
+```
+
+### Anti-patterns
+
+```python
+# WRONG — pydantic is overkill for a simple internal struct
+from pydantic import BaseModel
+class Point(BaseModel):
+    x: float
+    y: float
+
+# WRONG — dataclass provides no runtime validation for untrusted input
+@dataclass
+class UserInput:
+    email: str  # Accepts "not-an-email" silently
+```
+
+```python
+# CORRECT
+from dataclasses import dataclass
+@dataclass(frozen=True, slots=True)
+class Point:
+    x: float
+    y: float
+
+from pydantic import BaseModel, EmailStr
+class UserInput(BaseModel):
+    email: EmailStr
+```
 
 ______________________________________________________________________
 

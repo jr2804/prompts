@@ -73,7 +73,7 @@ Sub-Command                    │ What It Reviews                              
 python-ultimate naming         │ File/dir variable naming (_file/_dir/_path suffixes)  │ references/naming-conventions.md
 python-ultimate type-checking  │ TYPE_CHECKING guards and Optional[T] usage             │ references/type-checking.md
 python-ultimate imports        │ Required-vs-optional import patterns                    │ references/imports-optional-dependencies.md
-python-ultimate coding-standards│ Type hints, f-strings, pathlib, docstrings, comments  │ references/coding-standards.md
+python-ultimate coding-standards│ Type hints, f-strings, pathlib, docstrings, comments, data modeling │ references/coding-standards.md
 python-ultimate linter-rules   │ Ruff violations (E402, B007, B008, S108, etc.)         │ references/linter-rules.md
 python-ultimate debugging      │ Systematic 4-phase debugging process                   │ references/debugging.md
 python-ultimate testing        │ Test organization, fixtures, mocking, TDD, coverage    │ references/testing.md
@@ -275,6 +275,7 @@ Canonical quick-reference for common bad or forbidden patterns. Detailed rationa
 | Debugging workflow | Guess-and-check fixes before RCA | Follow 4-phase process | [references/debugging.md](references/debugging.md) |
 | Debugging behavior | Repeated "one more try" after multiple failures | Stop and reassess architecture | [references/debugging.md](references/debugging.md) |
 | Code review behavior | Performative agreement phrases | Technical response and evidence | [references/code-review.md](references/code-review.md) |
+| Data modeling | Using `pydantic` for lightweight internal structs, or `dataclass` at trust boundaries | `dataclass` for internal DTOs; `pydantic` for validation/API boundaries | [references/coding-standards.md](references/coding-standards.md) |
 
 ______________________________________________________________________
 
@@ -317,6 +318,7 @@ Google style. Required for public functions and classes.
 - `sys.path` manipulation
 - Defensive `try/except ImportError` for required dependencies (see [references/imports-optional-dependencies.md](references/imports-optional-dependencies.md))
 - Vague or wide parameter/return types with hidden `isinstance`/`hasattr` checks and `None`-as-error returns (see [references/coding-standards.md](references/coding-standards.md))
+- Using `pydantic` for lightweight internal structs, or `dataclass` for untrusted/API data (see [references/coding-standards.md](references/coding-standards.md))
 
 ______________________________________________________________________
 
@@ -664,7 +666,7 @@ All detailed content lives in `references/`. Load only what you need:
 
 | File | Content |
 | ---------------------------------- | --------------------------------------------------------- |
-| `coding-standards.md` | Type hints, formatting, size limits, docstrings, comments |
+| `coding-standards.md` | Type hints, formatting, size limits, docstrings, comments, data modeling |
 | `cli-development.md` | Typer/Click, parameters, Rich output, env vars |
 | `linter-rules.md` | Ruff rules E402, B007, B008, S108, PLC0415, NPY002, S311 |
 | `testing.md` | Fixtures, parameterized, mocking, TDD, coverage |
