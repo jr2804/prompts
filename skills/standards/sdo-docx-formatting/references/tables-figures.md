@@ -16,8 +16,18 @@
 
 ### Layout
 
+- Every table **must** have at least one header row (style `table-header`),
+  which by default is the first row (`header_rows=1`). Tables without a header
+  row are not allowed.
 - Centre all tables horizontally on the page.
 - Final edit: set column width to "Autofit to contents" for all tables.
+- **Header row repetition:** Enable "Repeat as header row at the top of each
+  page" on **all** header rows (style `table-header`), not just the first row.
+  Some tables have multi-row headers (e.g., a spanning title row followed by
+  column labels). In OOXML this is `<w:tblHeader/>` inside `<w:trPr>` for each
+  header row. This ensures headers repeat when a table spans a page break.
+  Apply to every row that uses the header style, even if the table is expected
+  to fit on a single page.
 
 ### Captions and cross-references
 
