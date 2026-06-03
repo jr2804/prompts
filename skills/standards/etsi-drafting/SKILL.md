@@ -105,6 +105,23 @@ Worded as statements of fact:
 - Title above table: "Table N: title"
 - Notes within the figure/table frame
 
+### ETSI-specific figure paragraph rules (mandatory)
+
+Apply these rules for all ETSI deliverables (TS, ES, EN, TR, EG, SR, GS):
+
+- Figure layout in Word must be **In line with text**. Floating layouts
+  (Square, Tight, Through, Top and Bottom, Behind Text, In Front of Text)
+  are forbidden.
+- A single nominal figure may contain multiple images/pictures inside the
+  same figure paragraph.
+- The paragraph containing the figure(s) must use style `FL`
+  (`figure-para`).
+- After the last image in the figure paragraph, end the paragraph before
+  adding the caption (equivalent to pressing Enter). Do not use a soft line
+  break (`Shift+Enter`) between image content and caption.
+- Place the caption in a separate paragraph with style `TF`
+  (`figure-caption`).
+
 ### Notes
 
 - Integrated in text: "NOTE: " or "NOTE N: " for multiple

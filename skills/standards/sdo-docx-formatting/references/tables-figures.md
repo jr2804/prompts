@@ -66,6 +66,21 @@
   [Draw.io SVG text rendering guidelines](https://www.drawio.com/doc/faq/svg-export-text-problems)
   to avoid text display issues in Word.
 
+### ETSI-specific figure paragraph override
+
+When the active per-SDO drafting skill is ETSI (`etsi-drafting`), enforce all
+of the following:
+
+- Figure image layout must be **In line with text**. Other Word wrapping
+  layouts are forbidden.
+- A single nominal figure may include multiple images/pictures within one
+  `figure-para` paragraph.
+- The image paragraph must end immediately after the final image. Do not place
+  caption text in the same paragraph.
+- Do not use soft line breaks (`Shift+Enter`) between image content and
+  caption.
+- Put the caption in a new paragraph using `figure-caption` style.
+
 ### Captions and cross-references
 
 - Caption format: `Figure&#160;N: <caption text>` -- use a non-breaking
