@@ -25,13 +25,23 @@ see `sdo-writing-style`. This skill covers only mechanical correctness.
 | **Ranges** | "from ... to ..." or "13 360-13 410 kHz" -- never mix |
 | **Decimals** | Precede with zero: 0.3; "per cent" in text, "%" in tables |
 | **Capitalization** | General = lower case; specific reference with number = initial caps; "if in doubt, lower case" |
-| **Cross-references** | Use "clause" not "chapter" or "section" for internal references |
+| **Cross-references** | In standards, use "clause" (not "section") for internal references; in meeting documents, "section" may be used where the template or SDO practice allows it |
 | **Abbreviations** | Spell out on first use; no "the" before org abbreviations (ITU, not the ITU) |
 | **Lists** | Format A (items < 1 sentence): lower case, full stop only on last item; Format B (longer items): semicolons between items, full stop on last; Format C (each item >= 1 sentence): capitals, full stops on all. Consistency within document; "etc." never with "e.g."/"including" |
 | **Gender** | Use "chair" not "chairman"; "workforce" not "manpower"; avoid masculine-only pronouns |
 | **Disability** | People-first: "persons with disabilities"; "wheelchair user" not "wheelchair-bound" |
 
 ## Detailed conventions
+
+## Document class switch (important)
+
+Before applying terminology rules, classify the target as one of:
+
+- **Standards document** (specification/report/Recommendation/Norm):
+  prefer "clause" terminology for internal structure and references.
+- **Meeting document** (contribution/submission/TDoc/TD):
+  "section" terminology is acceptable when aligned with SDO convention
+  and the active template.
 
 For the full rule set, see:
 

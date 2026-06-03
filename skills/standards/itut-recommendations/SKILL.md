@@ -34,7 +34,19 @@ Recommendation is organized as follows:
 | 6+ | **Text** | Body of the Recommendation |
 | Annex A+ | **Integral annexes** | Normative material (same approval as Recommendation) |
 | Annex (continues) | **Non-integral annexes** | Informative/supplementary (SG agreement, not full approval) |
+| *(last, optional)* | **Bibliography** | Informative references not cited normatively; heading style `Appendix_No & title` with page break before |
 | *(last)* | **Index** *(optional)* | |
+
+### Canonical skeleton template
+
+For new Recommendation drafting and for checking currently published Word
+style definitions, use the local downloaded skeleton first:
+
+- `assets/itu-t-recommendation-skeleton.docx`
+
+Upstream source URL (for refresh):
+
+- `https://www.itu.int/en/ITU-T/studygroups/Documents/Doc-ITUT-Recs-Skelet.docx`
 
 ### Term formatting (clause 3)
 
@@ -64,6 +76,28 @@ This format applies to both 3.1 "Terms defined elsewhere" and
 - Digits separated by periods: 1, 1.1, 1.1.1
 - No trailing period after single number
 - Do not create subclause 1.1 unless 1.2 also exists
+
+______________________________________________________________________
+
+## Bibliography
+
+The Bibliography is an **optional, non-normative** clause containing
+informative references (sources not cited normatively in the body).
+
+- **Position:** Always the last clause of the Recommendation, after all
+  integral and non-integral annexes (and before the Index if present).
+- **Heading:** Formatted with style `Appendix_No & title` (the same style
+  used for non-integral appendix headings). Write only the word
+  `Bibliography` — no number prefix.
+- **Page break:** There **must** be a page break immediately before the
+  Bibliography heading. Apply it as `pageBreakBefore: true` on the heading
+  paragraph, not as a separate break paragraph.
+- **Entries:** Each entry uses style `References` — the same style as
+  normative reference entries in clause 2. Format: `[N]\t<citation text>`
+  with a `{SEQ Ref \* ARABIC}` field and bookmark.
+
+See `itut-drafting` for the concrete style-name mapping and officecli
+commands.
 
 ______________________________________________________________________
 

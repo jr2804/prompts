@@ -5,6 +5,35 @@ description: 'ITU-T contribution and TDoc submission procedures, deadlines, liai
 
 # ITU-T Contributions & TDoc Procedures
 
+## Terminology guardrails (important)
+
+- **Contribution (C-series meeting input):** regular pre-meeting submission
+  by authorized members, subject to contribution deadlines.
+- **Temporary Document (TD):** ITU-T internal working document category with
+  distinct process and role expectations (e.g., chairman/rapporteur/editor
+  workflows and meeting-time handling).
+
+Do not assume `TD` in ITU-T is synonymous with generic "TDoc" usage in
+other SDO contexts. In ITU-T workflows, treat `Contribution` and `TD` as
+separate document types with different handling rules.
+
+## Official template / portal sources
+
+Local artifacts (preferred for reproducible/offline use):
+
+- `../itut-drafting/assets/itu-t-sg12-contribution-template.docx`
+
+Upstream source URLs (for refresh):
+
+- Contribution template (example SG12):
+  `https://www.itu.int/dms_pub/itu-t/oth/0A/0F/T0A0F00002F0012MSWE.docx`
+- TD portal entry point:
+  `https://www.itu.int/oth/T0A0F00000A/en`
+
+Use the local Contribution template for regular pre-meeting submissions and
+use the TD portal entry point for TD-specific workflow orientation under
+chair/rapporteur/editor processes.
+
 ## Contribution submission
 
 ### Who submits

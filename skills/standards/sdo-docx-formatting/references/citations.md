@@ -2,10 +2,15 @@
 
 ## References section placement
 
-- The `References` section is always the **last** section in the document,
-  after any annexes.
-- Unlike all other sections, `References` is **not** numbered; use
-  `heading-1` style without a manual number prefix.
+- The `References` section (normative) typically appears as the last numbered
+  clause before any annexes, or as the last unnumbered section after annexes,
+  depending on SDO conventions.
+- Unlike numbered clauses, `References` is **not** numbered; use `heading-1`
+  style without a manual number prefix.
+- For some SDOs (e.g. ITU-T), a **Bibliography** may follow all annexes as
+  the very last element. The Bibliography uses a different heading style
+  (`appendix-heading` abstract name) and requires a page break before it.
+  See the per-SDO drafting skill for details.
 
 ## Entry format
 
@@ -30,3 +35,28 @@
 | Abstract | Concrete (per SDO drafting skill) |
 |----------|-----------------------------------|
 | `reference-entry` | SDO-specific style for each references entry |
+
+______________________________________________________________________
+
+## Bibliography (informative references)
+
+Some SDOs (e.g. ITU-T) include a **Bibliography** as the last clause,
+containing informative references that are not cited normatively.
+
+### Rules
+
+- **Heading style:** Use `bibliography-heading` (abstract name) — a
+  distinct style from `heading-1`. In ITU-T this maps to `Appendix_No & title`. Do **not** apply `heading-1` to a Bibliography heading.
+- **Page break before:** The Bibliography heading paragraph **must** have
+  `pageBreakBefore: true` set as a paragraph property. Never use a
+  separate empty paragraph with a manual page break.
+- **Entry style:** Identical to normative references — use `reference-entry`
+  style with the same `[N]\t<text>` format, `{SEQ Ref \* ARABIC}` fields,
+  and bookmarks. Do not use `body-text` or `Normal` for entries.
+
+### Style mapping
+
+| Abstract | Concrete (per SDO drafting skill) |
+|----------|-----------------------------------|
+| `bibliography-heading` | SDO-specific style for Bibliography heading (may equal `appendix-heading`) |
+| `reference-entry` | Same style used for normative reference entries |

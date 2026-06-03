@@ -41,12 +41,28 @@ SDO applies and use the example mappings in the table above as defaults.
 
 ## Conventions by domain
 
+### Document mode (apply first)
+
+Determine document class before applying structural rules:
+
+- **Standards mode** (specifications, reports, Recommendations, Norms):
+  use clause-centric structure (`N`, `N.M`, `N.M.P`), and treat
+  normative references as an early clause (typically clause 2).
+- **Meeting-document mode** (contributions, submissions, TDoc/TD):
+  section-oriented structure is allowed by template/SDO practice, and
+  reference sections are often placed near the end.
+
+If uncertain, ask the user whether the document is a meeting document or
+an actual standard.
+
 ### Headings (critical rules)
 
-- **Never use MS Word automatic numbering** for sections. Use `<w:tab/>`
-  between heading number and title.
-- Numbering: `N` → `N.M` → `N.M.P`. `Introduction` is numbered like any
-  other section. `References` is **not** numbered.
+- **Never use MS Word automatic numbering** for clauses/sections. Use
+  `<w:tab/>` between heading number and title.
+- Numbering: `N` → `N.M` → `N.M.P`.
+- In **standards mode**, use clause terminology (not section terminology)
+  for internal structure and cross-references.
+- `References` is not numbered when represented as a standalone heading.
 
 ### Enumerations (critical rules)
 
@@ -72,7 +88,11 @@ SDO applies and use the example mappings in the table above as defaults.
 
 - Each entry: `[N]\t<text>` using `reference-entry` style and `{SEQ Ref \* ARABIC}`
   field. Bookmark `ref_<name>` around the sequence field only.
-- `References` is the **last** section, after annexes, unnumbered.
+- In **standards mode**, normative `References` are typically near the
+  beginning (often clause 2). If a `Bibliography` exists, it is an
+  informative end section/appendix and follows annexes.
+- In **meeting-document mode**, a `References` section is commonly placed
+  near or at the end.
 
 ### Text formatting (critical rules)
 

@@ -2,9 +2,16 @@
 
 ## Purpose
 
-Skills in this directory enable coding agents to autonomously write meeting
-contribution documents for Standards Developing Organizations (SDOs)
-in `.docx` format. Initial focus: ETSI, 3GPP, ITU-T.
+Skills in this directory enable coding agents to autonomously write both
+meeting documents and standards deliverables for Standards Developing
+Organizations (SDOs) in `.docx` format. Initial focus: ETSI, 3GPP, ITU-T.
+
+Document classes covered by this skill family:
+
+- **Meeting documents**: contributions, submissions, temporary documents
+  (TDoc/TD, depending on SDO-specific meaning and permissions).
+- **Standards documents**: specifications, technical reports,
+  Recommendations (ITU-T), Norms/EN (ETSI), and related normative texts.
 
 ## Source material inventory
 
@@ -16,6 +23,11 @@ in `.docx` format. Initial focus: ETSI, 3GPP, ITU-T.
 | `tmp/tdoc-example/` | Worked example of 3GPP TDoc project (PLAN.md, AGENTS.md) | `3gpp-drafting` (patterns) |
 | `tmp/awesome-3gpp-skills/skills/standards-document-formatting/` | Reusable formatting conventions (headings, tables, figures, notes, citations, enumerations, text) | `sdo-docx-formatting` |
 | `tmp/awesome-3gpp-skills/skills/3gpp-tdoc-conventions/` | 3GPP template, metadata, revision workflow, project layout, set_docx_props.py | `3gpp-drafting` |
+| `skills/standards/itut-drafting/assets/itu-t-sg12-contribution-template.docx` | Downloaded ITU-T Contribution template (SG12 example) | `itut-contributions`, `itut-drafting` |
+| `skills/standards/itut-recommendations/assets/itu-t-recommendation-skeleton.docx` | Downloaded ITU-T Recommendation skeleton and style baseline | `itut-recommendations`, `itut-drafting` |
+| `https://www.itu.int/dms_pub/itu-t/oth/0A/0F/T0A0F00002F0012MSWE.docx` | Upstream refresh source for local contribution template asset | `itut-contributions`, `itut-drafting` |
+| `https://www.itu.int/oth/T0A0F00000A/en` | ITU-T TD portal entry point | `itut-contributions` |
+| `https://www.itu.int/en/ITU-T/studygroups/Documents/Doc-ITUT-Recs-Skelet.docx` | Upstream refresh source for local Recommendation skeleton asset | `itut-recommendations`, `itut-drafting` |
 
 ## Three-layer architecture
 

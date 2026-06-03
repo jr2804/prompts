@@ -43,6 +43,28 @@ These key constraints are inlined here to reduce cross-referencing:
   new contribution. This is a user-provided template carrying ITU-T branding,
   predefined styles, and placeholder content. Do **not** modify the original;
   always work on a copy.
+- `assets/itu-t-sg12-contribution-template.docx` -- downloaded official ITU-T
+  contribution template (SG12 example) for reproducible offline use.
+- `../itut-recommendations/assets/itu-t-recommendation-skeleton.docx` --
+  downloaded official ITU-T Recommendation skeleton for style-baseline checks.
+
+## Canonical ITU-T template sources (online)
+
+These are the upstream sources for the downloaded assets above:
+
+- Contribution template (example SG12):
+  `https://www.itu.int/dms_pub/itu-t/oth/0A/0F/T0A0F00002F0012MSWE.docx`
+- New Recommendation skeleton (latest Word styles baseline):
+  `https://www.itu.int/en/ITU-T/studygroups/Documents/Doc-ITUT-Recs-Skelet.docx`
+
+### Template selection rule
+
+- For **meeting contributions**: start from
+  `assets/itu-t-sg12-contribution-template.docx`.
+- For **Recommendation drafting or style refresh checks**: use
+  `../itut-recommendations/assets/itu-t-recommendation-skeleton.docx`
+  to confirm style definitions (including appendix and bibliography headings).
+- Use the online URLs only to refresh these local files when needed.
 
 ______________________________________________________________________
 
@@ -69,7 +91,9 @@ formatting rules from `sdo-docx-formatting`.
 | `figure-note` | (varies by template) | If not found in template, omit styling and add a TODO comment for manual review |
 | `note-main` | `Note` | Last note in block |
 | `note-continuation` | (varies by template) | If not found in template, omit styling and add a TODO comment for manual review |
-| `reference-entry` | `References` | Each references entry |
+| `reference-entry` | `References` | Each references entry (normative references *and* bibliography entries) |
+| `appendix-heading` | `Appendix_No & title` | Non-integral (informative) appendix headings |
+| `bibliography-heading` | `Appendix_No & title` | Bibliography clause heading (same style as appendix) |
 | `code-text` | `Macro Text` | officecli styleId: `MacroText` |
 
 Additional ITU-T-specific styles (no abstract equivalent):
@@ -80,6 +104,62 @@ Additional ITU-T-specific styles (no abstract equivalent):
 | `Equation_legend` | officecli styleId: `Equation_legend` -- annotation paragraph following equation |
 | `Headingb` | Sub-headings within a proposed clause block (not auto-numbered) |
 | `TSBHeaderSummary` | Abstract table cell content |
+
+______________________________________________________________________
+
+## Bibliography clause
+
+The **Bibliography** is an optional, non-normative clause that lists
+informative references. It appears as the **very last element** of a
+Recommendation, after all integral and non-integral annexes.
+
+### Three mandatory rules — never drop any of them
+
+1. **Heading style** — Use style `Appendix_No & title` (abstract:
+   `bibliography-heading`), **not** `Heading 1`. The Bibliography is a
+   non-integral appendix in ITU-T, so it shares the appendix heading style.
+   Write the heading text as `Bibliography` without a number prefix.
+
+2. **Page break before heading** — Insert a page break immediately before
+   the `Bibliography` heading paragraph. Apply it as a paragraph property
+   (`w:pageBreakBefore` = `true`, or `pageBreakBefore: true` in the
+   officecli `set` command) on the heading paragraph itself — **do not**
+   insert a separate empty paragraph with a manual page break.
+
+   ```json
+   { "command": "set",
+     "path": "/body/p[<bibliography-heading-ordinal>]",
+     "props": { "style": "Appendix_No & title",
+                "pageBreakBefore": true,
+                "text": "Bibliography" } }
+   ```
+
+3. **Entry style** — Each bibliography entry uses style `References`
+   (abstract: `reference-entry`) — the **same** style as normative
+   reference entries in clause 2. Do not use `Body Text`, `Normal`, or
+   any other style for bibliography entries.
+
+### Entry format
+
+Format identical to normative references:
+
+```
+[N]\t<citation text>
+```
+
+- Square-bracket-wrapped `{SEQ Ref \* ARABIC}` field (no hard-coded number).
+- Real `<w:tab/>` run between the bracket and the citation text.
+- Bookmark `ref_<short_name>` around the sequence field only.
+- Style: `References` on every entry paragraph.
+
+### Common agent failure modes
+
+| Mistake | Correct behaviour |
+|---------|-------------------|
+| Using `Heading 1` for the Bibliography heading | Use `Appendix_No & title` |
+| Omitting the page break before Bibliography | Set `pageBreakBefore: true` on the heading paragraph |
+| Styling entries with `Body Text` or `Normal` | Apply `References` style to every entry |
+| Hard-coding `[1]`, `[2]` as plain text | Use `{SEQ Ref \* ARABIC}` field with bookmark |
 
 ______________________________________________________________________
 
