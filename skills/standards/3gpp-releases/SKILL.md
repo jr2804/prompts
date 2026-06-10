@@ -130,9 +130,9 @@ TS numbers follow pattern: `<series>.<spec>`, where `<series>` is 21, 22, 23, et
 
 ## Cross-References
 
-- **@3gpp-working-groups** - For understanding which TSGs produce which specs
-- **@3gpp-specifications** - For spec file format and numbering
-- **@3gpp-change-request** - For modifications to specs in releases
+- `3gpp-working-groups` - For understanding which TSGs produce which specs
+- `3gpp-specifications` - For spec file format and numbering
+- `3gpp-change-request` - For modifications to specs in releases
 
 ## Resources
 

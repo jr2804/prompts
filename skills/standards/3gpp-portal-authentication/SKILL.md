@@ -279,9 +279,9 @@ response = session.get("https://www.3gpp.org/ftp/tsg_ran/WG1_RL1/RAN1_98/Docs/R1
 
 ## Cross-References
 
-- **@3gpp-tdocs** - TDoc metadata structure and portal URLs
-- **@3gpp-meetings** - Meeting registration and portal integration
-- **@3gpp-specifications** - Spec file access patterns
+- `3gpp-tdocs` - TDoc metadata structure and portal URLs
+- `3gpp-meetings` - Meeting registration and portal integration
+- `3gpp-specifications` - Spec file access patterns
 
 ## Resources
 

@@ -267,11 +267,11 @@ New spec version becomes available
 
 ## Cross-References
 
-- **@3gpp-basics** - 3GPP organization and structure
-- **@3gpp-working-groups** - Working Group responsibility for specs
-- **@3gpp-tdocs** - CRs as meeting documents (tdocs)
-- **@3gpp-releases** - Understanding Release structure
-- **@3gpp-portal-authentication** - Some CR documents may require EOL access
+- `3gpp-basics` - 3GPP organization and structure
+- `3gpp-working-groups` - Working Group responsibility for specs
+- `3gpp-tdocs` - CRs as meeting documents (tdocs)
+- `3gpp-releases` - Understanding Release structure
+- `3gpp-portal-authentication` - Some CR documents may require EOL access
 
 ## Resources
 

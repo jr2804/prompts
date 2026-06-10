@@ -308,9 +308,9 @@ def infer_working_group_from_tdoc(tdoc_id: str) -> str | None:
 
 ## Cross-References
 
-- **@3gpp-working-groups** - For understanding working group and subgroup structure
-- **@3gpp-meetings** - For understanding how TDocs are associated with meetings
-- **@3gpp-portal-authentication** - For accessing TDoc metadata from portal
+- `3gpp-working-groups` - For understanding working group and subgroup structure
+- `3gpp-meetings` - For understanding how TDocs are associated with meetings
+- `3gpp-portal-authentication` - For accessing TDoc metadata from portal
 
 ## Key Points
 

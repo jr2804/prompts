@@ -19,6 +19,32 @@ all required styles and structural elements. Always start from the appropriate
 skeleton for the deliverable type being drafted. Do not add new styles or
 modify existing ones.
 
+### Downloaded skeletons (`assets/`)
+
+| File | Deliverable type | Notes |
+|------|-----------------|-------|
+| `ETSI_ES_skeleton.docx` | ES (ETSI Standard) | |
+| `ETSI_EN_skeleton.docx` | EN (European Norm) | |
+| `ETSI_TS_skeleton.docx` | TS (Technical Specification) | |
+| `ETSI_TR_skeleton.docx` | TR (Technical Report) | |
+| `ETSI_EG_skeleton.docx` | EG (ETSI Guide) | |
+| `ETSI_SR_skeleton.docx` | SR (Special Report) | |
+| `ETSI_GS_skeleton.docx` | GS (Group Specification) | |
+| `ETSI_GR_skeleton.docx` | GR (Group Report) | |
+| `ETSI_hEN_Directive_skeleton.docx` | hEN (Harmonised EN under Directive) | |
+| `ETSI_hEN_Regulation_skeleton.docx` | hEN (Harmonised EN under Regulation) | |
+
+Upstream refresh URL:
+
+- `https://portal.etsi.org/Services/editHelp/Standards-development/Drafting/Skeletons`
+
+### Template selection rule
+
+- **Always start from the skeleton** matching the target deliverable type.
+- If unsure which type applies, ask the user.
+- The skeleton contains all required styles; do not create new styles or
+  rename existing ones.
+
 ______________________________________________________________________
 
 ## ETSI deliverable structure

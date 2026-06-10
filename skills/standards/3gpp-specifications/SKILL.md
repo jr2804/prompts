@@ -237,10 +237,10 @@ Change Requests are tracked in a database accessible via:
 
 ## Cross-References
 
-- **@3gpp-releases** - For release structure and freeze concepts
-- **@3gpp-working-groups** - For understanding which WG owns which specs
-- **@3gpp-change-request** - For modification process via CRs
-- **@3gpp-meetings** - For understanding when specs are approved (at TSG plenaries)
+- `3gpp-releases` - For release structure and freeze concepts
+- `3gpp-working-groups` - For understanding which WG owns which specs
+- `3gpp-change-request` - For modification process via CRs
+- `3gpp-meetings` - For understanding when specs are approved (at TSG plenaries)
 
 ## Resources
 

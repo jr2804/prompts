@@ -262,10 +262,10 @@ FTP directory names on server do NOT match official WG names:
 
 ## Cross-References
 
-- **@3gpp-basics** - For 3GPP organization and structure
-- **@3gpp-meetings** - For meeting pages and naming conventions
-- **@3gpp-tdocs** - For TDoc handling and FTP structure
-- **@3gpp-portal-authentication** - For portal access when authentication required
+- `3gpp-basics` - For 3GPP organization and structure
+- `3gpp-meetings` - For meeting pages and naming conventions
+- `3gpp-tdocs` - For TDoc handling and FTP structure
+- `3gpp-portal-authentication` - For portal access when authentication required
 
 ## Resources
 

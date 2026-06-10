@@ -143,9 +143,9 @@ The 3GPP Meeting Calendar is available on the 3GU Portal:
 
 ## Cross-References
 
-- **@3gpp-working-groups** - For understanding WG codes in meeting URLs
-- **@3gpp-tdocs** - For accessing TDocs from meetings with files links
-- **@3gpp-portal-authentication** - For accessing meeting details pages that require login
+- `3gpp-working-groups` - For understanding WG codes in meeting URLs
+- `3gpp-tdocs` - For accessing TDocs from meetings with files links
+- `3gpp-portal-authentication` - For accessing meeting details pages that require login
 
 ## Common Mistakes
 

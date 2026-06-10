@@ -45,6 +45,8 @@ These key constraints are inlined here to reduce cross-referencing:
   always work on a copy.
 - `assets/itu-t-sg12-contribution-template.docx` -- downloaded official ITU-T
   contribution template (SG12 example) for reproducible offline use.
+- `assets/itu-t-sg12-liaison-statement-template.docx` -- downloaded official ITU-T
+  Liaison Statement template (SG12 example) for drafting outgoing LS documents.
 - `../itut-recommendations/assets/itu-t-recommendation-skeleton.docx` --
   downloaded official ITU-T Recommendation skeleton for style-baseline checks.
 
@@ -54,6 +56,8 @@ These are the upstream sources for the downloaded assets above:
 
 - Contribution template (example SG12):
   `https://www.itu.int/dms_pub/itu-t/oth/0A/0F/T0A0F00002F0012MSWE.docx`
+- Liaison Statement template (example SG12):
+  `https://www.itu.int/dms_pub/itu-t/oth/0A/0F/T0A0F00000B0006MSWE.docx`
 - New Recommendation skeleton (latest Word styles baseline):
   `https://www.itu.int/en/ITU-T/studygroups/Documents/Doc-ITUT-Recs-Skelet.docx`
 
@@ -61,6 +65,8 @@ These are the upstream sources for the downloaded assets above:
 
 - For **meeting contributions**: start from
   `assets/itu-t-sg12-contribution-template.docx`.
+- For **outgoing Liaison Statements**: start from
+  `assets/itu-t-sg12-liaison-statement-template.docx`.
 - For **Recommendation drafting or style refresh checks**: use
   `../itut-recommendations/assets/itu-t-recommendation-skeleton.docx`
   to confirm style definitions (including appendix and bibliography headings).

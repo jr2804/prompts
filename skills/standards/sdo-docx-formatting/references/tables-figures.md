@@ -29,7 +29,7 @@
   Apply to every row that uses the header style, even if the table is expected
   to fit on a single page.
 
-### Captions and cross-references
+### Table captions and cross-references
 
 - Caption format: `Table&#160;N: <caption text>` -- use a non-breaking
   space between "Table" and the number.
@@ -81,7 +81,7 @@ of the following:
   caption.
 - Put the caption in a new paragraph using `figure-caption` style.
 
-### Captions and cross-references
+### Figure captions and cross-references
 
 - Caption format: `Figure&#160;N: <caption text>` -- use a non-breaking
   space between "Figure" and the number.

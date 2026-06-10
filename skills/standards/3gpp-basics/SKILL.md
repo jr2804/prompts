@@ -120,10 +120,10 @@ To access certain 3GPP resources, you need an ETSI Online Account (EOL). However
 
 ## See Also
 
-- **@3gpp-working-groups** - Detailed information about Working Groups, Sub-Working Groups, tbid/SubTB identifiers
-- **@3gpp-meetings** - Meeting structure, naming conventions, and web pages
-- **@3gpp-tdocs** - TDoc patterns, metadata, and file server access
-- **@3gpp-portal-authentication** - EOL authentication, AJAX login patterns
+- `3gpp-working-groups` - Detailed information about Working Groups, Sub-Working Groups, tbid/SubTB identifiers
+- `3gpp-meetings` - Meeting structure, naming conventions, and web pages
+- `3gpp-tdocs` - TDoc patterns, metadata, and file server access
+- `3gpp-portal-authentication` - EOL authentication, AJAX login patterns
 
 ## Resources
 
