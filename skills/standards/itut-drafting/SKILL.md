@@ -219,6 +219,57 @@ content goes after this.
 
 ______________________________________________________________________
 
+## Liaison Statement template structure
+
+The LS template (`assets/itu-t-sg12-liaison-statement-template.docx`) uses an
+11-row header table. This differs from the contribution template above.
+
+### Header table (`/body/tbl[1]`)
+
+| Row | Cell | Content | Style |
+|-----|------|---------|-------|
+| tr[1]/tc[2] | Question(s) | e.g. `4/12` | `TSBHeaderQuestion` |
+| tr[1]/tc[4] | Meeting | e.g. `Geneva, 9-17 June 2026` | `VenueDate` (right-aligned) |
+| tr[2]/tc[2] | Study Group | e.g. `12` | `Normal` |
+| tr[2]/tc[4] | Working Party | e.g. `WP1/12` | `Normal` |
+| tr[3]/tc[2] | Source | e.g. `ITU-T Study Group 12` | `TSBHeaderSource` |
+| tr[4]/tc[2] | Title | LS title | `TSBHeaderTitle` |
+| tr[5] | "LIAISON STATEMENT" banner | merged across all 6 columns, centred | `Normal` + bold |
+| tr[6]/tc[2] | For action to | e.g. `ITU-T Q10/21` | `LSForAction` |
+| tr[7]/tc[2] | For information to | e.g. `ITU-T SG21` | `LSForInfo` |
+| tr[8]/tc[2] | Approval | e.g. `Q4/12 rapporteur group meeting...` | `LSApproval` |
+| tr[9]/tc[2] | Deadline | e.g. `1 September 2026` | `LSDeadline` |
+| tr[10]/tc[2] | Contact 1 — Name/Org/Country | Tab-separated fields | `Normal` |
+| tr[10]/tc[3] | Contact 1 — Tel/E-mail | Tab-separated with labels | `Normal` + tabs @ 794 twips |
+| tr[11] | Contact 2 | Clear with `""` if unused | `Normal` |
+
+**Note:** The LS template has 6 table columns (not 2). Cells use `colspan`
+and `rowspan`:
+
+- tr\[1\]: 4 visible cells with colspans 1/2/2/1
+- tr[3] onward: cells span across all 6 columns
+
+Populate via officecli batch targeting the style names rather than paraIds:
+
+```json
+[
+  { "command": "set", "path": "/body/tbl[1]/tr[1]/tc[2]/p",
+    "props": { "text": "4/12" } },
+  { "command": "set", "path": "/body/tbl[1]/tr[4]/tc[2]/p",
+    "props": { "text": "LS on ...", "style": "TSBHeaderTitle" } }
+]
+```
+
+### LS-specific fields
+
+- **Abstract** is in a separate table (`/body/tbl[2]`), same structure as
+  the contribution template.
+- The LS body follows after the abstract table, with no instruction
+  paragraphs to delete (unlike the contribution template).
+- The first body paragraph is at `/body/p[paraId=70FBDF66]` in the template.
+
+______________________________________________________________________
+
 ## Equation conventions
 
 ### Display equations (numbered, standalone)
@@ -528,6 +579,7 @@ ______________________________________________________________________
 | Error | Root Cause | Fix |
 |-------|-----------|-----|
 | Conclusion heading missing | Batch added heading + table together; table `set` commands failed (index didn't exist yet) | Split: add heading separately, then table, then fill with dedicated batch |
+| Paragraphs reversed in `add` with `after` | Each `add` with `after: anchor` inserts immediately after the anchor, pushing any previously added paragraphs down | Submit `add` commands in **reverse reading order** (last paragraph first, first paragraph last). The first add ends up furthest from the anchor, the last add ends up closest. |
 | `\left\right` with subscripts crashes equation | OMML parser limitation | Use plain `(` `)` delimiters |
 | "Body Text" style not found | Template uses `Normal` as body style | Use `Normal` for body paragraphs |
 | Running header shows placeholder | Header paragraph r[4] not updated | Target `/header[1]/p[@paraId=00100052]/r[4]` and set text |
