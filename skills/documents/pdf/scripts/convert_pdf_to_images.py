@@ -1,3 +1,11 @@
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#   "pdf2image",
+# ]
+# ///
+# Requires the poppler system package (e.g. `apt install poppler-utils`).
+
 import os
 import sys
 

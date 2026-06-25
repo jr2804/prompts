@@ -335,10 +335,11 @@ with open("encrypted.pdf", "wb") as output:
 | Script | Purpose |
 |--------|---------|
 | `check_bounding_boxes.py` | Verify form field positions match visual layout |
+| `check_bounding_boxes_test.py` | Unit tests for `check_bounding_boxes.py` (run with `uv run`) |
 | `check_fillable_fields.py` | Check if a PDF has fillable form fields |
 | `convert_pdf_to_images.py` | Convert PDF pages to images |
-| `create_validation_image.py` | Create visual validation images |
 | `extract_form_field_info.py` | Extract form field metadata from PDFs |
 | `extract_form_structure.py` | Extract form structure from non-fillable PDFs |
 | `fill_fillable_fields.py` | Fill fillable PDF form fields |
 | `fill_pdf_form_with_annotations.py` | Fill PDF forms using annotations |
+| `create_validation_image.py` | Optional: overlay bounding boxes onto a page image for visual debugging |

@@ -1,8 +1,12 @@
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#   "pypdf",
+# ]
+# ///
+
 import sys
 from pypdf import PdfReader
-
-
-
 
 reader = PdfReader(sys.argv[1])
 if (reader.get_fields()):
