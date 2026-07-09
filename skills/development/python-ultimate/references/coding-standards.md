@@ -34,6 +34,7 @@ description: Consolidated Python coding standards reference for type hints, stri
     - [Prohibited Linter Rules](#prohibited-linter-rules)
     - [os.path](#ospath)
     - [Optional[T]](#optionalt)
+    - [Vague Type Annotations: object and Any](#vague-type-annotations-object-and-any)
   - [Linting and Formatting](#linting-and-formatting)
 
 ______________________________________________________________________
@@ -43,16 +44,16 @@ ______________________________________________________________________
 Type hints are required for **all** function parameters and return values.
 
 ```python
-from typing import Any
-
-def process_data(item_id: str, group_id: int) -> dict[str, Any]:
+def process_data(item_id: str, group_id: int) -> dict[str, str]:
     """Process a data item and return metadata."""
     return {"id": item_id, "group": group_id}
 
 # Use pipe syntax for optional types
-def fetch_data(item_id: str | None) -> dict[str, Any] | None:
+from pathlib import Path
+
+def fetch_data(item_id: str, cache_dir: Path | None = None) -> dict[str, str] | None:
     """Fetch data metadata, returns None if not found."""
-    if item_id is None:
+    if cache_dir is None:
         return None
     return {"id": item_id}
 ```
@@ -60,8 +61,11 @@ def fetch_data(item_id: str | None) -> dict[str, Any] | None:
 **Rules:**
 
 - Use `T | None` instead of `Optional[T]`
-- Use `Any` from `typing` instead of `object`
-- Include type hints in docstrings for parameters and returns
+- Use precise types (str, int, Path, etc.) — never default to `object` or `Any`
+- If you need a union of known types, use `|`: `str | int | Path`
+- For structured objects with known fields, define a `typing.Protocol` or `@dataclass`
+- Only use `typing.Any` for genuinely dynamic values (e.g., binary blobs from embedded Python)
+- When `Any` is truly unavoidable, prefer `typing.Any` over bare `object`
 
 **Null comparisons:** Use `is` and `is not` for `None`, not `==` or `!=`.
 
@@ -535,6 +539,66 @@ def process_item(item_id: int) -> ProcessResult:
 - Does the function body contain `isinstance` or `hasattr` on its own parameters? → Split or narrow the type.
 - Does the function return `None` as a silent fallback for more than one condition? → Use a result type or raise an exception.
 - Is `Any` in the signature because you don't know what the caller might pass? → The caller should convert first.
+
+### Vague Type Annotations: `object` and `Any`
+
+Using `object` or `typing.Any` as type annotations is almost always a sign of
+laziness rather than genuine need. Both defeat static type checking and introduce
+linter warnings. There is always a more precise option.
+
+**Anti-pattern examples:**
+
+```python
+from typing import Any
+
+# WRONG — callers and type checkers gain nothing from these signatures
+def save_to_db(record: object) -> object: ...
+def process(data: Any) -> Any: ...
+```
+
+**What to use instead:**
+
+| Scenario | Preferred pattern | Example |
+|----------|-------------------|---------|
+| Value can be one of a few known types | Union via `\|` | `str \| int \| None` |
+| Structured object with known fields | `typing.Protocol` | `class Renderable(Protocol): ...` |
+| Simple data container | `@dataclass` or `TypedDict` | `@dataclass class Point: ...` |
+| True dynamic / binary object | `Any` (rare exception) | Embedded Python binary blobs |
+
+**Protocols over ABCs:**
+
+For structural typing, prefer `typing.Protocol` over abstract base classes.
+Protocols use duck typing — any object with the right methods satisfies the
+protocol without explicit inheritance, which is cleaner and more flexible:
+
+```python
+from typing import Protocol
+
+class Serializable(Protocol):
+    """Anything with a to_dict method."""
+    def to_dict(self) -> dict[str, str]: ...
+
+
+def persist(obj: Serializable) -> None:
+    data = obj.to_dict()
+    ...
+
+# No inheritance needed — any object with to_dict() works
+persist(my_object)  # OK if my_object has to_dict()
+```
+
+**When `Any` is acceptable (rare):**
+
+- Objects dynamically created by an embedded Python runtime (C/C++ extensions,
+  embedded interpreter)
+- Binary blobs passed through from a lower-level library where the type is truly
+  opaque at the Python layer
+- Generic deserialization helpers where the output type is determined at runtime
+  (and a `TypeVar` or `@overload` won't work)
+
+In these cases, use `typing.Any` rather than bare `object`. The linter
+understands that `Any` is explicitly opt-in; bare `object` just looks like a
+forgotten type annotation.
 
 ______________________________________________________________________
 

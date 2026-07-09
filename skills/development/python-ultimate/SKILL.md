@@ -143,7 +143,10 @@ comments, prohibited patterns, vague input/output types.
    - `os\.path\.` → must be `pathlib.Path`
    - `# noqa` → fix root issue
 3. Check for vague input/output types with multiple `isinstance` checks
-4. Report findings using the standard [antipattern response format](SKILL.md)
+4. Scan for vague type annotations:
+   - `rg ": object$"` or `rg "-> object"` → bare `object` as type
+   - `rg "\bAny\b" src/ --include "*.py"` → `typing.Any` usage (flag each occurrence for review)
+5. Report findings using the standard [antipattern response format](SKILL.md)
 
 ______________________________________________________________________
 
@@ -276,6 +279,7 @@ Canonical quick-reference for common bad or forbidden patterns. Detailed rationa
 | Debugging behavior | Repeated "one more try" after multiple failures | Stop and reassess architecture | [references/debugging.md](references/debugging.md) |
 | Code review behavior | Performative agreement phrases | Technical response and evidence | [references/code-review.md](references/code-review.md) |
 | Data modeling | Using `pydantic` for lightweight internal structs, or `dataclass` at trust boundaries | `dataclass` for internal DTOs; `pydantic` for validation/API boundaries | [references/coding-standards.md](references/coding-standards.md) |
+| Type hints | `object` or `typing.Any` as type annotation without justification | Precise union types (`str \| int`), `typing.Protocol` for structural types | [references/coding-standards.md](references/coding-standards.md) |
 
 ______________________________________________________________________
 
@@ -319,6 +323,7 @@ Google style. Required for public functions and classes.
 - Defensive `try/except ImportError` for required dependencies (see [references/imports-optional-dependencies.md](references/imports-optional-dependencies.md))
 - Vague or wide parameter/return types with hidden `isinstance`/`hasattr` checks and `None`-as-error returns (see [references/coding-standards.md](references/coding-standards.md))
 - Using `pydantic` for lightweight internal structs, or `dataclass` for untrusted/API data (see [references/coding-standards.md](references/coding-standards.md))
+- `object` or `typing.Any` as type annotations without justification (use precise union types, `typing.Protocol`, or narrowest possible type; see [references/coding-standards.md](references/coding-standards.md))
 
 ______________________________________________________________________
 
