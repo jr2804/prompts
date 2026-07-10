@@ -35,6 +35,7 @@ description: Consolidated Python coding standards reference for type hints, stri
     - [os.path](#ospath)
     - [Optional[T]](#optionalt)
     - [Vague Type Annotations: object and Any](#vague-type-annotations-object-and-any)
+  - [13. None and Default Value Best Practices](#13-none-and-default-value-best-practices)
   - [Linting and Formatting](#linting-and-formatting)
 
 ______________________________________________________________________
@@ -602,7 +603,240 @@ forgotten type annotation.
 
 ______________________________________________________________________
 
-## Linting and Formatting
+## 13. None and Default Value Best Practices
+
+`None` is often overused as a default value or error signal, introducing
+unnecessary `Optional` types and defensive `if x is not None` checks
+throughout the codebase. The ArjanCodes "None" refactoring example
+demonstrates the full transformation from `None`-laden code to clean
+signatures (see `https://github.com/ArjanCodes/examples/tree/main/2026/none`).
+
+### Rule 1: Use `field(default_factory=...)` for mutable defaults in dataclasses
+
+**Anti-pattern — `None` sentinel for collections:**
+
+```python
+from dataclasses import dataclass
+from typing import Any
+
+# WRONG — callers must handle None, type checker sees Optional
+@dataclass
+class Delivery:
+    destination: Coordinates
+    required_battery: int
+    avoid_zones: list[GeoFence] | None = None  # None as empty-list sentinel
+
+# Caller: always checked defensively
+if delivery.avoid_zones is not None:
+    for zone in delivery.avoid_zones:
+        ...
+```
+
+**Correct — default factory for the actual type:**
+
+```python
+@dataclass
+class Delivery:
+    destination: Coordinates
+    required_battery: int
+    avoid_zones: list[GeoFence] = field(default_factory=list)
+
+# Caller: no None check needed, empty list iteration is a no-op
+for zone in delivery.avoid_zones:
+    ...
+```
+
+Apply this to all mutable types: `list`, `dict`, `set`, and custom mutable
+types. Use `field(default_factory=Type)` consistently.
+
+### Rule 2: Replace `None` error returns with exceptions
+
+**Anti-pattern — `T | None` return as a silent error signal:**
+
+```python
+# WRONG — caller must check every call site, type checker sees Optional
+from typing import Any
+
+def assign_delivery(drone: DroneTelemetry, ...) -> Route | None:
+    if weather.wind_speed > drone.max_wind_speed:
+        return None  # Error silently swallowed
+    ...
+
+result = assign_delivery(drone, ...)
+if result is None:  # What failed? Why?
+    print("No route could be assigned")
+```
+
+**Correct — raise a meaningful exception:**
+
+```python
+class RouteRejected(Exception):
+    """Raised when route conditions are not met."""
+
+def assign_delivery(drone: ReadyDrone, delivery: Delivery, weather: WeatherReport) -> Route:
+    if weather.wind_speed > drone.max_wind_speed:
+        raise RouteRejected("Too windy for this drone")
+    ...
+
+try:
+    route = assign_delivery(drone, delivery, weather)
+except RouteRejected as error:
+    print(f"No route could be assigned: {error}")  # Clear, typed error
+```
+
+Benefits:
+
+- The return type is the success type, not `T | None`
+- Callers know exactly which error occurred and why
+- No ambiguous `None` meaning (not found vs. invalid vs. missing data)
+- Type checkers can verify the happy path without `isinstance`/`x is not None`
+
+### Rule 3: Extract validation to produce non-optional types
+
+When a dataclass contains many `T | None` fields because data arrives
+incompletely, extract validation into a separate function that converts
+the "uncertain" type into a "ready" type:
+
+```python
+# BEFORE — DroneTelemetry has many Optional fields
+@dataclass
+class DroneTelemetry:
+    drone_id: str
+    location: Coordinates | None
+    battery_level: int | None
+    max_wind_speed: int | None
+
+# assign_delivery: checks .location is None, .battery_level is None, ...
+
+def assign_delivery(
+    telemetry: DroneTelemetry, ...
+) -> Route | None:
+    if telemetry.location is None:
+        return None
+    ...
+```
+
+```python
+# AFTER — validation extracted, ReadyDrone has only required fields
+@dataclass(frozen=True)
+class ReadyDrone:
+    drone_id: str
+    location: Coordinates
+    battery_level: int
+    max_wind_speed: int
+
+def prepare_drone(telemetry: DroneTelemetry) -> ReadyDrone:
+    if telemetry.location is None:
+        raise ValueError("Drone has no GPS location")
+    if telemetry.battery_level is None:
+        raise ValueError("Drone has no battery reading")
+    if telemetry.max_wind_speed is None:
+        raise ValueError("Drone has no wind safety rating")
+    return ReadyDrone(
+        drone_id=telemetry.drone_id,
+        location=telemetry.location,
+        battery_level=telemetry.battery_level,
+        max_wind_speed=telemetry.max_wind_speed,
+    )
+
+# assign_delivery now takes ReadyDrone — no Optional checks needed
+def assign_delivery(drone: ReadyDrone, ...) -> Route:
+    ...
+```
+
+This separation makes each function responsible for one thing: validation
+or business logic.
+
+### Rule 4: Use Null Object pattern for optional dependencies
+
+**Anti-pattern — optional dependency with repeated `None` checks:**
+
+```python
+# WRONG — every call site checks
+from typing import Any
+
+def assign_delivery(
+    ..., diagnostics: RouteDiagnostics | None = None,
+) -> Any:
+    if diagnostics is not None:
+        diagnostics.record("Starting route assignment")
+    ...
+    if diagnostics is not None:
+        diagnostics.record("Route assigned")
+    return ...
+```
+
+**Correct — Protocol + Null Object:**
+
+```python
+from typing import Protocol
+
+class RouteDiagnostics(Protocol):
+    def record(self, message: str) -> None: ...
+
+class ConsoleDiagnostics:
+    def record(self, message: str) -> None:
+        print(f"[diagnostics] {message}")
+
+class NullDiagnostics:
+    def record(self, message: str) -> None:
+        pass  # Silent no-op
+
+# Function uses a concrete default, no Optional, no None checks
+def assign_delivery(
+    drone: ReadyDrone,
+    delivery: Delivery,
+    weather: WeatherReport,
+    diagnostics: RouteDiagnostics = NullDiagnostics(),
+) -> Route:
+    diagnostics.record("Starting route assignment")
+    ...
+```
+
+The null object satisfies the same Protocol but does nothing. No `None`
+checks anywhere.
+
+### Rule 5: Eliminate `None` from types that always have a value
+
+**Anti-pattern:**
+
+```python
+# WRONG — wind speed is always relevant for a weather report
+@dataclass
+class WeatherReport:
+    wind_speed: int | None  # When would this be None?
+
+def process(weather: WeatherReport) -> None:
+    if weather.wind_speed is not None:
+        ...  # Always defended, never triggered
+```
+
+**Correct:**
+
+```python
+@dataclass(frozen=True)
+class WeatherReport:
+    wind_speed: int  # Always available
+
+def process(weather: WeatherReport) -> None:
+    ...  # No None check
+```
+
+If the data source sometimes lacks the value, validate at the boundary
+before constructing the domain type.
+
+### Quick self-check
+
+- Does a dataclass field with `T | None = None` represent a value that is
+  genuinely optional, or is `None` a placeholder for "empty"?
+  → Use `field(default_factory=T)` instead.
+- Does a function return `T | None` to signal failure?
+  → Raise a specific exception instead.
+- Does a function parameter have `T | None = None` that is always checked
+  at the top?
+  → Consider Null Object pattern or a required argument.
+- Does a type have `T | None` fields that must be validated before use?
+  → Extract a validated variant without the `| None`.
 
 Run linters after significant changes:
 
