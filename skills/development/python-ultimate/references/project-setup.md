@@ -37,7 +37,10 @@ ______________________________________________________________________
 
 ## Dependency Management
 
-**Use `uv` for all package operations:**
+**Use `uv` for all package operations** (project workflow reference:
+[uv-projects.md](uv-projects.md); standalone-script reference:
+[uv-scripts.md](uv-scripts.md); execution discipline:
+[uv.md](uv.md)):
 
 ```bash
 uv add package-name          # Add production dependency

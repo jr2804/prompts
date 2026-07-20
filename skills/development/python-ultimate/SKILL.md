@@ -45,6 +45,9 @@ Single Python reference with quick routes for standards, tooling, workflows, and
 **Auditing codebase?** → Go to [Auditing](references/auditing.md)
 **Documenting?** → Go to [Documentation](references/documentation.md)
 **Planning a feature?** → Go to [Planning](references/planning.md)
+**Running Python?** → Go to [uv Execution](references/uv.md)
+**Standalone script?** → Go to [uv Scripts](references/uv-scripts.md)
+**Project workflow?** → Go to [uv Projects](references/uv-projects.md)
 **Bulk operations?** → Go to [Refactoring](references/refactoring.md) (10+ files)
 
 ### Slash Commands
@@ -80,6 +83,9 @@ python-ultimate testing        │ Test organization, fixtures, mocking, TDD, co
 python-ultimate audit          │ 6-dimension codebase audit                             │ references/auditing.md
 python-ultimate verification   │ Evidence-based completion claims                       │ references/verification.md
 python-ultimate code-review    │ Code review feedback evaluation                        │ references/code-review.md
+python-ultimate uv             │ Always `uv run`, never bare `python`                   │ references/uv.md
+python-ultimate uv-scripts     │ PEP 723 standalone scripts via `uv init --script`      │ references/uv-scripts.md
+python-ultimate uv-projects    │ Project workflow: init, add, sync, lock, groups        │ references/uv-projects.md
 ```
 
 ______________________________________________________________________
@@ -252,6 +258,52 @@ Evaluates code review feedback and responds with technical rigor.
 
 ______________________________________________________________________
 
+### python-ultimate uv
+
+Enforces execution discipline: every Python invocation goes through `uv`.
+
+**Workflow:**
+
+1. Open `references/uv.md` and load the Iron Rule and Execution Patterns
+2. Treat bare `python` / `python3` calls as violations — translate them to `uv run ...`
+3. In sandboxed environments, confirm `UV_CACHE_DIR` is set to a writable directory
+4. Report findings using the standard [antipattern response format](SKILL.md)
+
+______________________________________________________________________
+
+### python-ultimate uv-scripts
+
+Reviews PEP 723 standalone scripts for the "never hand-edit metadata" rule and
+agentic script-design rules.
+
+**Workflow:**
+
+1. Open `references/uv-scripts.md` and load the Iron Rule and the Core Workflow
+2. Search for PEP 723 blocks and check whether they were created/maintained via
+   `uv init --script` / `uv add --script` / `uv remove --script`
+3. Search for hand-edited metadata markers: `rg "# /// script"`, `rg "# dependencies ="` —
+   each occurrence must be backed by a `uv`-managed workflow
+4. Check interactive prompts (`input(`), missing `--help`, free-form stdout, and
+   unbounded output against the agentic script-design rules
+5. Report findings using the standard [antipattern response format](SKILL.md)
+
+______________________________________________________________________
+
+### python-ultimate uv-projects
+
+Reviews `uv`-managed projects: locking, syncing, groups, and common mistakes.
+
+**Workflow:**
+
+1. Open `references/uv-projects.md` and load the Common Mistakes table
+2. Check for `pip install` inside a project that has `pyproject.toml` + `uv.lock`
+3. Check `uv sync` usage — missing `--locked` where reproducibility matters
+4. Check `.venv/` is gitignored and `uv.lock` is committed
+5. Check workspaces and dependency groups for consistency
+6. Report findings using the standard [antipattern response format](SKILL.md)
+
+______________________________________________________________________
+
 ### Expected `/python-ultimate` Response Format
 
 For consistency across agents, format all sub-command responses as:
@@ -283,6 +335,12 @@ Canonical quick-reference for common bad or forbidden patterns. Detailed rationa
 | Debugging behavior | Repeated "one more try" after multiple failures | Stop and reassess architecture | [references/debugging.md](references/debugging.md) |
 | Code review behavior | Performative agreement phrases | Technical response and evidence | [references/code-review.md](references/code-review.md) |
 | Data modeling | Using `pydantic` for lightweight internal structs, or `dataclass` at trust boundaries | `dataclass` for internal DTOs; `pydantic` for validation/API boundaries | [references/coding-standards.md](references/coding-standards.md) |
+| Python execution | Bare `python` / `python3` invocations | `uv run ...` (uv selects interpreter, syncs env, resolves deps) | [references/uv.md](references/uv.md) |
+| Script metadata | Hand-written or hand-edited PEP 723 `# /// script` blocks | `uv init --script` / `uv add --script` / `uv remove --script` | [references/uv-scripts.md](references/uv-scripts.md) |
+| Project deps | `pip install` inside a `uv`-managed project | `uv add` (managed by `pyproject.toml`) | [references/uv-projects.md](references/uv-projects.md) |
+| Lockfiles | `uv sync` without `--locked` where reproducibility matters | `uv sync --locked` (or `--frozen` when the lockfile is trusted) | [references/uv-projects.md](references/uv-projects.md) |
+| VCS hygiene | Committing `.venv/`; omitting `uv.lock` | Gitignore `.venv/`; commit `uv.lock` | [references/uv-projects.md](references/uv-projects.md) |
+| Architecture | Assuming `uv python install` can provide 32-bit Python | Point `uv run --python <path>` at a system 32-bit interpreter | [references/uv-python-versions.md](references/uv-python-versions.md) |
 | Type hints | `object` or `typing.Any` as type annotation without justification | Precise union types (`str \| int`), `typing.Protocol` for structural types | [references/coding-standards.md](references/coding-standards.md) |
 | Default values | `None` as default for collections or as silent error signal | `field(default_factory=...)` for mutable defaults, exceptions for error states | [references/coding-standards.md](references/coding-standards.md) |
 
@@ -554,7 +612,8 @@ ______________________________________________________________________
 
 ## Project Setup
 
-Project structure, dependencies, and imports. See [references/project-setup.md](references/project-setup.md).
+Project structure, dependencies, and imports. See [references/project-setup.md](references/project-setup.md)
+and [references/uv-projects.md](references/uv-projects.md).
 
 ### Key Tools
 
@@ -567,6 +626,63 @@ Project structure, dependencies, and imports. See [references/project-setup.md](
 1. Standard library
 2. Third-party
 3. Local (absolute imports)
+
+______________________________________________________________________
+
+## uv Workflow
+
+Running, scripting, and project management through `uv`. See
+[references/uv.md](references/uv.md), [references/uv-scripts.md](references/uv-scripts.md),
+[references/uv-projects.md](references/uv-projects.md), and
+[references/uv-python-versions.md](references/uv-python-versions.md).
+
+### Iron Rule
+
+**Always `uv run`. Never bare `python` / `python3`.**
+
+```bash
+# BAD
+python script.py
+
+# GOOD
+uv run script.py
+```
+
+### Standalone Scripts (PEP 723)
+
+Manage metadata exclusively through `uv` — never hand-edit the `# /// script` block.
+
+```bash
+uv init --script path/to/script.py
+uv add --script path/to/script.py "requests>=2.32,<3"
+uv run path/to/script.py
+```
+
+### Projects
+
+```bash
+uv init my-project
+uv add requests --dev pytest
+uv sync --locked
+uv run pytest
+```
+
+### Python Versions & Architectures
+
+```bash
+uv python install 3.12
+uv python pin 3.12
+uv run --python 3.12 script.py
+```
+
+`uv` ships **x86_64** interpreters only — for 32-bit Python, point `--python`
+at a system-installed interpreter. See
+[references/uv-python-versions.md](references/uv-python-versions.md).
+
+### Scope Boundary
+
+Installing `uv` itself and running MCP servers with `uvx` belong to the
+standalone `uv` skill — not this skill.
 
 ______________________________________________________________________
 
@@ -693,3 +809,7 @@ All detailed content lives in `references/`. Load only what you need:
 | `project-setup.md` | Project structure, uv, imports |
 | `verification.md` | Pre-commit hooks, tox, Makefile targets |
 | `imports-optional-dependencies.md` | Required vs optional dependency import patterns |
+| `uv.md` | Execution discipline: always `uv run`, never bare `python`, `UV_CACHE_DIR` |
+| `uv-scripts.md` | PEP 723 standalone scripts, `uv init --script`, agentic design |
+| `uv-projects.md` | Project workflow, lock/sync, `--locked` vs `--frozen`, groups, workspaces |
+| `uv-python-versions.md` | Version pinning, `--python` flag, 32-bit / free-threaded builds |
