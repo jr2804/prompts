@@ -31,7 +31,7 @@ Document classes covered by this skill family:
 
 ## Three-layer architecture
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────┐
 │ Layer 1 -- Common drafting tools (prefix: sdo-)              │
 │   Writing style, .docx formatting rules, officecli guardrails│
@@ -137,7 +137,7 @@ style-name mappings. Each skill **delegates** formatting rules to
 
 ### Cross-reference map
 
-```
+```text
 sdo-writing-style
     │
     └── sdo-docx-formatting ── sdo-docx-operations
@@ -169,7 +169,7 @@ etsi-drafting 3gpp-drafting     itut-drafting ───────────�
 
 ## Toolchain strategy (encoded in Layer 1, inherited by Layer 3)
 
-```
+```text
 Preferred:  officecli              (native .docx editing, SVG support,
                                     raw-set for field codes / tab runs)
 Fallback:   python-docx + docxtpl  (programmatic control, templates,
@@ -187,7 +187,7 @@ Ancillary tools:
 
 When an agent works on a specific contribution, the project root follows:
 
-```
+```text
 <project>/
 ├── PLAN.md              # YAML frontmatter = metadata source of truth
 ├── AGENTS.md            # Orchestration-only (scope, structure, tool refs)
@@ -265,7 +265,7 @@ Existing skills in this repo already follow this convention; no renames needed.
 
 When an agent drafts a contribution for a specific SDO, load skills in this order:
 
-```
+```text
 1. sdo-project-setup        (bootstrap: detect new/ongoing, sync metadata, ensure layout)
 2. sdo-writing-style        (if producing prose content)
 3. sdo-docx-formatting      (formatting rules using abstract names)
