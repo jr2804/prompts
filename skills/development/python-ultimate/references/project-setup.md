@@ -118,7 +118,7 @@ ______________________________________________________________________
 
 ## Python Version
 
-**Minimum: Python 3.10**
+### Minimum: Python 3.10
 
 Use modern type hint syntax:
 

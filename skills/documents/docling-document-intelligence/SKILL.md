@@ -299,14 +299,14 @@ previews), run the bundled evaluator on the JSON export, then refine the
 pipeline if needed. This is how the agent **checks its work** and **improves
 the run** without guessing.
 
-**Step A — Produce JSON and optional Markdown**
+#### Step A — Produce JSON and optional Markdown
 
 ```bash
 docling "<source>" --to json --output /tmp/
 docling "<source>" --to md --output /tmp/
 ```
 
-**Step B — Evaluate**
+#### Step B — Evaluate
 
 ```bash
 uv run scripts/docling-evaluate.py /tmp/<filename>.json --markdown /tmp/<filename>.md
@@ -319,7 +319,7 @@ The script prints a JSON report to stdout: `status` (`pass` | `warn` | `fail`),
 `metrics`, `issues`, and `recommended_actions` (concrete `docling` CLI
 flags to try next).
 
-**Step C — Refinement loop (max 3 attempts unless the user says otherwise)**
+#### Step C — Refinement loop (max 3 attempts unless the user says otherwise)
 
 1. If `status` is `warn` or `fail`, apply **one** primary change from
    `recommended_actions` (e.g. switch `--pipeline vlm`, change
@@ -328,7 +328,7 @@ flags to try next).
 3. Stop when `status` is `pass`, or after 3 iterations — then summarize what
    worked and any remaining issues for the user.
 
-**Step D — Self-improvement log (skill memory)**
+#### Step D — Self-improvement log (skill memory)
 
 After a successful pass **or** after the final iteration, append one entry to
 [improvement-log.md](improvement-log.md) in this skill directory:

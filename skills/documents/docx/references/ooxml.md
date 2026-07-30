@@ -6,7 +6,7 @@
 - [Document Content Patterns](#document-content-patterns) - XML patterns for headings, lists, tables, formatting, etc.
 - [Document Library (Python)](#document-library-python) - Recommended approach for OOXML manipulation with automatic infrastructure setup
 - [Tracked Changes (Redlining)](#tracked-changes-redlining) - XML patterns for implementing tracked changes
-- [Comments](#comments) - XML patterns for adding comments
+- [Comments](#adding-comments) - XML patterns for adding comments
 
 ## Technical Guidelines
 

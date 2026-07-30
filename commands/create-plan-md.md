@@ -22,7 +22,7 @@ Create a high-quality `PLAN.md` as a living implementation plan.
      - Read and analyze the existing file
      - Extract the feature title from the `# PLAN:` heading
      - Rename to `PLAN-<feature-title>.md` (slugify the title, lowercase, replace spaces with hyphens)
-     - Inform user: "Existing plan archived as PLAN-<feature-title>.md"
+     - Inform user: "Existing plan archived as `PLAN-{feature-title}.md`"
    - If no feature title found, rename to `PLAN-archived-<timestamp>.md`
 
 3. **Collect required inputs before writing the plan**

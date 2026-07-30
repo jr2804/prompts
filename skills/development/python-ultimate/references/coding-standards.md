@@ -258,6 +258,7 @@ ______________________________________________________________________
 | Data models — simple containers | `@dataclass` (stdlib) | Internal DTOs, lightweight structs |
 | App settings | pydantic-settings | Use BaseSettings for config |
 | Database | oxyde | SQL backend for pydantic models |
+| Enums with associated values | aenum (`MultiValueEnum`) | Members carry extra positional values (prefix, label, …); avoids parallel lookup dicts |
 | Testing | pytest | Testing framework |
 | Formatting/linting | ruff, undersort, codespell | Code quality tools |
 | Excel reading | pandas + python-calamine | Fast Excel reading |
@@ -357,6 +358,75 @@ from pydantic import BaseModel, EmailStr
 class UserInput(BaseModel):
     email: EmailStr
 ```
+
+### Enum Associated Values (no parallel lookup structures)
+
+When an enum needs associated data (a short prefix, a label, a display
+name), do **not** define a parallel module-level `dict` next to the enum and
+a `@property` that indexes it. This violates DRY (the mapping duplicates the
+member list), scatters one concept across two constructs, and breaks the
+canonical module section order — a module-level `_X` constant sandwiched
+between a `class` and a later `class` is exactly the class–constant–class
+layout that structural sorters reject (see the
+[`clean-sort` skill](https://codeberg.org/jr2804/clean-sort/src/branch/main/skills/clean-sort/SKILL.md):
+sections must run `… constants → enums → classes …`, not interleave).
+
+Use [`aenum`](https://github.com/ethanfurman/aenum) `MultiValueEnum`, which
+lets each member carry extra positional values via `__init__`. The member
+list stays in exactly one place — the enum body.
+
+```python
+# WRONG — parallel dict + property that indexes it
+from enum import StrEnum
+from typing import Final
+
+_ASSET_PREFIX: Final[dict[AssetKind, str]] = {
+    AssetKind.TABLE: "tab",
+    AssetKind.FIGURE: "fig",
+    AssetKind.EQUATION: "eq",
+}
+
+class AssetKind(StrEnum):
+    TABLE = "table"
+    FIGURE = "figure"
+    EQUATION = "equation"
+
+    @property
+    def prefix(self) -> str:
+        return _ASSET_PREFIX[self]   # forward ref to the dict above
+```
+
+```python
+# CORRECT — one member list, associated values declared inline
+from enum import StrEnum
+from aenum import MultiValueEnum
+
+class AssetKind(StrEnum, MultiValueEnum):
+    def __init__(self, value: str, *aliases: str) -> None:
+        self.prefix = aliases[0] if aliases else value[:3]
+
+    TABLE = "table", "tab"
+    FIGURE = "figure", "fig"
+    EQUATION = "equation", "eq"
+```
+
+The first positional value is the canonical `.value`; every further value is
+an alias that resolves to the same member on lookup (`AssetKind("tab")` is
+`AssetKind.TABLE`). `__init__` is free to bind those positions to any
+attribute name you need (`.prefix`, `.label`, `.unit`, …). For three or more
+associated values, accept more positional params in `__init__`:
+
+```python
+class Unit(StrEnum, MultiValueEnum):
+    def __init__(self, value: str, symbol: str, scale: float) -> None:
+        self.symbol = symbol
+        self.scale = scale
+
+    METER = "meter", "m", 1.0
+    KILOMETER = "kilometer", "km", 1000.0
+```
+
+**Install:** `uv add aenum`.
 
 ______________________________________________________________________
 
@@ -837,6 +907,8 @@ before constructing the domain type.
   → Consider Null Object pattern or a required argument.
 - Does a type have `T | None` fields that must be validated before use?
   → Extract a validated variant without the `| None`.
+
+## Linting and Formatting
 
 Run linters after significant changes:
 

@@ -16,7 +16,7 @@ ______________________________________________________________________
 
 ## Refactoring Workflow
 
-**Find → Replace → Verify**
+Workflow: Find → Replace → Verify.
 
 ### 1. Find All Occurrences
 
@@ -74,7 +74,7 @@ ______________________________________________________________________
 
 ## Code Transfer
 
-**Read → Extract → Insert**
+Workflow: Read → Extract → Insert.
 
 ### Copy Function Between Files
 

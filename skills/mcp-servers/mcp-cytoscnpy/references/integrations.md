@@ -58,7 +58,7 @@ When connected, CytoScnPy exposes:
 Tools are configured via VS Code extension settings or CLI flags.
 
 > **Note:** HTTP/SSE transport is planned for future releases to enable remote analysis.
-
+>
 > **Important:** The MCP server is available in the standalone CLI binary (install script or `cytoscnpy-cli` build). The Python `cytoscnpy` package does not run `mcp-server`.
 
 ## CI/CD Integration

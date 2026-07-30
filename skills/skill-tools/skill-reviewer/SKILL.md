@@ -49,27 +49,27 @@ This catches:
 
 Evaluate the skill using the criteria in [references/review-criteria.md](references/review-criteria.md):
 
-**Frontmatter Checks**
+#### Frontmatter Checks
 
 - [ ] `name` field present and valid (hyphen-case, ≤64 chars)
 - [ ] `description` field present (≤1024 chars, no angle brackets)
 - [ ] No unexpected fields (only: name, description, license, metadata, compatibility, allowed-tools)
 
-**Description Quality**
+#### Description Quality
 
 - [ ] Imperative phrasing ("Use when..." not "This skill does...")
 - [ ] Focus on user intent, not implementation
 - [ ] Specific keywords for triggering
 - [ ] Clear when-to-use scenarios
 
-**Body Structure**
+#### Body Structure
 
 - [ ] Concise instructions (\<500 lines preferred)
 - [ ] Progressive disclosure (main points in SKILL.md, details in references/)
 - [ ] No agent-specific references ("Claude", "Gemini", etc.)
 - [ ] Examples where helpful
 
-**Resource Organization**
+#### Resource Organization
 
 - [ ] Scripts in `scripts/` if needed
 - [ ] Reference docs in `references/` if needed

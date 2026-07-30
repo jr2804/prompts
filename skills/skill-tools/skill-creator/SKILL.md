@@ -148,7 +148,7 @@ Keep SKILL.md body to the essentials and under 500 lines to minimize context blo
 
 **Key principle:** When a skill supports multiple variations, frameworks, or options, keep only the core workflow and selection guidance in SKILL.md. Move variant-specific details (patterns, examples, configuration) into separate reference files.
 
-**Pattern 1: High-level guide with references**
+##### Pattern 1: High-level guide with references
 
 ```markdown
 # PDF Processing
@@ -167,7 +167,7 @@ Extract text with pdfplumber:
 
 Claude loads FORMS.md, REFERENCE.md, or EXAMPLES.md only when needed.
 
-**Pattern 2: Domain-specific organization**
+##### Pattern 2: Domain-specific organization
 
 For Skills with multiple domains, organize content by domain to avoid loading irrelevant context:
 
@@ -196,7 +196,7 @@ cloud-deploy/
 
 When the user chooses AWS, Claude only reads aws.md.
 
-**Pattern 3: Conditional details**
+##### Pattern 3: Conditional details
 
 Show basic content, link to advanced content:
 

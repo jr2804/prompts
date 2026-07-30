@@ -8,7 +8,7 @@ Real-world code examples demonstrating the four principles. Each example shows w
 
 **User Request:** "Add a feature to export user data"
 
-**❌ What Goes Wrong (Wrong Assumptions)**
+#### ❌ What Goes Wrong (Wrong Assumptions)
 
 ```python
 def export_users(format='json'):
@@ -34,7 +34,7 @@ def export_users(format='json'):
 - Assumed which fields to include
 - Assumed CSV fieldnames without checking actual data structure
 
-**✅ What Should Happen (Surface Assumptions)**
+#### ✅ What Should Happen (Surface Assumptions)
 
 ```text
 Before implementing, I need to clarify:
@@ -59,7 +59,7 @@ ______________________________________________________________________
 
 **User Request:** "Make the search faster"
 
-**❌ What Goes Wrong (Pick Silently)**
+#### ❌ What Goes Wrong (Pick Silently)
 
 ```python
 # Adds caching, database indexes, and async processing
@@ -69,7 +69,7 @@ async def search(query: str) -> List[Result]:
     # ... 200 lines of optimization code
 ```
 
-**✅ What Should Happen**
+#### ✅ What Should Happen
 
 ```text
 "Make the search faster" could mean:
@@ -101,7 +101,7 @@ ______________________________________________________________________
 
 **User Request:** "Add a function to calculate discount"
 
-**❌ What Goes Wrong (Overengineered)**
+#### ❌ What Goes Wrong (Overengineered)
 
 ```python
 from abc import ABC, abstractmethod
@@ -147,7 +147,7 @@ class DiscountCalculator:
 # Usage requires 30+ lines of setup for a simple calculation
 ```
 
-**✅ What Should Happen (Simple)**
+#### ✅ What Should Happen (Simple)
 
 ```python
 def calculate_discount(amount: float, percent: float) -> float:
@@ -166,7 +166,7 @@ ______________________________________________________________________
 
 **User Request:** "Save user preferences to database"
 
-**❌ What Goes Wrong (Unnecessary Features)**
+#### ❌ What Goes Wrong (Unnecessary Features)
 
 ```python
 class PreferenceManager:
@@ -206,7 +206,7 @@ class PreferenceManager:
         return True
 ```
 
-**✅ What Should Happen (Just What Was Asked)**
+#### ✅ What Should Happen (Just What Was Asked)
 
 ```python
 def save_preferences(db, user_id: int, preferences: dict):
@@ -227,7 +227,7 @@ ______________________________________________________________________
 
 **User Request:** "Fix the bug where empty emails crash the validator"
 
-**❌ What Goes Wrong (Too Much)**
+#### ❌ What Goes Wrong (Too Much)
 
 ```diff
   def validate_user(user_data):
@@ -266,7 +266,7 @@ ______________________________________________________________________
 - Changed comments
 - Added docstring
 
-**✅ What Should Happen (Surgical)**
+#### ✅ What Should Happen (Surgical)
 
 ```diff
   def validate_user(user_data):
@@ -296,7 +296,7 @@ ______________________________________________________________________
 
 **User Request:** "Add logging to the upload function"
 
-**❌ What Goes Wrong (Reformat Everything)**
+#### ❌ What Goes Wrong (Reformat Everything)
 
 ```diff
 - def upload_file(file_path, destination):
@@ -339,7 +339,7 @@ ______________________________________________________________________
 - Reformatted whitespace
 - Changed boolean return logic
 
-**✅ What Should Happen (Match Existing Style)**
+#### ✅ What Should Happen (Match Existing Style)
 
 ```diff
 + import logging
@@ -376,7 +376,7 @@ ______________________________________________________________________
 
 **User Request:** "Fix the authentication system"
 
-**❌ What Goes Wrong (Vague Approach)**
+#### ❌ What Goes Wrong (Vague Approach)
 
 ```text
 I'll fix the authentication system by:
@@ -388,7 +388,7 @@ I'll fix the authentication system by:
 [Proceeds to make changes without clear success criteria]
 ```
 
-**✅ What Should Happen (Verifiable Goals)**
+#### ✅ What Should Happen (Verifiable Goals)
 
 ```text
 To "fix authentication," I need to define success criteria.
@@ -419,7 +419,7 @@ ______________________________________________________________________
 
 **User Request:** "Add rate limiting to the API"
 
-**❌ What Goes Wrong (All at Once)**
+#### ❌ What Goes Wrong (All at Once)
 
 ```python
 # Implements full rate limiting with Redis, multiple strategies,
@@ -427,7 +427,7 @@ ______________________________________________________________________
 # No clear verification steps
 ```
 
-**✅ What Should Happen (Incremental with Verification)**
+#### ✅ What Should Happen (Incremental with Verification)
 
 ```text
 Plan for rate limiting:
@@ -462,7 +462,7 @@ ______________________________________________________________________
 
 **User Request:** "The sorting breaks when there are duplicate scores"
 
-**❌ What Goes Wrong (Fix Without Reproducing)**
+#### ❌ What Goes Wrong (Fix Without Reproducing)
 
 ```python
 # Immediately changes sort logic without confirming the bug
@@ -470,7 +470,7 @@ def sort_scores(scores):
     return sorted(scores, key=lambda x: (-x['score'], x['name']))
 ```
 
-**✅ What Should Happen (Reproduce First)**
+#### ✅ What Should Happen (Reproduce First)
 
 ```python
 # 1. First, write a test that reproduces the issue

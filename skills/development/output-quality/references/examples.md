@@ -6,7 +6,7 @@ Before/after examples demonstrating quality improvements across text, code, and 
 
 ### Example 1: Generic Article Opening
 
-**Before (Score: 78/100 — High Slop)**
+#### Before (Score: 78/100 — High Slop)
 
 ```text
 In today's fast-paced world, artificial intelligence has become increasingly important.
@@ -23,7 +23,7 @@ of modern AI systems and explore how businesses can navigate these challenges ef
 - "navigate the complexities" — vague hand-waving
 - Multiple clichés in 4 sentences
 
-**After (Score: 15/100 — Clean)**
+#### After (Score: 15/100 — Clean)
 
 ```text
 Companies deploying AI face three concrete problems: managing model costs, handling failures
@@ -42,7 +42,7 @@ ______________________________________________________________________
 
 ### Example 2: Documentation Slop
 
-**Before (Score: 82/100)**
+#### Before (Score: 82/100)
 
 ```text
 ## Overview
@@ -64,7 +64,7 @@ to note that API keys should be kept secure at all times.
 - "you'll want to" — wishy-washy
 - "it's important to note" — patronizing
 
-**After (Score: 10/100)**
+#### After (Score: 10/100)
 
 ```text
 ## Overview
@@ -92,7 +92,7 @@ ______________________________________________________________________
 
 ### Example 1: Generic Data Handler
 
-**Before: Overengineered (80/100 slop)**
+#### Before: Overengineered (80/100 slop)
 
 ```python
 class DataProcessor:
@@ -135,7 +135,7 @@ result = processor.process([1, 2, 3])
 - "data", "item", "result" — generic names
 - Single responsibility violated
 
-**After: Simple (10/100 slop)**
+#### After: Simple (10/100 slop)
 
 ```python
 def double_values(numbers):
@@ -157,7 +157,7 @@ ______________________________________________________________________
 
 ### Example 2: Validation Mess
 
-**Before: Scattered (85/100)**
+#### Before: Scattered (85/100)
 
 ```python
 # validate_email.py
@@ -189,7 +189,7 @@ if '@' in user_email and '.' in user_email:
 - Inconsistent error handling
 - Multiple implementations
 
-**After: Single source (15/100)**
+#### After: Single source (15/100)
 
 ```python
 # utils/validate.py
@@ -228,7 +228,7 @@ ______________________________________________________________________
 
 ### Example 1: Generic Landing Page
 
-**Before (Slop indicators)**
+#### Before (Slop indicators)
 
 ```text
 Hero: Purple-to-pink gradient background
@@ -252,7 +252,7 @@ Footer: Five blue buttons (Sign Up, Learn More, Documentation, Contact, Blog)
 - Buzzwords, no specifics
 - Too many buttons
 
-**After (Quality indicators)**
+#### After (Quality indicators)
 
 ```text
 Hero: Brand-color background (e.g., dark blue)
@@ -287,7 +287,7 @@ ______________________________________________________________________
 
 ### Example 2: Component Visual Regression
 
-**Before: Inconsistent**
+#### Before: Inconsistent
 
 ```text
 Button variants: 8 different styles
@@ -305,7 +305,7 @@ Which for a destructive action?
 No clear pattern.
 ```
 
-**After: Clear hierarchy**
+#### After: Clear hierarchy
 
 ```text
 Primary: Blue, rounded, 16px padding

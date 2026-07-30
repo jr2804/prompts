@@ -219,7 +219,7 @@ ______________________________________________________________________
 
 ### Dual notation
 
-When referencing an identical Recommendation | International Standard outside
+When referencing an identical Recommendation \| International Standard outside
 the text, use ITU-T first: "see Rec. ITU-T X.882 | ISO/IEC 13712-3".
 
 ### Internal references

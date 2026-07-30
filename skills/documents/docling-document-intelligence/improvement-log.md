@@ -17,4 +17,4 @@ not tracked by every user; it is meant for **local** learning.
 
 ## Entries
 
-_(None — add your own after running conversions.)_
+None yet — add your own after running conversions.

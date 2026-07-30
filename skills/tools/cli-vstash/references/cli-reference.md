@@ -186,4 +186,4 @@ Start MCP server for Claude Desktop integration.
 vstash-mcp
 ```
 
-See [mcp-vstash skill](../mcp-servers/mcp-vstash/SKILL.md) for setup.
+See [mcp-vstash skill](../../../mcp-servers/mcp-vstash/SKILL.md) for setup.

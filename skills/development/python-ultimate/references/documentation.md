@@ -115,14 +115,13 @@ from module import function_name
 result = function_name(arg1, arg2)
 ````
 
-````text
-
----
+______________________________________________________________________
 
 ## 4. Data Flow
 
 **Purpose**: Trace how data moves through the system.
 
+````text
 ### Data Flow Diagram
 
 ```mermaid
@@ -185,14 +184,11 @@ Include:
 }
 ```
 
-````text
-
----
-
 ## 6. Configuration
 
 **Purpose**: Document all configuration options.
 
+````text
 Include:
 - Environment variables
 - Config files and schemas
@@ -205,13 +201,13 @@ Include:
 |----------|------|---------|-------------|
 | `DEBUG` | bool | `false` | Enable debug mode |
 | `API_KEY` | str | — | API authentication key |
-
----
+````
 
 ## 7. Setup Guide
 
 **Purpose**: Get new developers running locally.
 
+````text
 Include:
 - Prerequisites
 - Installation steps

@@ -1,8 +1,8 @@
 # AGENTS.md Design Guidelines
 
-**Evidence-Based Best Practices for Repository-Level Context Files**
+## Overview
 
-*Based on arXiv:2602.11988 "Evaluating AGENTS.md" and industry best practices*
+Evidence-based best practices for repository-level context files, based on arXiv:2602.11988 ("Evaluating AGENTS.md") and industry best practices.
 
 ______________________________________________________________________
 
