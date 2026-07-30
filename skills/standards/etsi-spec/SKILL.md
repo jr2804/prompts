@@ -97,7 +97,7 @@ The script returns:
 
 **Example output for ETSI TS 103 224:**
 
-```
+```text
 ======================================================================
 SPECIFICATION: ETSI TS 103224
 ======================================================================
@@ -196,9 +196,9 @@ If the script fails, retrieve metadata manually:
 
 For detailed ETSI standards organization and search capabilities, see:
 
-- ETSI Search Engine: https://www.etsi.org/standards
-- ETSI Document Types: https://www.etsi.org/standards/types-of-standards
-- ETSI Delivery Directory: https://www.etsi.org/deliver
+- ETSI Search Engine: <https://www.etsi.org/standards>
+- ETSI Document Types: <https://www.etsi.org/standards/types-of-standards>
+- ETSI Delivery Directory: <https://www.etsi.org/deliver>
 
 ## Requirements
 

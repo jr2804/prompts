@@ -109,7 +109,7 @@ Formal communication between ITU-T groups or with other SDOs.
 
 ### Format example
 
-```
+```text
 Question(s):  4
 Meeting, date: London, 2-6 October 2017
 Study Group:  15         Working Party: 1
@@ -135,7 +135,7 @@ ______________________________________________________________________
 ## IPR and declarations
 
 - **Patent disclosure**: Early disclosure encouraged. Use the Patent Statement
-  and Licensing Declaration Form at https://www.itu.int/ITU-T/ipr.
+  and Licensing Declaration Form at <https://www.itu.int/ITU-T/ipr>.
 - **General patent statement**: Voluntary blanket declaration covering all
   of an organization's contributions (alternative to per-Recommendation).
 - **Copyright**: By submitting, contributors acknowledge no restrictions on

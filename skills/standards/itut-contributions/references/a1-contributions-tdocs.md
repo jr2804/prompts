@@ -132,7 +132,7 @@ Formal communication between ITU-T groups or with other standards organizations.
 
 ### Format example
 
-```
+```text
 Question(s):  4
 Meeting, date: London, 2-6 October 2017
 Study Group:  15         Working Party: 1

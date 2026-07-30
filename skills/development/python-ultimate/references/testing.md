@@ -20,7 +20,7 @@ ______________________________________________________________________
 
 ### Directory Structure
 
-```
+```text
 tests/
 ├── unit/
 │   ├── core/          # Core functionality tests

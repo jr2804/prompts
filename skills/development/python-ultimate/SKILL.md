@@ -70,7 +70,7 @@ ______________________________________________________________________
 When the sub-command is `help` (or when the user asks for available commands),
 render the following table so the user sees all available options:
 
-```
+```text
 Sub-Command                    │ What It Reviews                                        │ Reference
 ───────────────────────────────┼────────────────────────────────────────────────────────┼──────────────────────────────────
 python-ultimate naming         │ File/dir variable naming (_file/_dir/_path suffixes)  │ references/naming-conventions.md
@@ -145,7 +145,7 @@ comments, prohibited patterns, vague input/output types.
 1. Open `references/coding-standards.md` and load relevant sections
 2. For each prohibited pattern, search with targeted grep patterns:
    - `Optional\[` → must be `T | None`
-   - `\.format\(` or `% ` formatting → must be f-strings
+   - `\.format\(` or `%` formatting → must be f-strings
    - `os\.path\.` → must be `pathlib.Path`
    - `# noqa` → fix root issue
 3. Check for vague input/output types with multiple `isinstance` checks

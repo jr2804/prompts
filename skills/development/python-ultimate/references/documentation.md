@@ -115,7 +115,7 @@ from module import function_name
 result = function_name(arg1, arg2)
 ````
 
-````
+````text
 
 ---
 
@@ -185,7 +185,7 @@ Include:
 }
 ```
 
-````
+````text
 
 ---
 
@@ -352,7 +352,7 @@ ______________________________________________________________________
 
 Create documentation as:
 
-```
+```text
 docs/
 ├── README.md              # Overview and quick start
 ├── ARCHITECTURE.md        # System architecture

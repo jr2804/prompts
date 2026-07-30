@@ -63,7 +63,7 @@ rg 'fast\s+(\w+)' -r 'fast-$1'           # Capture groups
 
 Set `RIPGREP_CONFIG_PATH` env var. Each line is a flag:
 
-```
+```text
 --max-columns=150
 --hidden
 --smart-case

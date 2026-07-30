@@ -13,7 +13,7 @@ the document body.
 
 ### Step 1 -- Derive the target filename
 
-```
+```text
 <tdoc> - <title>.docx
 ```
 

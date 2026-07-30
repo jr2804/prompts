@@ -115,7 +115,7 @@ A well-structured skill typically includes:
 
 **Example:**
 
-```
+```text
 scripts/
 ├── extract_text.py    # PDF text extraction
 └── validate_pdf.py    # PDF validation
@@ -138,7 +138,7 @@ scripts/
 
 **Example:**
 
-```
+```text
 references/
 ├── api-reference.md    # Complete API docs
 ├── forms.md           # Form handling guide
@@ -155,7 +155,7 @@ references/
 
 **Example:**
 
-```
+```text
 assets/
 ├── template.pptx       # PowerPoint template
 └── logo.png           # Brand logo

@@ -36,7 +36,7 @@
 
 ## Example (3GPP/ETSI style names)
 
-```
+```text
 NOTE 1:\t<text>     -- style NO (first note)
 NOTE 2:\t<text>     -- style NW (continuation)
 NOTE 3:\t<text>     -- style NO (last note in block)

@@ -40,7 +40,7 @@ python detect_slop.py article.md
 
 **Output:**
 
-```
+```text
 Overall Slop Score: 62/100
 Assessment: 🟠 Moderate to high slop (40-60 range typical for AI-generated content)
 
@@ -87,7 +87,7 @@ Shows what would change WITHOUT modifying the file.
 
 **Output:**
 
-```
+```text
 Analyzing: article.md
 
 🔄 REPLACEMENTS (8 suggested):

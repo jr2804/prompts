@@ -14,7 +14,7 @@ operations (tab-run injection, field codes, bookmarks), see
 ## Assets
 
 ETSI provides deliverable skeletons (Word templates) for each type via the
-editHelp! website at https://portal.etsi.org/edithelp/home.asp. These contain
+editHelp! website at <https://portal.etsi.org/edithelp/home.asp>. These contain
 all required styles and structural elements. Always start from the appropriate
 skeleton for the deliverable type being drafted. Do not add new styles or
 modify existing ones.

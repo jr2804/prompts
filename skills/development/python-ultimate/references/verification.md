@@ -13,7 +13,7 @@ ______________________________________________________________________
 
 ## Iron Law
 
-```
+```text
 NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE
 ```
 
@@ -25,7 +25,7 @@ ______________________________________________________________________
 
 ## Gate Function
 
-```
+```text
 BEFORE claiming any status or expressing satisfaction:
 
 1. IDENTIFY   → What command proves this claim?

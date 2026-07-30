@@ -66,7 +66,7 @@ Catalog of visual and UX design slop patterns.
 
 ❌ **Slop: Content forced into templates**
 
-```
+```text
 [Hero Section - Large Image]
 [Three Equal Cards]
 [CTA Button]
@@ -88,7 +88,7 @@ Same structure for every page, regardless of content.
 
 ❌ **Slop: Everything in cards**
 
-```
+```text
 ┌─────────┐  ┌─────────┐  ┌─────────┐
 │ Item 1  │  │ Item 2  │  │ Item 3  │
 └─────────┘  └─────────┘  └─────────┘
@@ -107,7 +107,7 @@ Every content type (article, person, product) gets the same card treatment.
 
 ❌ **Slop**
 
-```
+```text
                     [Centered Heading]
                     [Centered Subtext]
                     [Centered Button]
@@ -203,7 +203,7 @@ Which one do I use when? Confusion.
 
 ✅ **Better: Limited, intentional variants**
 
-```
+```text
 <Button variant="primary">Submit</Button>    <!-- Main action -->
 <Button variant="secondary">Cancel</Button>  <!-- Alternative -->
 <Button variant="danger">Delete</Button>     <!-- Destructive -->
@@ -216,7 +216,7 @@ Four variants, clear rules for each.
 
 ❌ **Slop: Random padding/margins**
 
-```
+```text
 Component 1: 16px padding
 Component 2: 20px padding
 Component 3: 12px padding
@@ -229,7 +229,7 @@ No pattern or system.
 
 ✅ **Better: Spacing scale**
 
-```
+```text
 --space-1:  4px   (tight)
 --space-2:  8px   (compact)
 --space-3: 16px   (default)
@@ -254,7 +254,7 @@ Looks unprofessional and hard to build.
 
 ✅ **Better: Typographic scale**
 
-```
+```text
 Display: 56px, 1.2 line-height (hero headlines)
 H1:      40px, 1.3 line-height
 H2:      32px, 1.4 line-height

@@ -9,7 +9,7 @@
 - **Latest Version**: V1.1.1
 - **Publication Date**: September 4, 2014
 - **Directory**: `/deliver/etsi_tr/103000_103099/103053/`
-- **PDF URL**: https://www.etsi.org/deliver/etsi_tr/103000_103099/103053/01.01.01_60/tr_103053v010101p.pdf
+- **PDF URL**: <https://www.etsi.org/deliver/etsi_tr/103000_103099/103053/01.01.01_60/tr_103053v010101p.pdf>
 
 ### 2. ETSI ES 200 381-1
 
@@ -18,7 +18,7 @@
 - **Latest Version**: V1.2.1
 - **Publication Date**: October 19, 2012
 - **Directory**: `/deliver/etsi_es/200300_200399/20038101/`
-- **PDF URL**: https://www.etsi.org/deliver/etsi_es/200300_200399/20038101/01.02.01_60/es_20038101v010201p.pdf
+- **PDF URL**: <https://www.etsi.org/deliver/etsi_es/200300_200399/20038101/01.02.01_60/es_20038101v010201p.pdf>
 
 ### 3. ETSI ES 200 381-2
 

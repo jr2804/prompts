@@ -9,7 +9,7 @@ If the PDF has fillable form fields:
 
 - Run this script from this file's directory: `python scripts/extract_form_field_info.py <input.pdf> <field_info.json>`. It will create a JSON file with a list of fields in this format:
 
-```
+```text
 [
   {
     "field_id": (unique ID for the field),
@@ -59,7 +59,7 @@ If the PDF has fillable form fields:
   Then analyze the images to determine the purpose of each form field (make sure to convert the bounding box PDF coordinates to image coordinates).
 - Create a `field_values.json` file in this format with the values to be entered for each field:
 
-```
+```text
 [
   {
     "field_id": "last_name", // Must match the field_id from `extract_form_field_info.py`
@@ -81,11 +81,11 @@ If the PDF has fillable form fields:
   `python scripts/fill_fillable_fields.py <input pdf> <field_values.json> <output pdf>`
   This script will verify that the field IDs and values you provide are valid; if it prints error messages, correct the appropriate fields and try again.
 
-# Non-fillable fields
+## Non-fillable fields
 
 If the PDF doesn't have fillable form fields, you'll add text annotations. First try to extract coordinates from the PDF structure (more accurate), then fall back to visual estimation if needed.
 
-## Step 1: Try Structure Extraction First
+### Step 1: Try Structure Extraction First
 
 Run this script to extract text labels, lines, and checkboxes with their exact PDF coordinates:
 `python scripts/extract_form_structure.py <input.pdf> form_structure.json`
@@ -101,11 +101,11 @@ This creates a JSON file containing:
 
 ______________________________________________________________________
 
-## Approach A: Structure-Based Coordinates (Preferred)
+### Approach A: Structure-Based Coordinates (Preferred)
 
 Use this when `extract_form_structure.py` found text labels in the PDF.
 
-### A.1: Analyze the Structure
+#### A.1: Analyze the Structure
 
 Read form_structure.json and identify:
 
@@ -116,7 +116,7 @@ Read form_structure.json and identify:
 
 **Coordinate system**: PDF coordinates where y=0 is at TOP of page, y increases downward.
 
-### A.2: Check for Missing Elements
+#### A.2: Check for Missing Elements
 
 The structure extraction may not detect all form elements. Common cases:
 
@@ -126,7 +126,7 @@ The structure extraction may not detect all form elements. Common cases:
 
 If you see form fields in the PDF images that aren't in form_structure.json, you'll need to use **visual analysis** for those specific fields (see "Hybrid Approach" below).
 
-### A.3: Create fields.json with PDF Coordinates
+#### A.3: Create fields.json with PDF Coordinates
 
 For each field, calculate entry coordinates from the extracted structure:
 
@@ -172,7 +172,7 @@ Create fields.json using `pdf_width` and `pdf_height` (signals PDF coordinates):
 
 **Important**: Use `pdf_width`/`pdf_height` and coordinates directly from form_structure.json.
 
-### A.4: Validate Bounding Boxes
+#### A.4: Validate Bounding Boxes
 
 Before filling, check your bounding boxes for errors:
 `python scripts/check_bounding_boxes.py fields.json`
@@ -181,15 +181,15 @@ This checks for intersecting bounding boxes and entry boxes that are too small f
 
 ______________________________________________________________________
 
-## Approach B: Visual Estimation (Fallback)
+### Approach B: Visual Estimation (Fallback)
 
 Use this when the PDF is scanned/image-based and structure extraction found no usable text labels (e.g., all text shows as "(cid:X)" patterns).
 
-### B.1: Convert PDF to Images
+#### B.1: Convert PDF to Images
 
 `python scripts/convert_pdf_to_images.py <input.pdf> <images_dir/>`
 
-### B.2: Initial Field Identification
+#### B.2: Initial Field Identification
 
 Examine each page image to identify form sections and get **rough estimates** of field locations:
 
@@ -199,7 +199,7 @@ Examine each page image to identify form sections and get **rough estimates** of
 
 For each field, note approximate pixel coordinates (they don't need to be precise yet).
 
-### B.3: Zoom Refinement (CRITICAL for accuracy)
+#### B.3: Zoom Refinement (CRITICAL for accuracy)
 
 For each field, crop a region around the estimated position to refine coordinates precisely.
 
@@ -240,7 +240,7 @@ Example: If the crop started at (50, 120) and the entry box starts at (52, 18) w
 
 **Repeat for each field**, grouping nearby fields into single crops when possible.
 
-### B.4: Create fields.json with Refined Coordinates
+#### B.4: Create fields.json with Refined Coordinates
 
 Create fields.json using `image_width` and `image_height` (signals image coordinates):
 
@@ -264,7 +264,7 @@ Create fields.json using `image_width` and `image_height` (signals image coordin
 
 **Important**: Use `image_width`/`image_height` and the refined pixel coordinates from the zoom analysis.
 
-### B.5: Validate Bounding Boxes
+#### B.5: Validate Bounding Boxes
 
 Before filling, check your bounding boxes for errors:
 `python scripts/check_bounding_boxes.py fields.json`
@@ -273,7 +273,7 @@ This checks for intersecting bounding boxes and entry boxes that are too small f
 
 ______________________________________________________________________
 
-## Hybrid Approach: Structure + Visual
+### Hybrid Approach: Structure + Visual
 
 Use this when structure extraction works for most fields but misses some elements (e.g., circular checkboxes, unusual form controls).
 
@@ -287,7 +287,7 @@ Use this when structure extraction works for most fields but misses some element
 
 ______________________________________________________________________
 
-## Step 2: Validate Before Filling
+### Step 2: Validate Before Filling
 
 **Always validate bounding boxes before filling:**
 `python scripts/check_bounding_boxes.py fields.json`
@@ -299,12 +299,12 @@ This checks for:
 
 Fix any reported errors in fields.json before proceeding.
 
-## Step 3: Fill the Form
+### Step 3: Fill the Form
 
 The fill script auto-detects the coordinate system and handles conversion:
 `python scripts/fill_pdf_form_with_annotations.py <input.pdf> fields.json <output.pdf>`
 
-## Step 4: Verify Output
+### Step 4: Verify Output
 
 Convert the filled PDF to images and verify text placement:
 `python scripts/convert_pdf_to_images.py <output.pdf> <verify_images/>`

@@ -13,7 +13,7 @@ ______________________________________________________________________
 
 ## Workflow
 
-```
+```text
 READ → UNDERSTAND → VERIFY → EVALUATE → RESPOND → IMPLEMENT
 ```
 
@@ -86,7 +86,7 @@ Before implementing external feedback:
 
 **YAGNI Check:**
 
-```
+```text
 IF reviewer suggests unused feature:
   grep codebase for actual usage
   IF unused: "This endpoint isn't called. Remove it (YAGNI)?"
@@ -106,7 +106,7 @@ ______________________________________________________________________
 
 **Acknowledging correct feedback:**
 
-```
+```text
 ✅ "Fixed. [Brief description]"
 ✅ "Good catch - [specific issue]. Fixed in [location]."
 ✅ [Just fix it and show the code]
@@ -114,7 +114,7 @@ ______________________________________________________________________
 
 **If you were wrong:**
 
-```
+```text
 ✅ "You were right - I checked [X] and it does [Y]. Implementing now."
 ✅ "Verified, you're correct. My initial understanding was wrong because [reason]. Fixing."
 ```
@@ -123,7 +123,7 @@ ______________________________________________________________________
 
 ## Responding to Unclear Feedback
 
-```
+```text
 IF any item is unclear:
   STOP – do not implement anything yet
   ASK for clarification on unclear items
@@ -133,7 +133,7 @@ IF any item is unclear:
 
 **Example:**
 
-```
+```text
 Partner: "Fix items 1-6"
 You understand 1,2,3,6. Unclear on 4,5.
 
@@ -143,7 +143,7 @@ You understand 1,2,3,6. Unclear on 4,5.
 
 **When can't verify:**
 
-```
+```text
 "I can't verify this without [X]. Should I [investigate/ask/proceed]?"
 ```
 

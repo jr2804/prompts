@@ -87,7 +87,7 @@ auto-registered by officecli's XPath engine.
 stdin is already redirected (e.g., from `subprocess.run(input=...)`). The
 CLI detects the conflict and ignores the input:
 
-```
+```text
 Warning: batch is reading from --input but stdin is also redirected; stdin ignored.
 ```
 

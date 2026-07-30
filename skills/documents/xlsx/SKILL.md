@@ -49,13 +49,13 @@ Unless otherwise stated by the user or existing template
 - Use cell references instead of hardcoded values in formulas
 - Example: Use =B5\*(1+$B$6) instead of =B5\*1.05
 
-# XLSX creation, editing, and analysis
+## XLSX creation, editing, and analysis
 
-## Overview
+### Overview
 
 A user may ask you to create, edit, or analyze the contents of an .xlsx file.
 
-## Reading and analyzing data
+### Reading and analyzing data
 
 ```python
 import pandas as pd
@@ -64,36 +64,38 @@ df = pd.read_excel('file.xlsx')
 all_sheets = pd.read_excel('file.xlsx', sheet_name=None)
 ```
 
-## CRITICAL: Use Formulas, Not Hardcoded Values
+### CRITICAL: Use Formulas, Not Hardcoded Values
 
 **Always use Excel formulas instead of calculating values in Python and hardcoding them.**
 
-### ❌ WRONG
+#### ❌ WRONG
 
 ```python
 total = df['Sales'].sum()
 sheet['B10'] = total  # Hardcodes 5000
 ```
 
-### ✅ CORRECT
+#### ✅ CORRECT
 
 ```python
 sheet['B10'] = '=SUM(B2:B9)'
 ```
 
-## Common Workflow
+### Common Workflow
 
 1. **Choose tool**: pandas for data, openpyxl for formulas/formatting
 2. **Create/Load**: Create new workbook or load existing file
 3. **Modify**: Add/edit data, formulas, and formatting
 4. **Save**: Write to file
 5. **Recalculate formulas (MANDATORY IF USING FORMULAS)**:
+
    ```bash
    python scripts/recalc.py output.xlsx
    ```
+
 6. **Verify and fix any errors**
 
-### Creating new Excel files
+#### Creating new Excel files
 
 ```python
 from openpyxl import Workbook
@@ -108,7 +110,7 @@ sheet['A1'].font = Font(bold=True, color='FF0000')
 wb.save('output.xlsx')
 ```
 
-### Editing existing Excel files
+#### Editing existing Excel files
 
 ```python
 from openpyxl import load_workbook
@@ -119,7 +121,7 @@ sheet['A1'] = 'New Value'
 wb.save('modified.xlsx')
 ```
 
-## Recalculating formulas
+### Recalculating formulas
 
 ```bash
 python scripts/recalc.py <excel_file> [timeout_seconds]
@@ -132,7 +134,7 @@ The script:
 - Scans ALL cells for Excel errors
 - Returns JSON with detailed error locations and counts
 
-## Formula Verification Checklist
+### Formula Verification Checklist
 
 - [ ] **Test 2-3 sample references**: Verify they pull correct values
 - [ ] **Column mapping**: Confirm Excel columns match (e.g., column 64 = BL)
@@ -140,27 +142,27 @@ The script:
 - [ ] **NaN handling**: Check for null values with `pd.notna()`
 - [ ] **Division by zero**: Check denominators before using `/`
 
-## Best Practices
+### Best Practices
 
-### Library Selection
+#### Library Selection
 
 - **pandas**: Best for data analysis, bulk operations, and simple data export
 - **openpyxl**: Best for complex formatting, formulas, and Excel-specific features
 
-### Working with openpyxl
+#### Working with openpyxl
 
 - Cell indices are 1-based
 - Use `data_only=True` to read calculated values
 - **Warning**: If opened with `data_only=True` and saved, formulas are permanently lost
 - Formulas are preserved but not evaluated — use `scripts/recalc.py` to update values
 
-## Code Style Guidelines
+### Code Style Guidelines
 
 - Write minimal, concise Python code without unnecessary comments
 - Avoid verbose variable names and redundant operations
 - For Excel files: add comments to cells with complex formulas, document data sources for hardcoded values
 
-## Dependencies
+### Dependencies
 
 - **pandas**: Data analysis and manipulation
 - **openpyxl**: Excel file creation and editing with formulas/formatting

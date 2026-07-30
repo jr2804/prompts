@@ -119,7 +119,7 @@ curl -X GET "https://api.example.com/v1/resource?id=123&format=json"
 }
 ````
 
-````
+````text
 
 ### Code Documentation
 

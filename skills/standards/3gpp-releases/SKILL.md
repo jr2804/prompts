@@ -70,7 +70,7 @@ A TSG round is a quarterly plenary meeting where specifications are made availab
 
 ### FTP Directory Pattern
 
-```
+```text
 https://www.3gpp.org/ftp/Specs/<YYYY>-<MM>/
 ```
 

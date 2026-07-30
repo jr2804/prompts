@@ -52,7 +52,7 @@ Two forms allowed:
 
 **Form 1 -- dashed list:**
 
-```
+```text
 - first item;
 - second item;
 - etc.
@@ -60,7 +60,7 @@ Two forms allowed:
 
 **Form 2 -- lettered/numbered list:**
 
-```
+```text
 a) first item;
 b) second item;
 c) etc.
@@ -68,7 +68,7 @@ c) etc.
 
 **Sublists:**
 
-```
+```text
 a) first item:
     1) first sub-item;
     2) second sub-item.
@@ -138,13 +138,13 @@ ______________________________________________________________________
 
 ### Single note
 
-```
+```text
 NOTE -- Text of the note.
 ```
 
 ### Multiple notes within same subdivision
 
-```
+```text
 NOTE 1 -- First note text.
 NOTE 2 -- Second note text.
 NOTE 3 -- Third note text.

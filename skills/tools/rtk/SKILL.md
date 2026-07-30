@@ -148,7 +148,7 @@ rtk init --global       # Add RTK to ~/.claude/CLAUDE.md
 
 ## Installation
 
-RTK is available at: https://github.com/rtk-ai/rtk
+RTK is available at: <https://github.com/rtk-ai/rtk>
 
 Follow the installation instructions in the repository to set up RTK in your environment.
 

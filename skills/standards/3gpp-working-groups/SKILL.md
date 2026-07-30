@@ -68,7 +68,7 @@ Each Working Group within a TSG has a unique `SubTB` identifier:
 
 3GPP meeting lists use dynamic pages at:
 
-```
+```text
 https://www.3gpp.org/dynareport?code=Meetings-<ID>.htm
 ```
 
@@ -117,7 +117,7 @@ Meeting names are **inconsistent** across years and groups:
 
 **FTP Structure:**
 
-```
+```text
 tsg_ran/
 ├── WG1_RL1/
 ├── WG2_RL2/
@@ -143,7 +143,7 @@ tsg_ran/
 
 **FTP Structure:**
 
-```
+```text
 tsg_sa/
 ├── WG1_S1/
 ├── WG2_S2/
@@ -170,7 +170,7 @@ tsg_sa/
 
 **FTP Structure:**
 
-```
+```text
 tsg_ct/
 ├── WG1_C1/
 ├── WG2_C2/

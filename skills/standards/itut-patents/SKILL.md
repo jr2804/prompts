@@ -89,7 +89,7 @@ Every new or revised Recommendation must include this notice:
 
 ## Patent Information database
 
-- URL: https://www.itu.int/ITU-T/ipr/
+- URL: <https://www.itu.int/ITU-T/ipr/>
 - Not certified as accurate or complete.
 - Contains all submitted Declaration Forms and General Forms.
 - Used as a flag-raising mechanism; users should contact declaring

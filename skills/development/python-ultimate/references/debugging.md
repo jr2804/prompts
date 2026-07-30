@@ -17,7 +17,7 @@ ______________________________________________________________________
 
 ## Iron Law
 
-```
+```text
 NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST
 ```
 

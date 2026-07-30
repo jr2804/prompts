@@ -78,7 +78,7 @@ ______________________________________________________________________
 
 Organize CLI applications for maintainability:
 
-```
+```text
 project/
 ├── src/
 │   └── project/

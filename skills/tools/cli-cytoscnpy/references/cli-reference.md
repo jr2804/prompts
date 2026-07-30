@@ -1,10 +1,10 @@
 # CytoScnPy CLI Reference
 
-**Source:** https://djinn-soul.github.io/CytoScnPy/CLI/
+**Source:** <https://djinn-soul.github.io/CytoScnPy/CLI/>
 
 ## Command Syntax
 
-```
+```text
 cytoscnpy [OPTIONS] [COMMAND]
 ```
 

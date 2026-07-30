@@ -19,7 +19,7 @@ These skills are based on the [Anthropic skills repository](https://github.com/a
 
 Each skill follows the same layout:
 
-```
+```text
 skill-name/
 ├── SKILL.md          # Skill definition and main documentation
 ├── LICENSE.txt       # License

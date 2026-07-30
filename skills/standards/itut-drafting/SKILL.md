@@ -149,7 +149,7 @@ Recommendation, after all integral and non-integral annexes.
 
 Format identical to normative references:
 
-```
+```text
 [N]\t<citation text>
 ```
 
@@ -285,7 +285,7 @@ equation."
 
 Target structure:
 
-```
+```text
 [p intro sentence]
 [p style=Equation]  <- \t + oMath + \t + (EQ_seq_result)  -- one paragraph
 [p style=Equation_legend]  <- "where..." annotation paragraph
@@ -358,7 +358,7 @@ formatting:
 | r[1] | `3.1.N` (number prefix) | bold |
 | r[2] | `<w:tab/>` | bold (on run) |
 | r[3] | term name | bold |
-| r[4] | `: ` + definition text | normal |
+| r[4] | `:` + definition text | normal |
 
 ### Tab stop
 
@@ -412,7 +412,7 @@ elements:
 
 Replace the target paragraph via:
 
-```
+```text
 officeli raw-set <doc> /document \
   --xpath '//w:p[@w14:paraId="PARAID"]' \
   --action replace \
@@ -447,7 +447,7 @@ Examples:
 
 ### Caption structure
 
-```
+```text
 Figure\u00a0<N>-{SEQ FIG<N>}: caption text
 Table\u00a0<N>-{SEQ TAB<N>}: caption text
 ```
@@ -469,7 +469,7 @@ UPPER_SNAKE_CASE. Follow the naming scheme already used in the document:
 
 ### Run-level structure for a correct caption
 
-```
+```text
 r[1]   run          "Figure "           (non-breaking space)
        bookmark     (around 6-N)         name="FIG_xxx"
 r[2]   run          "6-"
@@ -486,7 +486,7 @@ r[8]   run          ": caption text"
 
 Body text references use `REF` fields pointing to the bookmark:
 
-```
+```text
 { REF FIG_EQUIPMENT_RRS_SP \h }
 { REF TAB_SIGNALS_ACCURACYMEASUREMENTS \h }
 ```

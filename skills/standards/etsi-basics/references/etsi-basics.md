@@ -74,7 +74,7 @@ ______________________________________________________________________
 
 ## Standards development lifecycle
 
-```
+```text
 Work Item -> Draft -> Validate & Review -> Editorial Check
     -> Approval -> Publication -> Maintenance & Evolution
                                           |
@@ -147,9 +147,9 @@ ______________________________________________________________________
 
 ## ETSI resources
 
-- ETSI Portal: https://portal.etsi.org/
-- editHelp!: https://portal.etsi.org/edithelp/home.asp (skeletons, templates)
-- TEDDI (Terms and Definitions Database): https://webapp.etsi.org/Teddi/
-- ETSI Directives: https://portal.etsi.org/Resources/ETSIDirectives.aspx
-- Making Better Standards: https://portal.etsi.org/mbs/
-- ETSI "Use of English" guide: https://ocgwiki.etsi.org/index.php?title=Use_of_English
+- ETSI Portal: <https://portal.etsi.org/>
+- editHelp!: <https://portal.etsi.org/edithelp/home.asp> (skeletons, templates)
+- TEDDI (Terms and Definitions Database): <https://webapp.etsi.org/Teddi/>
+- ETSI Directives: <https://portal.etsi.org/Resources/ETSIDirectives.aspx>
+- Making Better Standards: <https://portal.etsi.org/mbs/>
+- ETSI "Use of English" guide: <https://ocgwiki.etsi.org/index.php?title=Use_of_English>

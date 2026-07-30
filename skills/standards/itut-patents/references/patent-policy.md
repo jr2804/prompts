@@ -116,7 +116,7 @@ guidelines. Sources:
 
 ## ITU Patent Information database
 
-- Publicly available at https://www.itu.int/ITU-T/ipr/
+- Publicly available at <https://www.itu.int/ITU-T/ipr/>
 - Contains all declarations submitted via Declaration Forms and General
   Forms.
 - **Not certified as accurate or complete** -- only reflects information

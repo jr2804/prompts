@@ -53,7 +53,7 @@ Frontier models can follow ~150-200 instructions reliably. Claude Code's system 
 
 Don't stuff everything into root AGENTS.md. Use task-specific files:
 
-```
+```text
 docs/agent-context/
 ├── building-the-project.md
 ├── testing-patterns.md
@@ -134,7 +134,7 @@ Brief 2-3 sentence overview of main components.
 - **Architecture:** `docs/architecture.md`
 - **Testing:** `tests/AGENTS.md`
 
-````
+````text
 
 ### Package-Level AGENTS.md (<150 lines)
 
@@ -177,7 +177,7 @@ uv run pytest tests/package/ -v
 1. **Insight from refactoring** - Why it matters
 2. **Common pitfall** - How to avoid
 
-````
+````text
 
 ---
 
@@ -445,7 +445,7 @@ ______________________________________________________________________
 
 ## Appendix: Decision Tree
 
-```
+```text
 Should I add this to AGENTS.md?
 │
 ├─ Is it universally applicable? ─No─→ Put in task-specific doc

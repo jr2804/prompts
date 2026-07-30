@@ -100,7 +100,7 @@ Each two-digit series corresponds to a specific technical domain:
 
 ### Root Directory
 
-```
+```text
 https://www.3gpp.org/ftp/Specs/<YYYY>-<MM>/
 ```
 
@@ -138,7 +138,7 @@ Each TSG round directory contains:
 
 **Example:**
 
-```
+```text
 Series 21: 21.001, 21.002, 21.003, ..., 21.456
 Series 22: 22.001, 22.002, 22.003, ..., 22.101
 ```

@@ -99,7 +99,7 @@ TDOC_PATTERN = re.compile(r"([RSC][1-6P].{4,10})\.(zip|txt|pdf)", re.IGNORECASE)
 
 3GPP maintains a file server at FTP-like HTTP URLs:
 
-```
+```text
 https://www.3gpp.org/ftp/tsg_<working_group_identifier>/
 ```
 
@@ -115,7 +115,7 @@ https://www.3gpp.org/ftp/tsg_<working_group_identifier>/
 
 TDocs are available at:
 
-```
+```text
 https://www.3gpp.org/ftp/tsg_<wg>/<sub-working_group_identifier>/<meeting_identifier>/Docs/<tdoc_nbr>.zip
 ```
 
@@ -130,7 +130,7 @@ https://www.3gpp.org/ftp/tsg_<wg>/<sub-working_group_identifier>/<meeting_identi
 
 ### Example URLs
 
-```
+```text
 RAN WG1 TDoc R1-2301234:
 https://www.3gpp.org/ftp/tsg_ran/WG1_RL1/RAN1_98/Docs/R1-2301234.zip
 
@@ -173,7 +173,7 @@ TDocs are typically stored in subdirectories like "Docs/" rather than directly i
 
 Non-TDoc directories to skip during crawling:
 
-```
+```text
 EXCLUDED_DIRS = {"Inbox", "Draft", "Drafts", "Agenda", "Invitation", "Report"}
 ```
 
@@ -183,13 +183,13 @@ EXCLUDED_DIRS = {"Inbox", "Draft", "Drafts", "Agenda", "Invitation", "Report"}
 
 When TDoc number is known, use 3GPP portal to query metadata:
 
-```
+```text
 https://portal.3gpp.org/ngppapp/CreateTdoc.Aspx?mode=view&contributionUid=<tdoc_nbr>
 ```
 
 **Example:**
 
-```
+```text
 https://portal.3gpp.org/ngppapp/CreateTdoc.Aspx?mode=view&contributionUid=R1-2301234
 ```
 

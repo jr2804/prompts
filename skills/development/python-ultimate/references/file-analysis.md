@@ -103,7 +103,7 @@ ______________________________________________________________________
 
 ### Count Matches
 
-```
+```text
 Grep(pattern="^def ", output_mode="count", path="src/")
 Grep(pattern="^class ", output_mode="count", path="src/")
 Grep(pattern="^import ", output_mode="count", path="src/")
@@ -111,20 +111,20 @@ Grep(pattern="^import ", output_mode="count", path="src/")
 
 ### Find with Line Numbers
 
-```
+```text
 Grep(pattern="TODO|FIXME|HACK", output_mode="content", -n=true)
 ```
 
 ### Find Files by Pattern
 
-```
+```text
 Glob(pattern="**/*.py")
 Glob(pattern="**/*.md", path="docs/")
 ```
 
 ### Search with Inclusion Filter
 
-```
+```text
 Grep(pattern="function", include="*.js", path="src/")
 Grep(pattern="class", include="*.ts", path=".")
 ```
@@ -133,10 +133,10 @@ Grep(pattern="class", include="*.ts", path=".")
 
 | Pattern | Purpose |
 |---------|---------|
-| `^def ` | Top-level functions |
-| `^class ` | Top-level classes |
-| `^import ` | Import statements |
-| `^from ` | From imports |
+| `^def` | Top-level functions |
+| `^class` | Top-level classes |
+| `^import` | Import statements |
+| `^from` | From imports |
 | `TODO\|FIXME\|HACK` | Code markers |
 | `console\.log` | Debug statements |
 | `print\(` | Print statements |

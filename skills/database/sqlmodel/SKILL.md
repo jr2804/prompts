@@ -182,7 +182,7 @@ This skill includes comprehensive reference files organized by topic. Read the r
 
 ## Example Project Structure
 
-```
+```text
 app/
 ├── __init__.py
 ├── main.py              # FastAPI app with lifespan

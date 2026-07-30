@@ -2,7 +2,7 @@
 
 ## Project Structure
 
-```
+```text
 app/
 ├── __init__.py
 ├── main.py              # FastAPI application

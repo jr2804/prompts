@@ -15,7 +15,7 @@ ______________________________________________________________________
 
 ## Project Structure
 
-```
+```text
 project/
 ├── src/                  # Main source code
 │   └── package/          # Importable package

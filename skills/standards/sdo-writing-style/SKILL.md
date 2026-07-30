@@ -104,7 +104,7 @@ procedures, prefer fewer verified facts to many guessed ones.
   and causal claims as high-fragility facts.
 - If you cannot verify a claim, attribute it, soften it, or cut it.
 
-### 5. Use plain words. Allow ordinary repetition. Prefer verbs.
+### 5. Use plain words. Allow ordinary repetition. Prefer verbs
 
 Do not chase synonyms for basic words like `problem`, `change`, `system`,
 `work`, or `test`. Repeat the ordinary word when it is the right word.

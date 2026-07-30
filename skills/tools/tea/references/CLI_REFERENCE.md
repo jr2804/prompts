@@ -4,9 +4,9 @@ Complete command-line reference for tea. See the main SKILL.md for usage example
 
 ## Official Documentation
 
-- Main docs: https://gitea.com/gitea/tea/src/branch/main/docs/CLI.md
-- GitHub: https://github.com/gitea/tea
-- Releases: https://github.com/gitea/tea/releases
+- Main docs: <https://gitea.com/gitea/tea/src/branch/main/docs/CLI.md>
+- GitHub: <https://github.com/gitea/tea>
+- Releases: <https://github.com/gitea/tea/releases>
 
 ## Installation
 
@@ -30,7 +30,7 @@ chmod +x tea
 
 ## Command Hierarchy
 
-```
+```text
 tea
 ├── logins (login)
 │   ├── list (ls)

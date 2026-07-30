@@ -164,7 +164,7 @@ For skill improvement workflows:
 
 Output completion marker when done:
 
-```
+```text
 <skill-review-complete>
 ```
 

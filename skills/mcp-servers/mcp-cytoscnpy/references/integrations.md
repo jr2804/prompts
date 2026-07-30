@@ -1,6 +1,6 @@
 # CytoScnPy Integrations Reference
 
-**Source:** https://djinn-soul.github.io/CytoScnPy/integrations/
+**Source:** <https://djinn-soul.github.io/CytoScnPy/integrations/>
 
 ## VS Code Extension
 

@@ -21,7 +21,7 @@ A modular skill family for agent-assisted software development workflows. Each s
 
 ### Full Feature Development
 
-```
+```text
 using-git-worktrees → subagent-driven-development
      ↓                        ↓
 Create isolated          Execute plan with
@@ -31,7 +31,7 @@ feature branch           per-task subagents
 
 ### Parallel Bug Investigation
 
-```
+```text
 dispatching-parallel-agents
      ↓
 Multiple subagents
@@ -41,7 +41,7 @@ failures simultaneously
 
 ### Quick Post-Task Review
 
-```
+```text
 requesting-code-review
      ↓
 Lightweight review

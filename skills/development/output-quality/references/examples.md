@@ -8,7 +8,7 @@ Before/after examples demonstrating quality improvements across text, code, and 
 
 **Before (Score: 78/100 — High Slop)**
 
-```
+```text
 In today's fast-paced world, artificial intelligence has become increasingly important.
 Many organizations are looking to leverage cutting-edge AI technologies to empower their
 teams and unlock new opportunities. In this article, we will delve into the complexities
@@ -25,7 +25,7 @@ of modern AI systems and explore how businesses can navigate these challenges ef
 
 **After (Score: 15/100 — Clean)**
 
-```
+```text
 Companies deploying AI face three concrete problems: managing model costs, handling failures
 gracefully, and explaining decisions to users. This article examines practical solutions from
 five companies that process millions of predictions daily.
@@ -44,7 +44,7 @@ ______________________________________________________________________
 
 **Before (Score: 82/100)**
 
-```
+```text
 ## Overview
 
 Our API is a powerful and flexible platform that empowers developers to build innovative
@@ -66,7 +66,7 @@ to note that API keys should be kept secure at all times.
 
 **After (Score: 10/100)**
 
-```
+```text
 ## Overview
 
 The API manages your invoices, payments, and reconciliation. Start with the /invoices endpoint
@@ -230,7 +230,7 @@ ______________________________________________________________________
 
 **Before (Slop indicators)**
 
-```
+```text
 Hero: Purple-to-pink gradient background
       Centered "Empower Your Business" headline
       Generic floating 3D spheres
@@ -254,7 +254,7 @@ Footer: Five blue buttons (Sign Up, Learn More, Documentation, Contact, Blog)
 
 **After (Quality indicators)**
 
-```
+```text
 Hero: Brand-color background (e.g., dark blue)
       Specific headline: "Auto-Process 100 Invoices in 5 Minutes"
       Screenshot of actual product (not generic)
@@ -289,7 +289,7 @@ ______________________________________________________________________
 
 **Before: Inconsistent**
 
-```
+```text
 Button variants: 8 different styles
   - PrimaryButton (blue, rounded, 12px padding)
   - SecondaryButton (gray, rounded, 12px padding)
@@ -307,7 +307,7 @@ No clear pattern.
 
 **After: Clear hierarchy**
 
-```
+```text
 Primary: Blue, rounded, 16px padding
   → Main action on every page
   → "Save", "Create", "Submit"

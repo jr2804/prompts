@@ -137,7 +137,7 @@ Start with simple prompts, add complexity only when needed:
 
 ### Instruction Hierarchy
 
-```
+```text
 [System Context] → [Task Instruction] → [Examples] → [Input Data] → [Output Format]
 ```
 
@@ -217,13 +217,13 @@ If verification fails, revise your response."""
 
 ______________________________________________________________________
 
-# Agent Prompting Best Practices
+## Agent Prompting Best Practices
 
 Based on Anthropic's official best practices for agent prompting.
 
-## Core principles
+### Core principles
 
-### Context Window
+#### Context Window
 
 The “context window” refers to the entirety of the amount of text a language model can look back on and reference when generating new text plus the new text it generates. This is different from the large corpus of data the language model was trained on, and instead represents a “working memory” for the model. A larger context window allows the model to understand and respond to more complex and lengthy prompts, while a smaller context window may limit the model’s ability to handle longer prompts or maintain coherence over extended conversations.
 
@@ -234,7 +234,7 @@ The “context window” refers to the entirety of the amount of text a language
   - Input phase: Contains all previous conversation history plus the current user message
   - Output phase: Generates a text response that becomes part of a future input
 
-### Concise is key
+#### Concise is key
 
 The context window is a public good. Your prompt, command, skill shares the context window with everything else Claude needs to know, including:
 
@@ -280,7 +280,7 @@ First, you'll need to install it using pip. Then you can use the code below...
 
 The concise version assumes Claude knows what PDFs are and how libraries work.
 
-### Set appropriate degrees of freedom
+#### Set appropriate degrees of freedom
 
 Match the level of specificity to the task's fragility and variability.
 
@@ -353,19 +353,19 @@ Do not modify the command or add additional flags.
 - **Narrow bridge with cliffs on both sides**: There's only one safe way forward. Provide specific guardrails and exact instructions (low freedom). Example: database migrations that must run in exact sequence.
 - **Open field with no hazards**: Many paths lead to success. Give general direction and trust Claude to find the best route (high freedom). Example: code reviews where context determines the best approach.
 
-# Persuasion Principles for Agent Communication
+## Persuasion Principles for Agent Communication
 
 Usefull for writing prompts, including but not limited to: commands, hooks, skills for Claude Code, or prompts for sub agents or any other LLM interaction.
 
-## Overview
+### Overview
 
 LLMs respond to the same persuasion principles as humans. Understanding this psychology helps you design more effective skills - not to manipulate, but to ensure critical practices are followed even under pressure.
 
 **Research foundation:** Meincke et al. (2025) tested 7 persuasion principles with N=28,000 AI conversations. Persuasion techniques more than doubled compliance rates (33% → 72%, p < .001).
 
-## The Seven Principles
+### The Seven Principles
 
-### 1. Authority
+#### 1. Authority
 
 **What it is:** Deference to expertise, credentials, or official sources.
 
@@ -388,7 +388,7 @@ LLMs respond to the same persuasion principles as humans. Understanding this psy
 ❌ Consider writing tests first when feasible.
 ```
 
-### 2. Commitment
+#### 2. Commitment
 
 **What it is:** Consistency with prior actions, statements, or public declarations.
 
@@ -411,7 +411,7 @@ LLMs respond to the same persuasion principles as humans. Understanding this psy
 ❌ Consider letting your partner know which skill you're using.
 ```
 
-### 3. Scarcity
+#### 3. Scarcity
 
 **What it is:** Urgency from time limits or limited availability.
 
@@ -434,7 +434,7 @@ LLMs respond to the same persuasion principles as humans. Understanding this psy
 ❌ You can review code when convenient.
 ```
 
-### 4. Social Proof
+#### 4. Social Proof
 
 **What it is:** Conformity to what others do or what's considered normal.
 
@@ -457,7 +457,7 @@ LLMs respond to the same persuasion principles as humans. Understanding this psy
 ❌ Some people find TodoWrite helpful for checklists.
 ```
 
-### 5. Unity
+#### 5. Unity
 
 **What it is:** Shared identity, "we-ness", in-group belonging.
 
@@ -479,7 +479,7 @@ LLMs respond to the same persuasion principles as humans. Understanding this psy
 ❌ You should probably tell me if I'm wrong.
 ```
 
-### 6. Reciprocity
+#### 6. Reciprocity
 
 **What it is:** Obligation to return benefits received.
 
@@ -492,7 +492,7 @@ LLMs respond to the same persuasion principles as humans. Understanding this psy
 
 - Almost always (other principles more effective)
 
-### 7. Liking
+#### 7. Liking
 
 **What it is:** Preference for cooperating with those we like.
 
@@ -506,7 +506,7 @@ LLMs respond to the same persuasion principles as humans. Understanding this psy
 
 - Always for discipline enforcement
 
-## Principle Combinations by Prompt Type
+### Principle Combinations by Prompt Type
 
 | Prompt Type | Use | Avoid |
 |------------|-----|-------|
@@ -515,7 +515,7 @@ LLMs respond to the same persuasion principles as humans. Understanding this psy
 | Collaborative | Unity + Commitment | Authority, Liking |
 | Reference | Clarity only | All persuasion |
 
-## Why This Works: The Psychology
+### Why This Works: The Psychology
 
 **Bright-line rules reduce rationalization:**
 
@@ -536,7 +536,7 @@ LLMs respond to the same persuasion principles as humans. Understanding this psy
 - Commitment sequences (statement → action) frequently modeled
 - Social proof patterns (everyone does X) establish norms
 
-## Ethical Use
+### Ethical Use
 
 **Legitimate:**
 
@@ -552,7 +552,7 @@ LLMs respond to the same persuasion principles as humans. Understanding this psy
 
 **The test:** Would this technique serve the user's genuine interests if they fully understood it?
 
-## Quick Reference
+### Quick Reference
 
 When designing a prompt, ask:
 

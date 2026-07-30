@@ -20,14 +20,14 @@ ______________________________________________________________________
 
 ### 1. Find All Occurrences
 
-```
+```text
 Grep(pattern="oldName", output_mode="files_with_matches")           # Find files
 Grep(pattern="oldName", output_mode="content", -n=true, -B=2, -A=2) # Verify with context
 ```
 
 ### 2. Replace All Instances
 
-```
+```text
 Edit(
   file_path="src/api.js",
   old_string="oldName",
@@ -38,7 +38,7 @@ Edit(
 
 ### 3. Verify Changes
 
-```
+```text
 Grep(pattern="oldName", output_mode="files_with_matches")  # Should return none
 Grep(pattern="newName", output_mode="content", -n=true)     # Confirm replacements
 ```
@@ -95,7 +95,7 @@ ______________________________________________________________________
 
 Use **Edit** when insertion point is relative to existing code:
 
-```
+```text
 Edit(
   file_path="src/utils.py",
   old_string="def existing():\n    pass",

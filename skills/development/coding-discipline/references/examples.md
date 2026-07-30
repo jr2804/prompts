@@ -36,7 +36,7 @@ def export_users(format='json'):
 
 **✅ What Should Happen (Surface Assumptions)**
 
-```
+```text
 Before implementing, I need to clarify:
 
 1. **Scope**: Export all users or filtered subset? (privacy implications)
@@ -71,7 +71,7 @@ async def search(query: str) -> List[Result]:
 
 **✅ What Should Happen**
 
-```
+```text
 "Make the search faster" could mean:
 
 1. **Faster response time** (< 100ms instead of 500ms)
@@ -378,7 +378,7 @@ ______________________________________________________________________
 
 **❌ What Goes Wrong (Vague Approach)**
 
-```
+```text
 I'll fix the authentication system by:
 1. Reviewing the code
 2. Identifying issues
@@ -390,7 +390,7 @@ I'll fix the authentication system by:
 
 **✅ What Should Happen (Verifiable Goals)**
 
-```
+```text
 To "fix authentication," I need to define success criteria.
 What specific issue are we solving?
 
@@ -429,7 +429,7 @@ ______________________________________________________________________
 
 **✅ What Should Happen (Incremental with Verification)**
 
-```
+```text
 Plan for rate limiting:
 
 1. Add basic in-memory rate limiting (single endpoint)

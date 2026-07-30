@@ -24,19 +24,19 @@ No extra config is required beyond installing Python dependencies (below).
 
 Open your agent-enabled IDE and ask, for example:
 
-```
+```text
 Parse report.pdf and give me a structural outline
 ```
 
-```
+```text
 Convert https://arxiv.org/pdf/2408.09869 to markdown
 ```
 
-```
+```text
 Chunk invoice.pdf for RAG ingestion with 512 token chunks
 ```
 
-```
+```text
 Process scanned.pdf using the VLM pipeline
 ```
 

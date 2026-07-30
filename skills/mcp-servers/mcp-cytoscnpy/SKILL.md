@@ -30,7 +30,7 @@ Add to `claude_desktop_config.json`:
 
 The VS Code extension automatically registers the MCP server. Just ask Copilot:
 
-```
+```text
 "Run a security scan on this file"
 ```
 

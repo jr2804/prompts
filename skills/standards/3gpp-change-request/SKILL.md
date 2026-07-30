@@ -54,7 +54,7 @@ Three main reasons for creating a CR:
 
 ## CR Number Format
 
-```
+```text
 <specnumber_no_dot>*_CR*<4-character_CR_number>*[r*<revision_number>*]
 ```
 
@@ -200,7 +200,7 @@ Optional field in CR document to track changes as CR passes through revisions:
 
 **Word™ files for CRs** follow 3GPP naming:
 
-```
+```text
 *<specnumber_no_dot>*_CR*<4-character_CR_number>*[r*<revision_number>*]
 ```
 
@@ -212,7 +212,7 @@ Optional field in CR document to track changes as CR passes through revisions:
 
 ### CR Lifecycle
 
-```
+```text
 Draft → WG Agreement → TSG Approval → MCC Incorporation → Published Spec
 ```
 

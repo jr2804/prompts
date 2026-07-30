@@ -41,7 +41,7 @@ vstash config
 
 ## Ingestion Pipeline
 
-```
+```text
 file/URL → parse → chunk → embed → store vectors → index text
 ```
 
@@ -59,7 +59,7 @@ file/URL → parse → chunk → embed → store vectors → index text
 
 ## Search Pipeline
 
-```
+```text
 query → embed → vector search (top-k×10) → keyword search (top-k×10) → RRF fusion → memory scoring → dedup → relevance signal → top-k
 ```
 

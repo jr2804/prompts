@@ -48,7 +48,7 @@ See [code-index-template.md](references/code-index-template.md) for a complete t
 
 ## Before Creating ANY New Function
 
-```
+```text
 ┌─────────────────────────────────────────┐
 │ 1. DESCRIBE what you need in plain English
 │ 2. CHECK CODE_INDEX.md for similar

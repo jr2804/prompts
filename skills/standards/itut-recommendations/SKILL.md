@@ -56,7 +56,7 @@ paragraphs and do **not** appear in the table of contents.
 
 Each term follows this pattern:
 
-```
+```text
 <bold>3.1.N\tTERM NAME</bold>: definition text
 ```
 

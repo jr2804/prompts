@@ -298,7 +298,7 @@ cross-references.
 
 **Format A** (items < 1 sentence): lower case, full stop only on last item
 
-```
+```text
 The purpose of training is to:
 - improve staff qualifications
 - meet the organization's human resources needs
@@ -307,7 +307,7 @@ The purpose of training is to:
 
 **Format B** (longer items): semicolons between items, full stop on last
 
-```
+```text
 The purposes were to:
 - adopt new and revised Questions;
 - adopt regional initiatives; and
@@ -316,7 +316,7 @@ The purposes were to:
 
 **Format C** (each item >= 1 sentence): capitals, full stops on all
 
-```
+```text
 The evaluation should include certain steps:
 - All those involved decide jointly to use a participatory approach.
 - When agreement is reached, a small group is elected.

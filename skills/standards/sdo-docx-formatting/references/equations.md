@@ -7,7 +7,7 @@ Use a **single paragraph** with style `equation` containing
 
 ### Structure
 
-```
+```text
 [p style=equation]  <- \t + oMathPara + \t + (N)  -- one paragraph
 ```
 
@@ -40,7 +40,7 @@ Keep names short (≤10 chars), uppercase, ASCII-only.
 
 ### Field code pattern
 
-```
+```text
 { SEQ EQ \* ARABIC }
 ```
 

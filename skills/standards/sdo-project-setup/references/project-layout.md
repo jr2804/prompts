@@ -2,7 +2,7 @@
 
 Common directory conventions for standards contribution projects.
 
-```
+```text
 <project>/
 ├── PLAN.md                    # YAML frontmatter = metadata source of truth
 ├── AGENTS.md                  # Orchestration-only (scope, structure, tool refs)
