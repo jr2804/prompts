@@ -1,7 +1,11 @@
 uv.lock
 __pycache__
 skills-lock.json
-.agents
+
+# Keep .agents/ DOX .md files tracked (override any blanket ignore)
+/.agents/*
+!/.agents/*.md
+
 /.vscode
 /QWEN.md
 tmp/
