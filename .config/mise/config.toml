@@ -9,7 +9,7 @@ ripgrep = "latest"
 # Linter/formatter/type checker tools
 "ruff" = "latest"
 "ty" = "latest"
-"pipx:mdformat" = {version = "latest", uvx = "true", uvx_args = "--with mdformat-front-matters"}
+"rumdl" = "latest"
 "pipx:undersort" = "latest"
 
 "github:kreuzberg-dev/kreuzberg" = "latest"
@@ -39,8 +39,12 @@ run = [
 ]
 
 [tasks.format-md]
-description = "Format Markdown files"
-run = "uv tool run --with mdformat-front-matters mdformat . --exclude .config/ --end-of-line keep --number"
+description = "Format Markdown files with rumdl"
+run = "rumdl fmt --config .config/rumdl.toml ./"
+
+[tasks.lint-md]
+description = "Lint Markdown files with rumdl (no writes)"
+run = "rumdl check --config .config/rumdl.toml ./"
 
 [tasks.add-skills]
 description = "Add skills to the agent"

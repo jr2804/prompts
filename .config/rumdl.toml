@@ -1,0 +1,36 @@
+# rumdl configuration file
+
+# Global configuration options
+[global]
+# List of file/directory patterns to exclude from linting/formatting
+exclude = [
+    ".git",
+    ".config",
+    ".planning",
+    "node_modules",
+    "vendor",
+    "dist",
+    "build",
+    "CHANGELOG.md",
+    "LICENSE",
+]
+
+# Respect .gitignore files when scanning directories (default: true)
+respect-gitignore = true
+
+# Maximum allowed line length (default: 80)
+line-length = 180
+
+# Markdown flavor/dialect (default: "standard")
+# Options: standard, gfm, commonmark, mkdocs, mdx, pandoc, quarto, obsidian, kramdown, azure_devops, myst
+flavor = "gfm"
+
+# Per-file rule ignores: maps file patterns to lists of rules to ignore.
+# MD013 (line length) excluded for self-authored instructional content with wide
+# tables/code fences/prose: skills, commands, the DOX hierarchy AGENTS.md files,
+# and the catalog README.
+[per-file-ignores]
+"skills/**/*.md" = ["MD013"]
+"commands/**/*.md" = ["MD013"]
+"**/AGENTS.md" = ["MD013"]
+"README.md" = ["MD013"]
