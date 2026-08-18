@@ -7,10 +7,10 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 import json
-from pathlib import Path
 import subprocess
+from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 
@@ -22,21 +22,6 @@ class CliResult:
     stderr: str
 
 
-def run_officecli(args: list[str], *, check: bool = True, verbose: bool = False) -> CliResult:
-    command = ["officecli", *args]
-    proc = subprocess.run(command, capture_output=True, text=True, check=False)
-    result = CliResult(command, proc.returncode, proc.stdout, proc.stderr)
-    if verbose:
-        print("$", " ".join(command))
-        if result.stdout.strip():
-            print(result.stdout.strip())
-        if result.stderr.strip():
-            print(result.stderr.strip())
-    if check and result.returncode != 0:
-        raise RuntimeError(f"officecli failed ({result.returncode}): {result.stderr.strip()}")
-    return result
-
-
 def load_json_spec(path: Path) -> dict[str, Any]:
     with path.open("r", encoding="utf-8") as handle:
         data = json.load(handle)
@@ -45,7 +30,9 @@ def load_json_spec(path: Path) -> dict[str, Any]:
     return data
 
 
-def raw_set(doc_path: str, xpath: str, action: str, xml: str, *, verbose: bool = False) -> CliResult:
+def raw_set(
+    doc_path: str, xpath: str, action: str, xml: str, *, verbose: bool = False
+) -> CliResult:
     if action not in {"replace", "before", "after"}:
         raise ValueError(f"Unsupported action: {action}")
     if action == "replace" and xml == "":
@@ -66,3 +53,22 @@ def raw_set(doc_path: str, xpath: str, action: str, xml: str, *, verbose: bool =
 
 def validate_doc(doc_path: str, *, verbose: bool = False) -> CliResult:
     return run_officecli(["validate", doc_path], verbose=verbose)
+
+
+def run_officecli(
+    args: list[str], *, check: bool = True, verbose: bool = False
+) -> CliResult:
+    command = ["officecli", *args]
+    proc = subprocess.run(command, capture_output=True, text=True, check=False)
+    result = CliResult(command, proc.returncode, proc.stdout, proc.stderr)
+    if verbose:
+        print("$", " ".join(command))
+        if result.stdout.strip():
+            print(result.stdout.strip())
+        if result.stderr.strip():
+            print(result.stderr.strip())
+    if check and result.returncode != 0:
+        raise RuntimeError(
+            f"officecli failed ({result.returncode}): {result.stderr.strip()}"
+        )
+    return result

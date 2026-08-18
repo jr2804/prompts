@@ -26,9 +26,10 @@ import argparse
 import json
 import platform
 import sys
+import traceback
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Union
 
 from PIL import Image, ImageDraw, ImageFont
 from pptx import Presentation
@@ -37,92 +38,14 @@ from pptx.shapes.base import BaseShape
 
 # Type aliases for cleaner signatures
 JsonValue = Union[str, int, float, bool, None]
-ParagraphDict = Dict[str, JsonValue]
-ShapeDict = Dict[
-    str, Union[str, float, bool, List[ParagraphDict], List[str], Dict[str, Any], None]
+ParagraphDict = dict[str, JsonValue]
+ShapeDict = dict[
+    str, str | float | bool | list[ParagraphDict] | list[str] | dict[str, Any] | None
 ]
-InventoryData = Dict[
-    str, Dict[str, "ShapeData"]
+InventoryData = dict[
+    str, dict[str, "ShapeData"]
 ]  # Dict of slide_id -> {shape_id -> ShapeData}
-InventoryDict = Dict[str, Dict[str, ShapeDict]]  # JSON-serializable inventory
-
-
-def main():
-    """Main entry point for command-line usage."""
-    parser = argparse.ArgumentParser(
-        description="Extract text inventory from PowerPoint with proper GroupShape support.",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples:
-  python inventory.py presentation.pptx inventory.json
-    Extracts text inventory with correct absolute positions for grouped shapes
-
-  python inventory.py presentation.pptx inventory.json --issues-only
-    Extracts only text shapes that have overflow or overlap issues
-
-The output JSON includes:
-  - All text content organized by slide and shape
-  - Correct absolute positions for shapes in groups
-  - Visual position and size in inches
-  - Paragraph properties and formatting
-  - Issue detection: text overflow and shape overlaps
-        """,
-    )
-
-    parser.add_argument("input", help="Input PowerPoint file (.pptx)")
-    parser.add_argument("output", help="Output JSON file for inventory")
-    parser.add_argument(
-        "--issues-only",
-        action="store_true",
-        help="Include only text shapes that have overflow or overlap issues",
-    )
-
-    args = parser.parse_args()
-
-    input_path = Path(args.input)
-    if not input_path.exists():
-        print(f"Error: Input file not found: {args.input}")
-        sys.exit(1)
-
-    if not input_path.suffix.lower() == ".pptx":
-        print("Error: Input must be a PowerPoint file (.pptx)")
-        sys.exit(1)
-
-    try:
-        print(f"Extracting text inventory from: {args.input}")
-        if args.issues_only:
-            print(
-                "Filtering to include only text shapes with issues (overflow/overlap)"
-            )
-        inventory = extract_text_inventory(input_path, issues_only=args.issues_only)
-
-        output_path = Path(args.output)
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        save_inventory(inventory, output_path)
-
-        print(f"Output saved to: {args.output}")
-
-        # Report statistics
-        total_slides = len(inventory)
-        total_shapes = sum(len(shapes) for shapes in inventory.values())
-        if args.issues_only:
-            if total_shapes > 0:
-                print(
-                    f"Found {total_shapes} text elements with issues in {total_slides} slides"
-                )
-            else:
-                print("No issues discovered")
-        else:
-            print(
-                f"Found text in {total_slides} slides with {total_shapes} text elements"
-            )
-
-    except Exception as e:
-        print(f"Error processing presentation: {e}")
-        import traceback
-
-        traceback.print_exc()
-        sys.exit(1)
+InventoryDict = dict[str, dict[str, ShapeDict]]  # JSON-serializable inventory
 
 
 @dataclass
@@ -145,18 +68,18 @@ class ParagraphData:
         """
         self.text: str = paragraph.text.strip()
         self.bullet: bool = False
-        self.level: Optional[int] = None
-        self.alignment: Optional[str] = None
-        self.space_before: Optional[float] = None
-        self.space_after: Optional[float] = None
-        self.font_name: Optional[str] = None
-        self.font_size: Optional[float] = None
-        self.bold: Optional[bool] = None
-        self.italic: Optional[bool] = None
-        self.underline: Optional[bool] = None
-        self.color: Optional[str] = None
-        self.theme_color: Optional[str] = None
-        self.line_spacing: Optional[float] = None
+        self.level: int | None = None
+        self.alignment: str | None = None
+        self.space_before: float | None = None
+        self.space_after: float | None = None
+        self.font_name: str | None = None
+        self.font_size: float | None = None
+        self.bold: bool | None = None
+        self.italic: bool | None = None
+        self.underline: bool | None = None
+        self.color: str | None = None
+        self.theme_color: str | None = None
+        self.line_spacing: float | None = None
 
         # Check for bullet formatting
         if (
@@ -269,9 +192,9 @@ class ShapeData:
     def __init__(
         self,
         shape: BaseShape,
-        absolute_left: Optional[int] = None,
-        absolute_top: Optional[int] = None,
-        slide: Optional[Any] = None,
+        absolute_left: int | None = None,
+        absolute_top: int | None = None,
+        slide: Any | None = None,
     ):
         """Initialize from a PowerPoint shape object.
 
@@ -290,8 +213,8 @@ class ShapeData:
         )
 
         # Get placeholder type if applicable
-        self.placeholder_type: Optional[str] = None
-        self.default_font_size: Optional[float] = None
+        self.placeholder_type: str | None = None
+        self.default_font_size: float | None = None
         if hasattr(shape, "is_placeholder") and shape.is_placeholder:  # type: ignore
             if shape.placeholder_format and shape.placeholder_format.type:  # type: ignore
                 self.placeholder_type = (
@@ -335,19 +258,19 @@ class ShapeData:
         self.height_emu = shape.height if hasattr(shape, "height") else 0
 
         # Calculate overflow status
-        self.frame_overflow_bottom: Optional[float] = None
-        self.slide_overflow_right: Optional[float] = None
-        self.slide_overflow_bottom: Optional[float] = None
-        self.overlapping_shapes: Dict[
+        self.frame_overflow_bottom: float | None = None
+        self.slide_overflow_right: float | None = None
+        self.slide_overflow_bottom: float | None = None
+        self.overlapping_shapes: dict[
             str, float
         ] = {}  # Dict of shape_id -> overlap area in sq inches
-        self.warnings: List[str] = []
+        self.warnings: list[str] = []
         self._estimate_frame_overflow()
         self._calculate_slide_overflow()
         self._detect_bullet_issues()
 
     @property
-    def paragraphs(self) -> List[ParagraphData]:
+    def paragraphs(self) -> list[ParagraphData]:
         """Calculate paragraphs from the shape's text frame."""
         if not self.shape or not hasattr(self.shape, "text_frame"):
             return []
@@ -429,7 +352,7 @@ class ShapeData:
         return int(inches * dpi)
 
     @staticmethod
-    def get_font_path(font_name: str) -> Optional[str]:
+    def get_font_path(font_name: str) -> str | None:
         """Get the font file path for a given font name.
 
         Args:
@@ -464,9 +387,6 @@ class ShapeData:
             ]
             extensions = [".ttf", ".otf"]
 
-        # Try to find the font file
-        from pathlib import Path
-
         for font_dir in font_dirs:
             font_dir_path = Path(font_dir).expanduser()
             if not font_dir_path.exists():
@@ -495,7 +415,7 @@ class ShapeData:
         return None
 
     @staticmethod
-    def get_slide_dimensions(slide: Any) -> tuple[Optional[int], Optional[int]]:
+    def get_slide_dimensions(slide: Any) -> tuple[int | None, int | None]:
         """Get slide dimensions from slide object.
 
         Args:
@@ -511,7 +431,7 @@ class ShapeData:
             return None, None
 
     @staticmethod
-    def get_default_font_size(shape: BaseShape, slide_layout: Any) -> Optional[float]:
+    def get_default_font_size(shape: BaseShape, slide_layout: Any) -> float | None:
         """Extract default font size from slide layout for a placeholder shape.
 
         Args:
@@ -566,7 +486,7 @@ class ShapeData:
 
         return 14  # Conservative default for body text
 
-    def _get_usable_dimensions(self, text_frame) -> Tuple[int, int]:
+    def _get_usable_dimensions(self, text_frame) -> tuple[int, int]:
         """Get usable width and height in pixels after accounting for margins."""
         # Default PowerPoint margins in inches
         margins = {"top": 0.05, "bottom": 0.05, "left": 0.1, "right": 0.1}
@@ -591,7 +511,7 @@ class ShapeData:
             self.inches_to_pixels(usable_height),
         )
 
-    def _wrap_text_line(self, line: str, max_width_px: int, draw, font) -> List[str]:
+    def _wrap_text_line(self, line: str, max_width_px: int, draw, font) -> list[str]:
         """Wrap a single line of text to fit within max_width_px."""
         if not line:
             return [""]
@@ -739,180 +659,111 @@ class ShapeData:
                 break
 
 
-def is_valid_shape(shape: BaseShape) -> bool:
-    """Check if a shape contains meaningful text content."""
-    # Must have a text frame with content
-    if not hasattr(shape, "text_frame") or not shape.text_frame:  # type: ignore
-        return False
+def main():
+    """Main entry point for command-line usage."""
+    parser = argparse.ArgumentParser(
+        description="Extract text inventory from PowerPoint with proper GroupShape support.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  python inventory.py presentation.pptx inventory.json
+    Extracts text inventory with correct absolute positions for grouped shapes
 
-    text = shape.text_frame.text.strip()  # type: ignore
-    if not text:
-        return False
+  python inventory.py presentation.pptx inventory.json --issues-only
+    Extracts only text shapes that have overflow or overlap issues
 
-    # Skip slide numbers and numeric footers
-    if hasattr(shape, "is_placeholder") and shape.is_placeholder:  # type: ignore
-        if shape.placeholder_format and shape.placeholder_format.type:  # type: ignore
-            placeholder_type = (
-                str(shape.placeholder_format.type).split(".")[-1].split(" ")[0]  # type: ignore
+The output JSON includes:
+  - All text content organized by slide and shape
+  - Correct absolute positions for shapes in groups
+  - Visual position and size in inches
+  - Paragraph properties and formatting
+  - Issue detection: text overflow and shape overlaps
+        """,
+    )
+
+    parser.add_argument("input", help="Input PowerPoint file (.pptx)")
+    parser.add_argument("output", help="Output JSON file for inventory")
+    parser.add_argument(
+        "--issues-only",
+        action="store_true",
+        help="Include only text shapes that have overflow or overlap issues",
+    )
+
+    args = parser.parse_args()
+
+    input_path = Path(args.input)
+    if not input_path.exists():
+        print(f"Error: Input file not found: {args.input}")
+        sys.exit(1)
+
+    if input_path.suffix.lower() != ".pptx":
+        print("Error: Input must be a PowerPoint file (.pptx)")
+        sys.exit(1)
+
+    try:
+        print(f"Extracting text inventory from: {args.input}")
+        if args.issues_only:
+            print(
+                "Filtering to include only text shapes with issues (overflow/overlap)"
             )
-            if placeholder_type == "SLIDE_NUMBER":
-                return False
-            if placeholder_type == "FOOTER" and text.isdigit():
-                return False
+        inventory = extract_text_inventory(input_path, issues_only=args.issues_only)
 
-    return True
+        output_path = Path(args.output)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        save_inventory(inventory, output_path)
 
+        print(f"Output saved to: {args.output}")
 
-def collect_shapes_with_absolute_positions(
-    shape: BaseShape, parent_left: int = 0, parent_top: int = 0
-) -> List[ShapeWithPosition]:
-    """Recursively collect all shapes with valid text, calculating absolute positions.
-
-    For shapes within groups, their positions are relative to the group.
-    This function calculates the absolute position on the slide by accumulating
-    parent group offsets.
-
-    Args:
-        shape: The shape to process
-        parent_left: Accumulated left offset from parent groups (in EMUs)
-        parent_top: Accumulated top offset from parent groups (in EMUs)
-
-    Returns:
-        List of ShapeWithPosition objects with absolute positions
-    """
-    if hasattr(shape, "shapes"):  # GroupShape
-        result = []
-        # Get this group's position
-        group_left = shape.left if hasattr(shape, "left") else 0
-        group_top = shape.top if hasattr(shape, "top") else 0
-
-        # Calculate absolute position for this group
-        abs_group_left = parent_left + group_left
-        abs_group_top = parent_top + group_top
-
-        # Process children with accumulated offsets
-        for child in shape.shapes:  # type: ignore
-            result.extend(
-                collect_shapes_with_absolute_positions(
-                    child, abs_group_left, abs_group_top
+        # Report statistics
+        total_slides = len(inventory)
+        total_shapes = sum(len(shapes) for shapes in inventory.values())
+        if args.issues_only:
+            if total_shapes > 0:
+                print(
+                    f"Found {total_shapes} text elements with issues in {total_slides} slides"
                 )
-            )
-        return result
-
-    # Regular shape - check if it has valid text
-    if is_valid_shape(shape):
-        # Calculate absolute position
-        shape_left = shape.left if hasattr(shape, "left") else 0
-        shape_top = shape.top if hasattr(shape, "top") else 0
-
-        return [
-            ShapeWithPosition(
-                shape=shape,
-                absolute_left=parent_left + shape_left,
-                absolute_top=parent_top + shape_top,
-            )
-        ]
-
-    return []
-
-
-def sort_shapes_by_position(shapes: List[ShapeData]) -> List[ShapeData]:
-    """Sort shapes by visual position (top-to-bottom, left-to-right).
-
-    Shapes within 0.5 inches vertically are considered on the same row.
-    """
-    if not shapes:
-        return shapes
-
-    # Sort by top position first
-    shapes = sorted(shapes, key=lambda s: (s.top, s.left))
-
-    # Group shapes by row (within 0.5 inches vertically)
-    result = []
-    row = [shapes[0]]
-    row_top = shapes[0].top
-
-    for shape in shapes[1:]:
-        if abs(shape.top - row_top) <= 0.5:
-            row.append(shape)
+            else:
+                print("No issues discovered")
         else:
-            # Sort current row by left position and add to result
-            result.extend(sorted(row, key=lambda s: s.left))
-            row = [shape]
-            row_top = shape.top
+            print(
+                f"Found text in {total_slides} slides with {total_shapes} text elements"
+            )
 
-    # Don't forget the last row
-    result.extend(sorted(row, key=lambda s: s.left))
-    return result
+    except Exception as e:
+        print(f"Error processing presentation: {e}")
+
+        traceback.print_exc()
+        sys.exit(1)
 
 
-def calculate_overlap(
-    rect1: Tuple[float, float, float, float],
-    rect2: Tuple[float, float, float, float],
-    tolerance: float = 0.05,
-) -> Tuple[bool, float]:
-    """Calculate if and how much two rectangles overlap.
+def get_inventory_as_dict(pptx_path: Path, issues_only: bool = False) -> InventoryDict:
+    """Extract text inventory and return as JSON-serializable dictionaries.
+
+    This is a convenience wrapper around extract_text_inventory that returns
+    dictionaries instead of ShapeData objects, useful for testing and direct
+    JSON serialization.
 
     Args:
-        rect1: (left, top, width, height) of first rectangle in inches
-        rect2: (left, top, width, height) of second rectangle in inches
-        tolerance: Minimum overlap in inches to consider as overlapping (default: 0.05")
+        pptx_path: Path to the PowerPoint file
+        issues_only: If True, only include shapes that have overflow or overlap issues
 
     Returns:
-        Tuple of (overlaps, overlap_area) where:
-        - overlaps: True if rectangles overlap by more than tolerance
-        - overlap_area: Area of overlap in square inches
+        Nested dictionary with all data serialized for JSON
     """
-    left1, top1, w1, h1 = rect1
-    left2, top2, w2, h2 = rect2
+    inventory = extract_text_inventory(pptx_path, issues_only=issues_only)
 
-    # Calculate overlap dimensions
-    overlap_width = min(left1 + w1, left2 + w2) - max(left1, left2)
-    overlap_height = min(top1 + h1, top2 + h2) - max(top1, top2)
+    # Convert ShapeData objects to dictionaries
+    dict_inventory: InventoryDict = {}
+    for slide_key, shapes in inventory.items():
+        dict_inventory[slide_key] = {
+            shape_key: shape_data.to_dict() for shape_key, shape_data in shapes.items()
+        }
 
-    # Check if there's meaningful overlap (more than tolerance)
-    if overlap_width > tolerance and overlap_height > tolerance:
-        # Calculate overlap area in square inches
-        overlap_area = overlap_width * overlap_height
-        return True, round(overlap_area, 2)
-
-    return False, 0
-
-
-def detect_overlaps(shapes: List[ShapeData]) -> None:
-    """Detect overlapping shapes and update their overlapping_shapes dictionaries.
-
-    This function requires each ShapeData to have its shape_id already set.
-    It modifies the shapes in-place, adding shape IDs with overlap areas in square inches.
-
-    Args:
-        shapes: List of ShapeData objects with shape_id attributes set
-    """
-    n = len(shapes)
-
-    # Compare each pair of shapes
-    for i in range(n):
-        for j in range(i + 1, n):
-            shape1 = shapes[i]
-            shape2 = shapes[j]
-
-            # Ensure shape IDs are set
-            assert shape1.shape_id, f"Shape at index {i} has no shape_id"
-            assert shape2.shape_id, f"Shape at index {j} has no shape_id"
-
-            rect1 = (shape1.left, shape1.top, shape1.width, shape1.height)
-            rect2 = (shape2.left, shape2.top, shape2.width, shape2.height)
-
-            overlaps, overlap_area = calculate_overlap(rect1, rect2)
-
-            if overlaps:
-                # Add shape IDs with overlap area in square inches
-                shape1.overlapping_shapes[shape2.shape_id] = overlap_area
-                shape2.overlapping_shapes[shape1.shape_id] = overlap_area
+    return dict_inventory
 
 
 def extract_text_inventory(
-    pptx_path: Path, prs: Optional[Any] = None, issues_only: bool = False
+    pptx_path: Path, prs: Any | None = None, issues_only: bool = False
 ) -> InventoryData:
     """Extract text content from all slides in a PowerPoint presentation.
 
@@ -974,30 +825,176 @@ def extract_text_inventory(
     return inventory
 
 
-def get_inventory_as_dict(pptx_path: Path, issues_only: bool = False) -> InventoryDict:
-    """Extract text inventory and return as JSON-serializable dictionaries.
+def collect_shapes_with_absolute_positions(
+    shape: BaseShape, parent_left: int = 0, parent_top: int = 0
+) -> list[ShapeWithPosition]:
+    """Recursively collect all shapes with valid text, calculating absolute positions.
 
-    This is a convenience wrapper around extract_text_inventory that returns
-    dictionaries instead of ShapeData objects, useful for testing and direct
-    JSON serialization.
+    For shapes within groups, their positions are relative to the group.
+    This function calculates the absolute position on the slide by accumulating
+    parent group offsets.
 
     Args:
-        pptx_path: Path to the PowerPoint file
-        issues_only: If True, only include shapes that have overflow or overlap issues
+        shape: The shape to process
+        parent_left: Accumulated left offset from parent groups (in EMUs)
+        parent_top: Accumulated top offset from parent groups (in EMUs)
 
     Returns:
-        Nested dictionary with all data serialized for JSON
+        List of ShapeWithPosition objects with absolute positions
     """
-    inventory = extract_text_inventory(pptx_path, issues_only=issues_only)
+    if hasattr(shape, "shapes"):  # GroupShape
+        result = []
+        # Get this group's position
+        group_left = shape.left if hasattr(shape, "left") else 0
+        group_top = shape.top if hasattr(shape, "top") else 0
 
-    # Convert ShapeData objects to dictionaries
-    dict_inventory: InventoryDict = {}
-    for slide_key, shapes in inventory.items():
-        dict_inventory[slide_key] = {
-            shape_key: shape_data.to_dict() for shape_key, shape_data in shapes.items()
-        }
+        # Calculate absolute position for this group
+        abs_group_left = parent_left + group_left
+        abs_group_top = parent_top + group_top
 
-    return dict_inventory
+        # Process children with accumulated offsets
+        for child in shape.shapes:  # type: ignore
+            result.extend(
+                collect_shapes_with_absolute_positions(
+                    child, abs_group_left, abs_group_top
+                )
+            )
+        return result
+
+    # Regular shape - check if it has valid text
+    if is_valid_shape(shape):
+        # Calculate absolute position
+        shape_left = shape.left if hasattr(shape, "left") else 0
+        shape_top = shape.top if hasattr(shape, "top") else 0
+
+        return [
+            ShapeWithPosition(
+                shape=shape,
+                absolute_left=parent_left + shape_left,
+                absolute_top=parent_top + shape_top,
+            )
+        ]
+
+    return []
+
+
+def is_valid_shape(shape: BaseShape) -> bool:
+    """Check if a shape contains meaningful text content."""
+    # Must have a text frame with content
+    if not hasattr(shape, "text_frame") or not shape.text_frame:  # type: ignore
+        return False
+
+    text = shape.text_frame.text.strip()  # type: ignore
+    if not text:
+        return False
+
+    # Skip slide numbers and numeric footers
+    if hasattr(shape, "is_placeholder") and shape.is_placeholder:  # type: ignore
+        if shape.placeholder_format and shape.placeholder_format.type:  # type: ignore
+            placeholder_type = (
+                str(shape.placeholder_format.type).split(".")[-1].split(" ")[0]  # type: ignore
+            )
+            if placeholder_type == "SLIDE_NUMBER":
+                return False
+            if placeholder_type == "FOOTER" and text.isdigit():
+                return False
+
+    return True
+
+
+def sort_shapes_by_position(shapes: list[ShapeData]) -> list[ShapeData]:
+    """Sort shapes by visual position (top-to-bottom, left-to-right).
+
+    Shapes within 0.5 inches vertically are considered on the same row.
+    """
+    if not shapes:
+        return shapes
+
+    # Sort by top position first
+    shapes = sorted(shapes, key=lambda s: (s.top, s.left))
+
+    # Group shapes by row (within 0.5 inches vertically)
+    result = []
+    row = [shapes[0]]
+    row_top = shapes[0].top
+
+    for shape in shapes[1:]:
+        if abs(shape.top - row_top) <= 0.5:
+            row.append(shape)
+        else:
+            # Sort current row by left position and add to result
+            result.extend(sorted(row, key=lambda s: s.left))
+            row = [shape]
+            row_top = shape.top
+
+    # Don't forget the last row
+    result.extend(sorted(row, key=lambda s: s.left))
+    return result
+
+
+def detect_overlaps(shapes: list[ShapeData]) -> None:
+    """Detect overlapping shapes and update their overlapping_shapes dictionaries.
+
+    This function requires each ShapeData to have its shape_id already set.
+    It modifies the shapes in-place, adding shape IDs with overlap areas in square inches.
+
+    Args:
+        shapes: List of ShapeData objects with shape_id attributes set
+    """
+    n = len(shapes)
+
+    # Compare each pair of shapes
+    for i in range(n):
+        for j in range(i + 1, n):
+            shape1 = shapes[i]
+            shape2 = shapes[j]
+
+            # Ensure shape IDs are set
+            assert shape1.shape_id, f"Shape at index {i} has no shape_id"
+            assert shape2.shape_id, f"Shape at index {j} has no shape_id"
+
+            rect1 = (shape1.left, shape1.top, shape1.width, shape1.height)
+            rect2 = (shape2.left, shape2.top, shape2.width, shape2.height)
+
+            overlaps, overlap_area = calculate_overlap(rect1, rect2)
+
+            if overlaps:
+                # Add shape IDs with overlap area in square inches
+                shape1.overlapping_shapes[shape2.shape_id] = overlap_area
+                shape2.overlapping_shapes[shape1.shape_id] = overlap_area
+
+
+def calculate_overlap(
+    rect1: tuple[float, float, float, float],
+    rect2: tuple[float, float, float, float],
+    tolerance: float = 0.05,
+) -> tuple[bool, float]:
+    """Calculate if and how much two rectangles overlap.
+
+    Args:
+        rect1: (left, top, width, height) of first rectangle in inches
+        rect2: (left, top, width, height) of second rectangle in inches
+        tolerance: Minimum overlap in inches to consider as overlapping (default: 0.05")
+
+    Returns:
+        Tuple of (overlaps, overlap_area) where:
+        - overlaps: True if rectangles overlap by more than tolerance
+        - overlap_area: Area of overlap in square inches
+    """
+    left1, top1, w1, h1 = rect1
+    left2, top2, w2, h2 = rect2
+
+    # Calculate overlap dimensions
+    overlap_width = min(left1 + w1, left2 + w2) - max(left1, left2)
+    overlap_height = min(top1 + h1, top2 + h2) - max(top1, top2)
+
+    # Check if there's meaningful overlap (more than tolerance)
+    if overlap_width > tolerance and overlap_height > tolerance:
+        # Calculate overlap area in square inches
+        overlap_area = overlap_width * overlap_height
+        return True, round(overlap_area, 2)
+
+    return False, 0
 
 
 def save_inventory(inventory: InventoryData, output_path: Path) -> None:

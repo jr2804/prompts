@@ -16,15 +16,12 @@ DATABASE_URL = "postgresql://user:password@localhost/dbname"
 
 # Create engine
 engine = create_engine(
-    DATABASE_URL,
-    pool_size=20,
-    max_overflow=30,
-    pool_pre_ping=True,
-    pool_recycle=3600
+    DATABASE_URL, pool_size=20, max_overflow=30, pool_pre_ping=True, pool_recycle=3600
 )
 
 # Create session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
 
 def get_db():
     """Dependency to get database session"""
@@ -33,6 +30,7 @@ def get_db():
         yield db
     finally:
         db.close()
+
 
 # Application lifespan for startup/shutdown
 @asynccontextmanager
@@ -43,6 +41,7 @@ async def lifespan(app: FastAPI):
     # Shutdown: Close connections, cleanup resources
     print("Shutting down...")
     engine.dispose()
+
 
 app = FastAPI(lifespan=lifespan)
 ```
@@ -58,6 +57,7 @@ from contextlib import asynccontextmanager
 # Global engine instance
 engine = None
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
@@ -70,7 +70,9 @@ async def lifespan(app: FastAPI):
     print("Closing MongoDB connection")
     client.close()
 
+
 app = FastAPI(lifespan=lifespan)
+
 
 def get_engine():
     """Dependency to get database engine"""
@@ -85,6 +87,7 @@ def get_engine():
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
+
 def get_db() -> Session:
     db = SessionLocal()
     try:
@@ -92,11 +95,9 @@ def get_db() -> Session:
     finally:
         db.close()
 
+
 @app.get("/users/{user_id}")
-async def get_user(
-    user_id: int,
-    db: Session = Depends(get_db)
-):
+async def get_user(user_id: int, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -108,14 +109,13 @@ async def get_user(
 ```python
 from odmantic import AIOEngine
 
+
 async def get_engine() -> AIOEngine:
     return engine
 
+
 @app.get("/posts/{post_id}")
-async def get_post(
-    post_id: str,
-    engine: AIOEngine = Depends(get_engine)
-):
+async def get_post(post_id: str, engine: AIOEngine = Depends(get_engine)):
     post = await engine.find_one(Post, Post.id == post_id)
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
@@ -130,6 +130,7 @@ async def get_post(
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import select
+
 
 class UserRepository:
     def __init__(self, db: Session):
@@ -169,12 +170,10 @@ class UserRepository:
             return True
         return False
 
+
 # Usage in endpoints
 @app.post("/users/", response_model=UserResponse)
-async def create_user(
-    user: UserCreate,
-    db: Session = Depends(get_db)
-):
+async def create_user(user: UserCreate, db: Session = Depends(get_db)):
     user_repo = UserRepository(db)
     return user_repo.create_user(user)
 ```
@@ -184,6 +183,7 @@ async def create_user(
 ```python
 from typing import List, Optional
 from odmantic import AIOEngine, Field
+
 
 class PostRepository:
     def __init__(self, engine: AIOEngine):
@@ -199,7 +199,9 @@ class PostRepository:
     async def get_posts(self, skip: int = 0, limit: int = 100) -> List[Post]:
         return await self.engine.find(Post, skip=skip, limit=limit)
 
-    async def update_post(self, post_id: str, post_update: PostUpdate) -> Optional[Post]:
+    async def update_post(
+        self, post_id: str, post_update: PostUpdate
+    ) -> Optional[Post]:
         post = await self.get_post_by_id(post_id)
         if post:
             update_data = post_update.dict(exclude_unset=True)
@@ -212,12 +214,10 @@ class PostRepository:
         result = await self.engine.delete(Post, Post.id == post_id)
         return result.deleted_count > 0
 
+
 # Usage in endpoints
 @app.post("/posts/", response_model=PostResponse)
-async def create_post(
-    post: PostCreate,
-    engine: AIOEngine = Depends(get_engine)
-):
+async def create_post(post: PostCreate, engine: AIOEngine = Depends(get_engine)):
     post_repo = PostRepository(engine)
     return await post_repo.create_post(post)
 ```
@@ -231,20 +231,22 @@ async def create_post(
 from sqlalchemy import create_engine
 from sqlalchemy.pool import QueuePool
 
+
 def create_postgres_engine():
     DATABASE_URL = "postgresql://user:password@localhost:5432/mydb"
 
     engine = create_engine(
         DATABASE_URL,
         poolclass=QueuePool,
-        pool_size=20,          # Number of connections to maintain
-        max_overflow=30,       # Additional connections beyond pool_size
-        pool_pre_ping=True,    # Verify connections before use
-        pool_recycle=3600,     # Recycle connections after 1 hour
-        pool_timeout=30,       # Time to wait for connection from pool
-        echo=False             # Set to True for SQL query logging
+        pool_size=20,  # Number of connections to maintain
+        max_overflow=30,  # Additional connections beyond pool_size
+        pool_pre_ping=True,  # Verify connections before use
+        pool_recycle=3600,  # Recycle connections after 1 hour
+        pool_timeout=30,  # Time to wait for connection from pool
+        echo=False,  # Set to True for SQL query logging
     )
     return engine
+
 
 # SQLite connection pooling (with StaticPool)
 def create_sqlite_engine(db_path: str = "app.db"):
@@ -255,11 +257,12 @@ def create_sqlite_engine(db_path: str = "app.db"):
             "check_same_thread": False,  # Allow multi-threaded access
             "timeout": 30,  # 30 second timeout for database locks
         },
-        echo=False
+        echo=False,
     )
 
     # Apply SQLite pragmas for performance
     from sqlalchemy import event
+
     @event.listens_for(engine, "connect")
     def set_sqlite_pragma(dbapi_connection, connection_record):
         cursor = dbapi_connection.cursor()
@@ -277,6 +280,7 @@ def create_sqlite_engine(db_path: str = "app.db"):
 from contextlib import contextmanager
 from sqlalchemy.exc import SQLAlchemyError
 
+
 @contextmanager
 def get_db_transaction():
     """Context manager for database transactions"""
@@ -290,9 +294,12 @@ def get_db_transaction():
     finally:
         db.close()
 
+
 # Usage in complex operations
 @app.post("/orders/")
-async def create_order_with_items(order_data: OrderCreate, db: Session = Depends(get_db)):
+async def create_order_with_items(
+    order_data: OrderCreate, db: Session = Depends(get_db)
+):
     try:
         # Create order
         order = Order(**order_data.dict())
@@ -317,6 +324,7 @@ async def create_order_with_items(order_data: OrderCreate, db: Session = Depends
 from typing import List
 import asyncio
 
+
 class UserService:
     def __init__(self, engine: AIOEngine):
         self.engine = engine
@@ -329,24 +337,19 @@ class UserService:
                     "from": "posts",
                     "localField": "_id",
                     "foreignField": "author_id",
-                    "as": "posts"
+                    "as": "posts",
                 }
             },
-            {
-                "$addFields": {
-                    "post_count": {"$size": "$posts"}
-                }
-            },
-            {
-                "$project": {
-                    "name": 1,
-                    "email": 1,
-                    "post_count": 1
-                }
-            }
+            {"$addFields": {"post_count": {"$size": "$posts"}}},
+            {"$project": {"name": 1, "email": 1, "post_count": 1}},
         ]
 
-        return await self.engine.get_collection(User).aggregate(pipeline).to_list(length=None)
+        return (
+            await self.engine.get_collection(User)
+            .aggregate(pipeline)
+            .to_list(length=None)
+        )
+
 
 # FastAPI endpoint using the service
 @app.get("/users/summary")
@@ -363,11 +366,9 @@ async def get_users_summary(engine: AIOEngine = Depends(get_engine)):
 from sqlalchemy.exc import IntegrityError, DataError
 from fastapi import HTTPException, status
 
+
 @app.post("/users/", response_model=UserResponse)
-async def create_user(
-    user: UserCreate,
-    db: Session = Depends(get_db)
-):
+async def create_user(user: UserCreate, db: Session = Depends(get_db)):
     try:
         db_user = User(email=user.email, name=user.name)
         db.add(db_user)
@@ -378,13 +379,13 @@ async def create_user(
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="User with this email already exists"
+            detail="User with this email already exists",
         )
     except DataError:
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Invalid data provided"
+            detail="Invalid data provided",
         )
 ```
 
@@ -394,11 +395,10 @@ async def create_user(
 from odmantic.exceptions import DocumentNotFoundError
 from pymongo.errors import DuplicateKeyError
 
+
 @app.put("/users/{user_id}")
 async def update_user(
-    user_id: str,
-    user_update: UserUpdate,
-    engine: AIOEngine = Depends(get_engine)
+    user_id: str, user_update: UserUpdate, engine: AIOEngine = Depends(get_engine)
 ):
     try:
         user = await engine.find_one(User, User.id == user_id)
@@ -413,8 +413,7 @@ async def update_user(
         return updated_user
     except DuplicateKeyError:
         raise HTTPException(
-            status_code=409,
-            detail="User with this email already exists"
+            status_code=409, detail="User with this email already exists"
         )
 ```
 
@@ -425,22 +424,25 @@ async def update_user(
 ```python
 from sqlalchemy.orm import selectinload, joinedload
 
+
 # Eager loading to prevent N+1 queries
 @app.get("/users/", response_model=List[UserResponse])
 async def get_users_with_posts(
-    skip: int = 0,
-    limit: int = 100,
-    db: Session = Depends(get_db)
+    skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
 ):
-    users = db.query(User).options(selectinload(User.posts)).offset(skip).limit(limit).all()
+    users = (
+        db.query(User).options(selectinload(User.posts)).offset(skip).limit(limit).all()
+    )
     return users
+
 
 # Using raw SQL for complex queries
 @app.get("/user-analytics")
 async def get_user_analytics(db: Session = Depends(get_db)):
     from sqlalchemy import text
 
-    result = db.execute(text("""
+    result = db.execute(
+        text("""
         SELECT
             u.name,
             COUNT(p.id) as post_count,
@@ -449,9 +451,13 @@ async def get_user_analytics(db: Session = Depends(get_db)):
         LEFT JOIN posts p ON u.id = p.author_id
         GROUP BY u.id, u.name
         ORDER BY post_count DESC
-    """)).fetchall()
+    """)
+    ).fetchall()
 
-    return [{"name": row[0], "post_count": row[1], "avg_content_length": row[2]} for row in result]
+    return [
+        {"name": row[0], "post_count": row[1], "avg_content_length": row[2]}
+        for row in result
+    ]
 ```
 
 ### MongoDB Performance Patterns
@@ -463,21 +469,19 @@ async def get_post_summaries(engine: AIOEngine = Depends(get_engine)):
     # Only return specific fields
     posts = await engine.find(
         Post,
-        projection=PostSummary  # Only return specified fields in PostSummary model
+        projection=PostSummary,  # Only return specified fields in PostSummary model
     )
     return posts
 
+
 # Use indexes effectively
 @app.get("/posts/by-category/{category}")
-async def get_posts_by_category(
-    category: str,
-    engine: AIOEngine = Depends(get_engine)
-):
+async def get_posts_by_category(category: str, engine: AIOEngine = Depends(get_engine)):
     # Ensure there's an index on the category field
     posts = await engine.find(
         Post,
         Post.category == category,
-        sort=(Post.created_at, -1)  # Sort by creation date, descending
+        sort=(Post.created_at, -1),  # Sort by creation date, descending
     )
     return posts
 ```
@@ -506,6 +510,7 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_
 # Create tables
 Base.metadata.create_all(bind=test_engine)
 
+
 def override_get_db():
     try:
         db = TestingSessionLocal()
@@ -513,16 +518,21 @@ def override_get_db():
     finally:
         db.close()
 
+
 # Override dependency
 app.dependency_overrides[get_db] = override_get_db
+
 
 @pytest.fixture
 def client():
     with TestClient(app) as c:
         yield c
 
+
 def test_create_user(client):
-    response = client.post("/users/", json={"email": "test@example.com", "name": "Test User"})
+    response = client.post(
+        "/users/", json={"email": "test@example.com", "name": "Test User"}
+    )
     assert response.status_code == 200
     data = response.json()
     assert data["email"] == "test@example.com"
@@ -535,6 +545,7 @@ import pytest
 from unittest.mock import AsyncMock, patch
 from fastapi.testclient import TestClient
 
+
 @pytest.fixture
 def mock_engine():
     engine = AsyncMock()
@@ -543,8 +554,9 @@ def mock_engine():
     engine.delete = AsyncMock()
     return engine
 
+
 def test_create_post(mock_engine):
-    with patch('main.get_engine', return_value=mock_engine):
+    with patch("main.get_engine", return_value=mock_engine):
         # Test your endpoint
         pass
 ```

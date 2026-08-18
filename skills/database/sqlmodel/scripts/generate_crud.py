@@ -8,18 +8,69 @@ Usage:
 """
 
 import argparse
-import sys
 from pathlib import Path
 
 
-def to_snake_case(name: str) -> str:
-    """Convert CamelCase to snake_case"""
-    result = []
-    for i, char in enumerate(name):
-        if char.isupper() and i > 0:
-            result.append("_")
-        result.append(char.lower())
-    return "".join(result)
+def main():
+    parser = argparse.ArgumentParser(
+        description="Generate CRUD boilerplate for SQLModel models"
+    )
+    parser.add_argument("model", type=str, help="Model name (e.g., User, Product)")
+    parser.add_argument(
+        "--crud-output", type=str, help="Output file for CRUD functions", default=None
+    )
+    parser.add_argument(
+        "--router-output", type=str, help="Output file for router", default=None
+    )
+    parser.add_argument(
+        "--print-only",
+        action="store_true",
+        help="Print to stdout instead of writing to files",
+    )
+
+    args = parser.parse_args()
+
+    model_name = args.model
+    snake_name = to_snake_case(model_name)
+
+    # Generate code
+    crud_code = generate_crud_code(model_name)
+    router_code = generate_router_code(model_name)
+
+    if args.print_only:
+        print("=" * 80)
+        print(f"CRUD Functions for {model_name}")
+        print("=" * 80)
+        print(crud_code)
+        print("\n" + "=" * 80)
+        print(f"Router for {model_name}")
+        print("=" * 80)
+        print(router_code)
+    else:
+        # Determine output paths
+        crud_output = args.crud_output or f"app/crud/{snake_name}s.py"
+        router_output = args.router_output or f"app/routers/{snake_name}s.py"
+
+        # Create directories if needed
+        Path(crud_output).parent.mkdir(parents=True, exist_ok=True)
+        Path(router_output).parent.mkdir(parents=True, exist_ok=True)
+
+        # Write files
+        with open(crud_output, "w") as f:
+            f.write(crud_code)
+        print(f"✅ Created CRUD functions: {crud_output}")
+
+        with open(router_output, "w") as f:
+            f.write(router_code)
+        print(f"✅ Created router: {router_output}")
+
+        print("\\nNext steps:")
+        print(
+            f"1. Define {model_name}Create, {model_name}Update, {model_name}Read in app/models.py"
+        )
+        print("2. Import router in app/main.py:")
+        print(f"   from app.routers import {snake_name}s")
+        print(f"   app.include_router({snake_name}s.router)")
 
 
 def generate_crud_code(model_name: str) -> str:
@@ -170,66 +221,14 @@ def delete_{snake_name}(
 '''
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description="Generate CRUD boilerplate for SQLModel models"
-    )
-    parser.add_argument("model", type=str, help="Model name (e.g., User, Product)")
-    parser.add_argument(
-        "--crud-output", type=str, help="Output file for CRUD functions", default=None
-    )
-    parser.add_argument(
-        "--router-output", type=str, help="Output file for router", default=None
-    )
-    parser.add_argument(
-        "--print-only",
-        action="store_true",
-        help="Print to stdout instead of writing to files",
-    )
-
-    args = parser.parse_args()
-
-    model_name = args.model
-    snake_name = to_snake_case(model_name)
-
-    # Generate code
-    crud_code = generate_crud_code(model_name)
-    router_code = generate_router_code(model_name)
-
-    if args.print_only:
-        print("=" * 80)
-        print(f"CRUD Functions for {model_name}")
-        print("=" * 80)
-        print(crud_code)
-        print("\n" + "=" * 80)
-        print(f"Router for {model_name}")
-        print("=" * 80)
-        print(router_code)
-    else:
-        # Determine output paths
-        crud_output = args.crud_output or f"app/crud/{snake_name}s.py"
-        router_output = args.router_output or f"app/routers/{snake_name}s.py"
-
-        # Create directories if needed
-        Path(crud_output).parent.mkdir(parents=True, exist_ok=True)
-        Path(router_output).parent.mkdir(parents=True, exist_ok=True)
-
-        # Write files
-        with open(crud_output, "w") as f:
-            f.write(crud_code)
-        print(f"✅ Created CRUD functions: {crud_output}")
-
-        with open(router_output, "w") as f:
-            f.write(router_code)
-        print(f"✅ Created router: {router_output}")
-
-        print(f"\\nNext steps:")
-        print(
-            f"1. Define {model_name}Create, {model_name}Update, {model_name}Read in app/models.py"
-        )
-        print(f"2. Import router in app/main.py:")
-        print(f"   from app.routers import {snake_name}s")
-        print(f"   app.include_router({snake_name}s.router)")
+def to_snake_case(name: str) -> str:
+    """Convert CamelCase to snake_case"""
+    result = []
+    for i, char in enumerate(name):
+        if char.isupper() and i > 0:
+            result.append("_")
+        result.append(char.lower())
+    return "".join(result)
 
 
 if __name__ == "__main__":

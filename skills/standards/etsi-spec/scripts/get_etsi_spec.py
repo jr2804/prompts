@@ -41,14 +41,122 @@ Example output:
     Download URL: https://www.etsi.org/deliver/etsi_ts/103200_103299/103224/01.07.01_60/ts_103224v010701p.pdf
 """
 
+import io
 import re
 import sys
+import traceback
 from datetime import datetime
-from pathlib import Path
 
 import requests
 from bs4 import BeautifulSoup
 from PyPDF2 import PdfReader
+
+
+def main():
+    """Main function to retrieve and display ETSI spec metadata."""
+    if len(sys.argv) < 2:
+        print("Usage: uv run get_etsi_spec.py <spec-number>")
+        print()
+        print("Examples:")
+        print("  uv run get_etsi_spec.py 103224")
+        print("  uv run get_etsi_spec.py 103 224")
+        print("  uv run get_etsi_spec.py ETSI TS 103 224")
+        print("  uv run get_etsi_spec.py EG 202 396-3")
+        print("  uv run get_etsi_spec.py TR 103 907")
+        print("  uv run get_etsi_spec.py ES 200 381-1")
+        sys.exit(1)
+
+    spec_input = sys.argv[1]
+
+    try:
+        # Parse specification number
+        spec_info = parse_spec_number(spec_input)
+
+        # Format spec for display
+        if spec_info["part"]:
+            full_spec = (
+                f"{spec_info['prefix']}{spec_info['number']}-{spec_info['part']}"
+            )
+        else:
+            full_spec = f"{spec_info['prefix']}{spec_info['number']}"
+
+        print(f"Searching for ETSI {spec_info['doc_type']} {full_spec}...")
+        print()
+
+        # Get directory URL
+        directory_url = get_spec_directory_url(spec_info)
+        print(f"Directory: {directory_url}")
+
+        # Get version directories
+        version_dirs = get_version_directories(directory_url, spec_info)
+
+        if not version_dirs:
+            print(
+                f"Error: No versions found for ETSI {spec_info['doc_type']} {full_spec}"
+            )
+            print()
+            print("Possible reasons:")
+            print("  - Specification number does not exist")
+            print("  - Different URL structure for this document type")
+            print("  - Try checking: https://www.etsi.org/deliver/etsi_<type>/")
+            sys.exit(1)
+
+        # Get latest version
+        latest_dir, latest_num, release_code = version_dirs[0]
+        print(f"Latest version: {format_version(latest_num)} (release {release_code})")
+        print()
+
+        # Get PDF URL
+        pdf_url = get_pdf_url(directory_url, latest_dir, spec_info)
+
+        # Extract metadata from PDF
+        print("Extracting metadata from PDF...")
+        metadata = extract_pdf_metadata(pdf_url)
+
+        # Display results
+        print("=" * 70)
+        print(f"SPECIFICATION: ETSI {spec_info['doc_type']} {full_spec}")
+        print("=" * 70)
+        print(f"Latest Version:  {format_version(latest_num)}")
+        print(f"Release Code:    {release_code}")
+        print(f"Directory:       {latest_dir}")
+
+        if metadata.get("title"):
+            print(f"Title:           {metadata['title']}")
+
+        if metadata.get("publication_date"):
+            pub_date = metadata["publication_date"]
+            # Format as month name
+            try:
+                dt = datetime.strptime(pub_date, "%Y-%m-%d")
+                pub_date_formatted = dt.strftime("%b %Y").lower()
+            except:
+                pub_date_formatted = pub_date
+            print(f"Publication Date: {pub_date_formatted}")
+
+        print(f"Download URL:    {pdf_url}")
+        print("=" * 70)
+        print()
+        print(f"Full versions available: {len(version_dirs)}")
+        if len(version_dirs) > 1:
+            print("Version history:")
+            for version_dir, version_num, release_code in version_dirs:
+                pub_year = version_num.split(".")[0][:2]
+                print(
+                    f"  - {format_version(version_num)} (release {release_code}) ~ 20{pub_year}"
+                )
+
+    except ValueError as e:
+        print(f"Error: {e}")
+        sys.exit(1)
+    except requests.RequestException as e:
+        print(f"Network error: {e}")
+        sys.exit(1)
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+
+        traceback.print_exc()
+        sys.exit(1)
 
 
 def parse_spec_number(spec_input):
@@ -312,8 +420,6 @@ def extract_pdf_metadata(pdf_url):
     response = requests.get(pdf_url, timeout=30)
     response.raise_for_status()
 
-    import io
-
     pdf_file = io.BytesIO(response.content)
     reader = PdfReader(pdf_file)
 
@@ -370,114 +476,6 @@ def format_version(version_num):
         patch = int(parts[2])
         return f"V{major}.{minor}.{patch}"
     return version_num
-
-
-def main():
-    """Main function to retrieve and display ETSI spec metadata."""
-    if len(sys.argv) < 2:
-        print("Usage: uv run get_etsi_spec.py <spec-number>")
-        print()
-        print("Examples:")
-        print("  uv run get_etsi_spec.py 103224")
-        print("  uv run get_etsi_spec.py 103 224")
-        print("  uv run get_etsi_spec.py ETSI TS 103 224")
-        print("  uv run get_etsi_spec.py EG 202 396-3")
-        print("  uv run get_etsi_spec.py TR 103 907")
-        print("  uv run get_etsi_spec.py ES 200 381-1")
-        sys.exit(1)
-
-    spec_input = sys.argv[1]
-
-    try:
-        # Parse specification number
-        spec_info = parse_spec_number(spec_input)
-
-        # Format spec for display
-        if spec_info["part"]:
-            full_spec = (
-                f"{spec_info['prefix']}{spec_info['number']}-{spec_info['part']}"
-            )
-        else:
-            full_spec = f"{spec_info['prefix']}{spec_info['number']}"
-
-        print(f"Searching for ETSI {spec_info['doc_type']} {full_spec}...")
-        print()
-
-        # Get directory URL
-        directory_url = get_spec_directory_url(spec_info)
-        print(f"Directory: {directory_url}")
-
-        # Get version directories
-        version_dirs = get_version_directories(directory_url, spec_info)
-
-        if not version_dirs:
-            print(
-                f"Error: No versions found for ETSI {spec_info['doc_type']} {full_spec}"
-            )
-            print()
-            print("Possible reasons:")
-            print("  - Specification number does not exist")
-            print("  - Different URL structure for this document type")
-            print("  - Try checking: https://www.etsi.org/deliver/etsi_<type>/")
-            sys.exit(1)
-
-        # Get latest version
-        latest_dir, latest_num, release_code = version_dirs[0]
-        print(f"Latest version: {format_version(latest_num)} (release {release_code})")
-        print()
-
-        # Get PDF URL
-        pdf_url = get_pdf_url(directory_url, latest_dir, spec_info)
-
-        # Extract metadata from PDF
-        print("Extracting metadata from PDF...")
-        metadata = extract_pdf_metadata(pdf_url)
-
-        # Display results
-        print("=" * 70)
-        print(f"SPECIFICATION: ETSI {spec_info['doc_type']} {full_spec}")
-        print("=" * 70)
-        print(f"Latest Version:  {format_version(latest_num)}")
-        print(f"Release Code:    {release_code}")
-        print(f"Directory:       {latest_dir}")
-
-        if metadata.get("title"):
-            print(f"Title:           {metadata['title']}")
-
-        if metadata.get("publication_date"):
-            pub_date = metadata["publication_date"]
-            # Format as month name
-            try:
-                dt = datetime.strptime(pub_date, "%Y-%m-%d")
-                pub_date_formatted = dt.strftime("%b %Y").lower()
-            except:
-                pub_date_formatted = pub_date
-            print(f"Publication Date: {pub_date_formatted}")
-
-        print(f"Download URL:    {pdf_url}")
-        print("=" * 70)
-        print()
-        print(f"Full versions available: {len(version_dirs)}")
-        if len(version_dirs) > 1:
-            print("Version history:")
-            for version_dir, version_num, release_code in version_dirs:
-                pub_year = version_num.split(".")[0][:2]
-                print(
-                    f"  - {format_version(version_num)} (release {release_code}) ~ 20{pub_year}"
-                )
-
-    except ValueError as e:
-        print(f"Error: {e}")
-        sys.exit(1)
-    except requests.RequestException as e:
-        print(f"Network error: {e}")
-        sys.exit(1)
-    except Exception as e:
-        print(f"Unexpected error: {e}")
-        import traceback
-
-        traceback.print_exc()
-        sys.exit(1)
 
 
 if __name__ == "__main__":

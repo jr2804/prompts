@@ -15,8 +15,6 @@ from pathlib import Path
 
 from soffice import get_soffice_env
 
-logger = logging.getLogger(__name__)
-
 LIBREOFFICE_PROFILE = "/tmp/libreoffice_docx_profile"
 MACRO_DIR = f"{LIBREOFFICE_PROFILE}/user/basic/Standard"
 
@@ -36,6 +34,8 @@ ACCEPT_CHANGES_MACRO = """<?xml version="1.0" encoding="UTF-8"?>
     End Sub
 </script:module>"""
 
+logger = logging.getLogger(__name__)
+
 
 def accept_changes(
     input_file: str,
@@ -47,7 +47,7 @@ def accept_changes(
     if not input_path.exists():
         return None, f"Error: Input file not found: {input_file}"
 
-    if not input_path.suffix.lower() == ".docx":
+    if input_path.suffix.lower() != ".docx":
         return None, f"Error: Input file is not a DOCX file: {input_file}"
 
     try:

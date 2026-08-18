@@ -3,8 +3,11 @@ Base validator with common validation logic for document files.
 """
 
 import re
+import tempfile
+import zipfile
 from pathlib import Path
 
+import defusedxml.minidom
 import lxml.etree
 
 
@@ -126,7 +129,6 @@ class BaseSchemaValidator:
 
     def repair_whitespace_preservation(self) -> int:
         """Add xml:space='preserve' to <w:t> elements with leading/trailing whitespace."""
-        import defusedxml.minidom
 
         repairs = 0
 
@@ -139,11 +141,17 @@ class BaseSchemaValidator:
                 for elem in dom.getElementsByTagName("*"):
                     if elem.tagName.endswith(":t") and elem.firstChild:
                         text = elem.firstChild.nodeValue
-                        if text and (text.startswith((' ', '\t')) or text.endswith((' ', '\t'))):
-                            if elem.getAttribute("xml:space") != "preserve":
-                                elem.setAttribute("xml:space", "preserve")
-                                repairs += 1
-                                modified = True
+                        if (
+                            text
+                            and (
+                                text.startswith((" ", "\t"))
+                                or text.endswith((" ", "\t"))
+                            )
+                            and elem.getAttribute("xml:space") != "preserve"
+                        ):
+                            elem.setAttribute("xml:space", "preserve")
+                            repairs += 1
+                            modified = True
 
                 if modified:
                     xml_file.write_bytes(dom.toxml(encoding="UTF-8"))
@@ -173,7 +181,7 @@ class BaseSchemaValidator:
             except Exception as e:
                 errors.append(
                     f"  {xml_file.relative_to(self.unpacked_dir)}: "
-                    f"Unexpected error: {str(e)}"
+                    f"Unexpected error: {e!s}"
                 )
 
         if errors:
@@ -423,7 +431,6 @@ class BaseSchemaValidator:
         Validate that all r:id attributes in XML files reference existing IDs
         in their corresponding .rels files, and optionally validate relationship types.
         """
-        import lxml.etree
 
         errors = []
 
@@ -753,9 +760,7 @@ class BaseSchemaValidator:
             # e.g., "sldId" -> "sld", "sldMasterId" -> "sldMaster"
             prefix = elem_lower[:-2]  # Remove "id"
             # Check if this might be a compound like "sldMasterId"
-            if prefix.endswith("master"):
-                return prefix.lower()
-            elif prefix.endswith("layout"):
+            if prefix.endswith(("master", "layout")):
                 return prefix.lower()
             else:
                 # Simple case like "sldId" -> "slide"
@@ -908,8 +913,6 @@ class BaseSchemaValidator:
         Returns:
             set: Set of error messages from the original file
         """
-        import tempfile
-        import zipfile
 
         # Resolve both paths to handle symlinks (e.g., /var vs /private/var on macOS)
         xml_file = Path(xml_file).resolve()
@@ -931,7 +934,7 @@ class BaseSchemaValidator:
                 return set()
 
             # Validate the specific file in original
-            is_valid, errors = self._validate_single_file_xsd(
+            _is_valid, errors = self._validate_single_file_xsd(
                 original_xml_file, temp_path
             )
             return errors if errors else set()

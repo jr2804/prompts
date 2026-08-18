@@ -4,6 +4,8 @@ Validator for PowerPoint presentation XML files against XSD schemas.
 
 import re
 
+import lxml.etree
+
 from .base import BaseSchemaValidator
 
 
@@ -76,7 +78,6 @@ class PPTXSchemaValidator(BaseSchemaValidator):
 
     def validate_uuid_ids(self):
         """Validate that ID attributes that look like UUIDs contain only hex values."""
-        import lxml.etree
 
         errors = []
         # UUID pattern: 8-4-4-4-12 hex digits with optional braces/hyphens
@@ -120,7 +121,6 @@ class PPTXSchemaValidator(BaseSchemaValidator):
 
     def validate_slide_layout_ids(self):
         """Validate that sldLayoutId elements in slide masters reference valid slide layouts."""
-        import lxml.etree
 
         errors = []
 
@@ -195,7 +195,6 @@ class PPTXSchemaValidator(BaseSchemaValidator):
 
     def validate_no_duplicate_slide_layouts(self):
         """Validate that each slide has exactly one slideLayout reference."""
-        import lxml.etree
 
         errors = []
         slide_rels_files = list(self.unpacked_dir.glob("ppt/slides/_rels/*.xml.rels"))
@@ -235,7 +234,6 @@ class PPTXSchemaValidator(BaseSchemaValidator):
 
     def validate_notes_slide_references(self):
         """Validate that each notesSlide file is referenced by only one slide."""
-        import lxml.etree
 
         errors = []
         notes_slide_references = {}  # Track which slides reference each notesSlide

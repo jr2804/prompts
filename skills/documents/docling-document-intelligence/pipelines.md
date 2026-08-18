@@ -54,8 +54,8 @@ converter = DocumentConverter()
 # Explicit PdfPipelineOptions (docling 2.81+): use InputFormat.PDF + PdfFormatOption.
 # Do not use format_options={"pdf": opts}; that raises AttributeError on pipeline options.
 opts = PdfPipelineOptions(
-    do_ocr=True,                 # False = skip OCR entirely
-    do_table_structure=True,     # False = skip table detection (faster)
+    do_ocr=True,  # False = skip OCR entirely
+    do_table_structure=True,  # False = skip table detection (faster)
 )
 converter = DocumentConverter(
     format_options={
@@ -84,18 +84,22 @@ All engines are plug-and-play via the CLI `--ocr-engine` flag or the Python
 ```python
 # EasyOCR (default — no extra install needed)
 from docling.datamodel.pipeline_options import PdfPipelineOptions
+
 opts = PdfPipelineOptions(do_ocr=True)  # uses EasyOCR by default
 
 # Tesseract (requires system Tesseract + pip install tesserocr — see Docling install docs)
 from docling.datamodel.pipeline_options import TesseractOcrOptions
+
 opts = PdfPipelineOptions(do_ocr=True, ocr_options=TesseractOcrOptions())
 
 # RapidOCR (lightweight, no C deps)
 from docling.datamodel.pipeline_options import RapidOcrOptions
+
 opts = PdfPipelineOptions(do_ocr=True, ocr_options=RapidOcrOptions())
 
 # macOS native OCR
 from docling.datamodel.pipeline_options import OcrMacOptions
+
 opts = PdfPipelineOptions(do_ocr=True, ocr_options=OcrMacOptions())
 ```
 
@@ -158,7 +162,7 @@ VLM. Reduces hallucination risk on text-heavy pages.
 ```python
 pipeline_options = VlmPipelineOptions(
     vlm_options=vlm_model_specs.GRANITEDOCLING_TRANSFORMERS,
-    force_backend_text=True,   # <-- hybrid mode
+    force_backend_text=True,  # <-- hybrid mode
     generate_page_images=True,
 )
 ```

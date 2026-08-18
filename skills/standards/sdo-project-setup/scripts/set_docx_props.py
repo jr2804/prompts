@@ -47,6 +47,7 @@ import re
 import sys
 import zipfile
 from pathlib import Path
+
 from lxml import etree
 
 # XML namespaces
@@ -61,148 +62,20 @@ FMTID = "{D5CDD505-2E9C-101B-9397-08002B2CF9AE}"
 DEFAULT_PROPS = "tdoc=tdoc,revision_of=revision_of,meeting=meeting,date=date,agenda_item=agenda_item,target=target"
 
 
-def parse_props_mapping(raw: str) -> dict[str, str]:
-    """Parse 'custom_name=fm_key,...' into {custom_name: fm_key}."""
-    mapping = {}
-    for pair in raw.split(","):
-        pair = pair.strip()
-        if "=" not in pair:
-            continue
-        custom_name, fm_key = pair.split("=", 1)
-        mapping[custom_name.strip()] = fm_key.strip()
-    return mapping
-
-
-def read_plan_frontmatter(plan_path):
-    """Parse YAML frontmatter from PLAN.md."""
-    try:
-        with open(plan_path, "r", encoding="utf-8") as f:
-            content = f.read()
-    except FileNotFoundError:
-        return {}
-
-    match = re.match(r"^---\s*\n(.*?)\n---", content, re.DOTALL)
-    if not match:
-        return {}
-
-    yaml_lines = match.group(1).strip().split("\n")
-    props = {}
-    for line in yaml_lines:
-        if ":" not in line:
-            continue
-        key, val = line.split(":", 1)
-        key = key.strip()
-        val = val.strip()
-        if val.startswith('"') and val.endswith('"'):
-            val = val[1:-1]
-        elif val.startswith("'") and val.endswith("'"):
-            val = val[1:-1]
-        props[key] = val
-    return props
-
-
-def build_custom_xml(custom_props):
-    """Build docProps/custom.xml from {name: value} dict."""
-    root = etree.Element(
-        "{%s}Properties" % CP_NS,
-        nsmap={"cp": CP_NS, "vt": VT_NS},
-    )
-    for i, (name, value) in enumerate(custom_props.items(), start=2):
-        prop = etree.SubElement(root, "{%s}property" % CP_NS)
-        prop.set("fmtid", FMTID)
-        prop.set("pid", str(i))
-        prop.set("name", name)
-        val_el = etree.SubElement(prop, "{%s}lpwstr" % VT_NS)
-        val_el.text = value
-    return etree.tostring(root, xml_declaration=True, encoding="UTF-8", standalone=True)
-
-
-def patch_core_xml(xml_bytes, title, author):
-    """Patch docProps/core.xml with title and author."""
-    tree = etree.fromstring(xml_bytes)
-    ns = {"dc": DC_NS, "cp": CORE_NS}
-
-    if title:
-        title_el = tree.find("dc:title", ns)
-        if title_el is None:
-            title_el = etree.SubElement(tree, "{%s}title" % DC_NS)
-        title_el.text = title
-
-    if author:
-        for tag, ns_uri in [("creator", DC_NS), ("lastModifiedBy", CORE_NS)]:
-            el = tree.find(f"{{{ns_uri}}}{tag}")
-            if el is None:
-                el = etree.SubElement(tree, f"{{{ns_uri}}}{tag}")
-            el.text = author
-
-    return etree.tostring(tree, xml_declaration=True, encoding="UTF-8", standalone=True)
-
-
-def patch_app_xml(xml_bytes, company):
-    """Patch docProps/app.xml with company name."""
-    if not company:
-        return xml_bytes
-
-    tree = etree.fromstring(xml_bytes)
-    ns = {"ep": EP_NS}
-    company_el = tree.find("ep:Company", ns)
-    if company_el is None:
-        company_el = etree.SubElement(tree, "{%s}Company" % EP_NS)
-    company_el.text = company
-    return etree.tostring(tree, xml_declaration=True, encoding="UTF-8", standalone=True)
-
-
-def update_content_types(files):
-    """Ensure custom.xml content type is registered."""
-    CT_PATH = "[Content_Types].xml"
-    CUSTOM_CT = "application/vnd.openxmlformats-officedocument.custom-properties+xml"
-
-    if CT_PATH not in files:
-        return
-
-    ct_tree = etree.fromstring(files[CT_PATH])
-    ct_ns = {"ct": "http://schemas.openxmlformats.org/package/2006/content-types"}
-    existing = {e.get("PartName") for e in ct_tree.findall("ct:Override", ct_ns)}
-    part_name = "/docProps/custom.xml"
-
-    if part_name not in existing:
-        override = etree.SubElement(ct_tree, "{http://schemas.openxmlformats.org/package/2006/content-types}Override")
-        override.set("PartName", part_name)
-        override.set("ContentType", CUSTOM_CT)
-    else:
-        for e in ct_tree.findall("ct:Override", ct_ns):
-            if e.get("PartName") == part_name:
-                e.set("ContentType", CUSTOM_CT)
-    files[CT_PATH] = etree.tostring(ct_tree, xml_declaration=True, encoding="UTF-8", standalone=True)
-
-
-def update_rels(files):
-    """Ensure custom.xml relationship exists."""
-    RELS_MAIN = "_rels/.rels"
-    if RELS_MAIN not in files:
-        return
-
-    rels_tree = etree.fromstring(files[RELS_MAIN])
-    nsmap = {"r": "http://schemas.openxmlformats.org/package/2006/relationships"}
-    existing = [r.get("Target") for r in rels_tree.findall("r:Relationship", nsmap)]
-
-    if "docProps/custom.xml" not in existing:
-        rel = etree.SubElement(rels_tree, "{http://schemas.openxmlformats.org/package/2006/relationships}Relationship")
-        rel.set("Id", "rId_custom")
-        rel.set("Type", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/custom-properties")
-        rel.set("Target", "docProps/custom.xml")
-        files[RELS_MAIN] = etree.tostring(rels_tree, xml_declaration=True, encoding="UTF-8", standalone=True)
-
-
 def main():
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser.add_argument("docx_path", help="Path to DOCX file to update")
     parser.add_argument("--plan", help="Path to PLAN.md (default: parent/PLAN.md)")
     parser.add_argument("--title", help="Override PLAN.md title")
     parser.add_argument("--author", help="Override author (default: $USERNAME)")
     parser.add_argument("--company", help="Override PLAN.md source/company")
-    parser.add_argument("--props", default=DEFAULT_PROPS,
-                        help=f"Custom property name -> frontmatter key mapping (default: {DEFAULT_PROPS})")
+    parser.add_argument(
+        "--props",
+        default=DEFAULT_PROPS,
+        help=f"Custom property name -> frontmatter key mapping (default: {DEFAULT_PROPS})",
+    )
 
     args = parser.parse_args()
     props_mapping = parse_props_mapping(args.props)
@@ -239,8 +112,12 @@ def main():
         files = {name: zin.read(name) for name in zin.namelist()}
 
     if "docProps/core.xml" in files:
-        files["docProps/core.xml"] = patch_core_xml(files["docProps/core.xml"], title, author)
-        print(f"  Patched docProps/core.xml (title: {title or '(none)'}, author: {author or '(none)'})")
+        files["docProps/core.xml"] = patch_core_xml(
+            files["docProps/core.xml"], title, author
+        )
+        print(
+            f"  Patched docProps/core.xml (title: {title or '(none)'}, author: {author or '(none)'})"
+        )
 
     if "docProps/app.xml" in files and company:
         files["docProps/app.xml"] = patch_app_xml(files["docProps/app.xml"], company)
@@ -248,7 +125,9 @@ def main():
 
     if custom_props:
         files["docProps/custom.xml"] = build_custom_xml(custom_props)
-        print(f"  Written docProps/custom.xml ({len(custom_props)} properties: {list(custom_props.keys())})")
+        print(
+            f"  Written docProps/custom.xml ({len(custom_props)} properties: {list(custom_props.keys())})"
+        )
         update_content_types(files)
         update_rels(files)
 
@@ -261,6 +140,155 @@ def main():
         f.write(buf.getvalue())
 
     print(f"Done -- updated {docx_path}")
+
+
+def parse_props_mapping(raw: str) -> dict[str, str]:
+    """Parse 'custom_name=fm_key,...' into {custom_name: fm_key}."""
+    mapping = {}
+    for pair in raw.split(","):
+        pair = pair.strip()
+        if "=" not in pair:
+            continue
+        custom_name, fm_key = pair.split("=", 1)
+        mapping[custom_name.strip()] = fm_key.strip()
+    return mapping
+
+
+def read_plan_frontmatter(plan_path):
+    """Parse YAML frontmatter from PLAN.md."""
+    try:
+        with open(plan_path, "r", encoding="utf-8") as f:
+            content = f.read()
+    except FileNotFoundError:
+        return {}
+
+    match = re.match(r"^---\s*\n(.*?)\n---", content, re.DOTALL)
+    if not match:
+        return {}
+
+    yaml_lines = match.group(1).strip().split("\n")
+    props = {}
+    for line in yaml_lines:
+        if ":" not in line:
+            continue
+        key, val = line.split(":", 1)
+        key = key.strip()
+        val = val.strip()
+        if (
+            val.startswith('"')
+            and val.endswith('"')
+            or val.startswith("'")
+            and val.endswith("'")
+        ):
+            val = val[1:-1]
+        props[key] = val
+    return props
+
+
+def build_custom_xml(custom_props):
+    """Build docProps/custom.xml from {name: value} dict."""
+    root = etree.Element(
+        f"{{{CP_NS}}}Properties",
+        nsmap={"cp": CP_NS, "vt": VT_NS},
+    )
+    for i, (name, value) in enumerate(custom_props.items(), start=2):
+        prop = etree.SubElement(root, f"{{{CP_NS}}}property")
+        prop.set("fmtid", FMTID)
+        prop.set("pid", str(i))
+        prop.set("name", name)
+        val_el = etree.SubElement(prop, f"{{{VT_NS}}}lpwstr")
+        val_el.text = value
+    return etree.tostring(root, xml_declaration=True, encoding="UTF-8", standalone=True)
+
+
+def patch_core_xml(xml_bytes, title, author):
+    """Patch docProps/core.xml with title and author."""
+    tree = etree.fromstring(xml_bytes)
+    ns = {"dc": DC_NS, "cp": CORE_NS}
+
+    if title:
+        title_el = tree.find("dc:title", ns)
+        if title_el is None:
+            title_el = etree.SubElement(tree, f"{{{DC_NS}}}title")
+        title_el.text = title
+
+    if author:
+        for tag, ns_uri in [("creator", DC_NS), ("lastModifiedBy", CORE_NS)]:
+            el = tree.find(f"{{{ns_uri}}}{tag}")
+            if el is None:
+                el = etree.SubElement(tree, f"{{{ns_uri}}}{tag}")
+            el.text = author
+
+    return etree.tostring(tree, xml_declaration=True, encoding="UTF-8", standalone=True)
+
+
+def patch_app_xml(xml_bytes, company):
+    """Patch docProps/app.xml with company name."""
+    if not company:
+        return xml_bytes
+
+    tree = etree.fromstring(xml_bytes)
+    ns = {"ep": EP_NS}
+    company_el = tree.find("ep:Company", ns)
+    if company_el is None:
+        company_el = etree.SubElement(tree, f"{{{EP_NS}}}Company")
+    company_el.text = company
+    return etree.tostring(tree, xml_declaration=True, encoding="UTF-8", standalone=True)
+
+
+def update_content_types(files):
+    """Ensure custom.xml content type is registered."""
+    CT_PATH = "[Content_Types].xml"
+    CUSTOM_CT = "application/vnd.openxmlformats-officedocument.custom-properties+xml"
+
+    if CT_PATH not in files:
+        return
+
+    ct_tree = etree.fromstring(files[CT_PATH])
+    ct_ns = {"ct": "http://schemas.openxmlformats.org/package/2006/content-types"}
+    existing = {e.get("PartName") for e in ct_tree.findall("ct:Override", ct_ns)}
+    part_name = "/docProps/custom.xml"
+
+    if part_name not in existing:
+        override = etree.SubElement(
+            ct_tree,
+            "{http://schemas.openxmlformats.org/package/2006/content-types}Override",
+        )
+        override.set("PartName", part_name)
+        override.set("ContentType", CUSTOM_CT)
+    else:
+        for e in ct_tree.findall("ct:Override", ct_ns):
+            if e.get("PartName") == part_name:
+                e.set("ContentType", CUSTOM_CT)
+    files[CT_PATH] = etree.tostring(
+        ct_tree, xml_declaration=True, encoding="UTF-8", standalone=True
+    )
+
+
+def update_rels(files):
+    """Ensure custom.xml relationship exists."""
+    RELS_MAIN = "_rels/.rels"
+    if RELS_MAIN not in files:
+        return
+
+    rels_tree = etree.fromstring(files[RELS_MAIN])
+    nsmap = {"r": "http://schemas.openxmlformats.org/package/2006/relationships"}
+    existing = [r.get("Target") for r in rels_tree.findall("r:Relationship", nsmap)]
+
+    if "docProps/custom.xml" not in existing:
+        rel = etree.SubElement(
+            rels_tree,
+            "{http://schemas.openxmlformats.org/package/2006/relationships}Relationship",
+        )
+        rel.set("Id", "rId_custom")
+        rel.set(
+            "Type",
+            "http://schemas.openxmlformats.org/officeDocument/2006/relationships/custom-properties",
+        )
+        rel.set("Target", "docProps/custom.xml")
+        files[RELS_MAIN] = etree.tostring(
+            rels_tree, xml_declaration=True, encoding="UTF-8", standalone=True
+        )
 
 
 if __name__ == "__main__":

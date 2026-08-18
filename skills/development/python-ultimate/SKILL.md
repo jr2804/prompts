@@ -736,17 +736,17 @@ High-efficiency Python execution for 10+ file operations. **90-99% token savings
 from pathlib import Path
 import re
 
-files = list(Path('.').glob('**/*.py'))
+files = list(Path(".").glob("**/*.py"))
 modified = 0
 
 for f in files:
     content = f.read_text()
-    new_content = re.sub(r'old_pattern', 'new_pattern', content)
+    new_content = re.sub(r"old_pattern", "new_pattern", content)
     if new_content != content:
         f.write_text(new_content)
         modified += 1
 
-result = {'files_scanned': len(files), 'files_modified': modified}
+result = {"files_scanned": len(files), "files_modified": modified}
 ```
 
 ```python
@@ -754,7 +754,7 @@ result = {'files_scanned': len(files), 'files_modified': modified}
 from pathlib import Path
 import ast
 
-files = list(Path('src').glob('**/*.py'))
+files = list(Path("src").glob("**/*.py"))
 complexity_issues = []
 
 for f in files:
@@ -762,11 +762,15 @@ for f in files:
     for node in ast.walk(tree):
         if isinstance(node, ast.FunctionDef):
             # Calculate simple complexity metric
-            nested = sum(1 for n in ast.walk(node) if isinstance(n, (ast.If, ast.For, ast.While)))
+            nested = sum(
+                1 for n in ast.walk(node) if isinstance(n, (ast.If, ast.For, ast.While))
+            )
             if nested > 10:
-                complexity_issues.append({'file': str(f), 'function': node.name, 'complexity': nested})
+                complexity_issues.append(
+                    {"file": str(f), "function": node.name, "complexity": nested}
+                )
 
-result = {'files_audited': len(files), 'high_complexity': len(complexity_issues)}
+result = {"files_audited": len(files), "high_complexity": len(complexity_issues)}
 ```
 
 **Best practices:**

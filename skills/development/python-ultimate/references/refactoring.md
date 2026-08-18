@@ -143,7 +143,7 @@ ______________________________________________________________________
 ```python
 from api.code_transform import rename_identifier
 
-result = rename_identifier('.', 'oldName', 'newName', '**/*.py')
+result = rename_identifier(".", "oldName", "newName", "**/*.py")
 # Returns: {'files_modified': 50, 'total_replacements': 247}
 ```
 
@@ -153,14 +153,17 @@ result = rename_identifier('.', 'oldName', 'newName', '**/*.py')
 from api.filesystem import batch_copy
 from api.code_analysis import find_functions
 
-functions = find_functions('app.py', pattern='handle_.*')
-operations = [{
-    'source_file': 'app.py',
-    'start_line': f['start_line'],
-    'end_line': f['end_line'],
-    'target_file': 'handlers.py',
-    'target_line': -1
-} for f in functions]
+functions = find_functions("app.py", pattern="handle_.*")
+operations = [
+    {
+        "source_file": "app.py",
+        "start_line": f["start_line"],
+        "end_line": f["end_line"],
+        "target_file": "handlers.py",
+        "target_line": -1,
+    }
+    for f in functions
+]
 batch_copy(operations)
 ```
 

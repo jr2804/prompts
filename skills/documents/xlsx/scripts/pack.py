@@ -54,7 +54,11 @@ def _condense_xml(xml_file: Path) -> None:
             if element.tagName.endswith(":t"):
                 continue
             for child in list(element.childNodes):
-                if (child.nodeType == child.TEXT_NODE and child.nodeValue and child.nodeValue.strip() == "") or child.nodeType == child.COMMENT_NODE:
+                if (
+                    child.nodeType == child.TEXT_NODE
+                    and child.nodeValue
+                    and child.nodeValue.strip() == ""
+                ) or child.nodeType == child.COMMENT_NODE:
                     element.removeChild(child)
         xml_file.write_bytes(dom.toxml(encoding="UTF-8"))
     except Exception:

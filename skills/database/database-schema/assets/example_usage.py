@@ -8,7 +8,7 @@ with FastAPI applications for PostgreSQL, MongoDB, and SQLite.
 import os
 
 # Import generated models and database configuration
-from database import Base, get_db
+from database import Base, engine, get_db
 from fastapi import Depends, FastAPI, HTTPException
 from models.user import User  # Example generated model
 from schemas.user import UserCreate, UserResponse  # Example generated schemas
@@ -82,7 +82,6 @@ async def startup_event() -> None:
     """
     Create database tables on startup
     """
-    from database import engine
 
     Base.metadata.create_all(bind=engine)
     print("Database tables created")

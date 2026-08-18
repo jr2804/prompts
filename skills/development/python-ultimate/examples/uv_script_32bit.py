@@ -62,12 +62,14 @@ import platform
 import struct
 import sys
 
+from rich.console import Console
+from rich.table import Table
+
 
 def main() -> None:
     """Print interpreter metadata using a declared dependency (rich)."""
     try:
-        from rich.console import Console
-        from rich.table import Table
+        pass
     except ImportError as exc:  # pragma: no cover - defensive
         msg = (
             "rich is not installed. Run via `uv run` so PEP 723 deps resolve:\n"

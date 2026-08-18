@@ -14,7 +14,7 @@ import sys
 from sqlmodel import SQLModel, create_engine
 
 
-def init_db(database_url: str = None) -> None:
+def init_db(database_url: str | None = None) -> None:
     """Initialize database tables"""
     # Get database URL from environment or parameter
     if database_url is None:
@@ -40,7 +40,7 @@ def init_db(database_url: str = None) -> None:
         sys.exit(1)
 
 
-def drop_db(database_url: str = None) -> None:
+def drop_db(database_url: str | None = None) -> None:
     """Drop all database tables"""
     if database_url is None:
         database_url = os.getenv(

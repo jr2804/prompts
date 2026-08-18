@@ -17,6 +17,32 @@ from pathlib import Path
 from quick_validate import validate_skill
 
 
+def main():
+    if len(sys.argv) < 2:
+        print(
+            "Usage: python utils/package_skill.py <path/to/skill-folder> [output-directory]"
+        )
+        print("\nExample:")
+        print("  python utils/package_skill.py skills/public/my-skill")
+        print("  python utils/package_skill.py skills/public/my-skill ./dist")
+        sys.exit(1)
+
+    skill_path = sys.argv[1]
+    output_dir = sys.argv[2] if len(sys.argv) > 2 else None
+
+    print(f"📦 Packaging skill: {skill_path}")
+    if output_dir:
+        print(f"   Output directory: {output_dir}")
+    print()
+
+    result = package_skill(skill_path, output_dir)
+
+    if result:
+        sys.exit(0)
+    else:
+        sys.exit(1)
+
+
 def package_skill(skill_path, output_dir=None):
     """
     Package a skill folder into a .skill file.
@@ -81,32 +107,6 @@ def package_skill(skill_path, output_dir=None):
     except Exception as e:
         print(f"❌ Error creating .skill file: {e}")
         return None
-
-
-def main():
-    if len(sys.argv) < 2:
-        print(
-            "Usage: python utils/package_skill.py <path/to/skill-folder> [output-directory]"
-        )
-        print("\nExample:")
-        print("  python utils/package_skill.py skills/public/my-skill")
-        print("  python utils/package_skill.py skills/public/my-skill ./dist")
-        sys.exit(1)
-
-    skill_path = sys.argv[1]
-    output_dir = sys.argv[2] if len(sys.argv) > 2 else None
-
-    print(f"📦 Packaging skill: {skill_path}")
-    if output_dir:
-        print(f"   Output directory: {output_dir}")
-    print()
-
-    result = package_skill(skill_path, output_dir)
-
-    if result:
-        sys.exit(0)
-    else:
-        sys.exit(1)
 
 
 if __name__ == "__main__":

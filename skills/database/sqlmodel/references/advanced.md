@@ -8,11 +8,9 @@
 from sqlmodel import Session
 from sqlalchemy.exc import SQLAlchemyError
 
+
 def transfer_balance(
-    session: Session,
-    from_user_id: int,
-    to_user_id: int,
-    amount: Decimal
+    session: Session, from_user_id: int, to_user_id: int, amount: Decimal
 ):
     """Transfer balance between users with transaction"""
     try:
@@ -85,16 +83,11 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 # Set isolation level on engine
-engine = create_engine(
-    DATABASE_URL,
-    isolation_level="REPEATABLE READ"
-)
+engine = create_engine(DATABASE_URL, isolation_level="REPEATABLE READ")
 
 # Or set per session
 with Session(engine) as session:
-    session.connection().execution_options(
-        isolation_level="SERIALIZABLE"
-    )
+    session.connection().execution_options(isolation_level="SERIALIZABLE")
 ```
 
 ## Cascading Deletes
@@ -103,6 +96,7 @@ with Session(engine) as session:
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
 
+
 class Author(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str
@@ -110,8 +104,9 @@ class Author(SQLModel, table=True):
     # CASCADE: Delete books when author is deleted
     books: List["Book"] = Relationship(
         back_populates="author",
-        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+        sa_relationship_kwargs={"cascade": "all, delete-orphan"},
     )
+
 
 class Book(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -119,6 +114,7 @@ class Book(SQLModel, table=True):
     author_id: int = Field(foreign_key="author.id")
 
     author: Author = Relationship(back_populates="books")
+
 
 # Usage
 with Session(engine) as session:
@@ -137,11 +133,9 @@ class Team(SQLModel, table=True):
     name: str
 
     members: List["Member"] = Relationship(
-        back_populates="team",
-        sa_relationship_kwargs={
-            "cascade": "all, delete-orphan"
-        }
+        back_populates="team", sa_relationship_kwargs={"cascade": "all, delete-orphan"}
     )
+
 
 # Prevent deletion if children exist
 class Category(SQLModel, table=True):
@@ -150,22 +144,19 @@ class Category(SQLModel, table=True):
 
     products: List["Product"] = Relationship(
         back_populates="category",
-        sa_relationship_kwargs={
-            "cascade": "save-update, merge"
-        }
+        sa_relationship_kwargs={"cascade": "save-update, merge"},
     )
+
 
 # Set NULL on delete
 from sqlalchemy import Column, Integer, ForeignKey
+
 
 class Comment(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     content: str
     user_id: Optional[int] = Field(
-        sa_column=Column(
-            Integer,
-            ForeignKey("user.id", ondelete="SET NULL")
-        )
+        sa_column=Column(Integer, ForeignKey("user.id", ondelete="SET NULL"))
     )
 ```
 
@@ -175,14 +166,18 @@ class Comment(SQLModel, table=True):
 from datetime import datetime
 from typing import Optional
 
+
 class SoftDeleteMixin:
     """Mixin for soft delete functionality"""
+
     is_deleted: bool = Field(default=False)
     deleted_at: Optional[datetime] = None
+
 
 class User(SQLModel, SoftDeleteMixin, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     username: str
+
 
 # Soft delete function
 def soft_delete(session: Session, model: SQLModel):
@@ -192,11 +187,13 @@ def soft_delete(session: Session, model: SQLModel):
     session.add(model)
     session.commit()
 
+
 # Query only non-deleted records
 def get_active_users(session: Session):
     """Get only non-deleted users"""
     statement = select(User).where(User.is_deleted == False)
     return session.exec(statement).all()
+
 
 # Restore soft-deleted record
 def restore(session: Session, model: SQLModel):
@@ -213,23 +210,28 @@ def restore(session: Session, model: SQLModel):
 from sqlalchemy import event
 from datetime import datetime
 
+
 class AuditMixin:
     """Mixin for audit fields"""
+
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
+
 
 class User(SQLModel, AuditMixin, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     username: str
 
+
 # Auto-update timestamp on modification
-@event.listens_for(User, 'before_update')
+@event.listens_for(User, "before_update")
 def receive_before_update(mapper, connection, target):
     """Update updated_at timestamp"""
     target.updated_at = datetime.utcnow()
 
+
 # Validate before insert
-@event.listens_for(User, 'before_insert')
+@event.listens_for(User, "before_insert")
 def receive_before_insert(mapper, connection, target):
     """Validate user before insert"""
     if not target.username:
@@ -245,23 +247,15 @@ class Document(SQLModel, table=True):
     content: str
     version: int = Field(default=1)
 
+
 def update_with_optimistic_lock(
-    session: Session,
-    doc_id: int,
-    new_content: str,
-    expected_version: int
+    session: Session, doc_id: int, new_content: str, expected_version: int
 ):
     """Update with optimistic locking"""
     statement = (
         update(Document)
-        .where(
-            Document.id == doc_id,
-            Document.version == expected_version
-        )
-        .values(
-            content=new_content,
-            version=Document.version + 1
-        )
+        .where(Document.id == doc_id, Document.version == expected_version)
+        .values(content=new_content, version=Document.version + 1)
     )
 
     result = session.execute(statement)
@@ -269,8 +263,7 @@ def update_with_optimistic_lock(
 
     if result.rowcount == 0:
         raise HTTPException(
-            status_code=409,
-            detail="Document was modified by another user"
+            status_code=409, detail="Document was modified by another user"
         )
 
     return session.get(Document, doc_id)
@@ -281,6 +274,7 @@ def update_with_optimistic_lock(
 ```python
 from sqlalchemy import CheckConstraint, UniqueConstraint, Index
 
+
 class Product(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str
@@ -290,21 +284,14 @@ class Product(SQLModel, table=True):
 
     __table_args__ = (
         # Check constraint
-        CheckConstraint('price > 0', name='check_positive_price'),
-        CheckConstraint('stock >= 0', name='check_non_negative_stock'),
-
+        CheckConstraint("price > 0", name="check_positive_price"),
+        CheckConstraint("stock >= 0", name="check_non_negative_stock"),
         # Unique constraint (composite)
-        UniqueConstraint('name', 'category', name='uq_product_name_category'),
-
+        UniqueConstraint("name", "category", name="uq_product_name_category"),
         # Index
-        Index('ix_product_category_price', 'category', 'price'),
-
+        Index("ix_product_category_price", "category", "price"),
         # Partial index (PostgreSQL)
-        Index(
-            'ix_in_stock_products',
-            'name',
-            postgresql_where=text('stock > 0')
-        ),
+        Index("ix_in_stock_products", "name", postgresql_where=text("stock > 0")),
     )
 ```
 
@@ -314,8 +301,10 @@ class Product(SQLModel, table=True):
 from sqlalchemy import TypeDecorator, String
 import json
 
+
 class JSONEncodedDict(TypeDecorator):
     """Custom type for storing dict as JSON string"""
+
     impl = String
 
     def process_bind_param(self, value, dialect):
@@ -327,6 +316,7 @@ class JSONEncodedDict(TypeDecorator):
         if value is not None:
             value = json.loads(value)
         return value
+
 
 class Settings(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -347,21 +337,19 @@ engine = create_engine(
     max_overflow=20,
     pool_timeout=30,
     pool_recycle=3600,
-    pool_pre_ping=True
+    pool_pre_ping=True,
 )
 
 # StaticPool - Single connection (testing)
 engine = create_engine(
     "sqlite:///:memory:",
     poolclass=StaticPool,
-    connect_args={"check_same_thread": False}
+    connect_args={"check_same_thread": False},
 )
 
 # NullPool - No pooling (serverless)
-engine = create_engine(
-    DATABASE_URL,
-    poolclass=NullPool
-)
+engine = create_engine(DATABASE_URL, poolclass=NullPool)
+
 
 # Custom pool events
 @event.listens_for(engine, "connect")
@@ -369,10 +357,12 @@ def receive_connect(dbapi_conn, connection_record):
     """Set connection parameters"""
     dbapi_conn.execute("SET TIME ZONE 'UTC'")
 
+
 @event.listens_for(engine, "checkout")
 def receive_checkout(dbapi_conn, connection_record, connection_proxy):
     """Called when connection is retrieved from pool"""
     print("Connection checked out")
+
 
 @event.listens_for(engine, "checkin")
 def receive_checkin(dbapi_conn, connection_record):
@@ -388,34 +378,41 @@ def get_user_by_email(session: Session, email: str):
     statement = select(User).where(User.email == email)
     return session.exec(statement).first()
 
+
 # ❌ BAD: Never use string formatting for queries
 def get_user_bad(session: Session, email: str):
     query = f"SELECT * FROM user WHERE email = '{email}'"  # SQL injection!
     return session.execute(text(query))
+
 
 # ✅ GOOD: Hash passwords
 from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
+
 
 def verify_password(plain: str, hashed: str) -> bool:
     return pwd_context.verify(plain, hashed)
 
+
 # ✅ GOOD: Validate input
 from pydantic import validator, EmailStr
+
 
 class UserCreate(SQLModel):
     username: str = Field(min_length=3, max_length=50)
     email: EmailStr
     password: str = Field(min_length=8)
 
-    @validator('username')
+    @validator("username")
     def username_alphanumeric(cls, v):
-        assert v.isalnum(), 'must be alphanumeric'
+        assert v.isalnum(), "must be alphanumeric"
         return v
+
 
 # ✅ GOOD: Use environment variables for secrets
 import os
@@ -430,13 +427,9 @@ DATABASE_URL = "postgresql://admin:password123@localhost/db"  # Don't do this!
 ## Error Handling Best Practices
 
 ```python
-from sqlalchemy.exc import (
-    IntegrityError,
-    DataError,
-    OperationalError,
-    DBAPIError
-)
+from sqlalchemy.exc import IntegrityError, DataError, OperationalError, DBAPIError
 from fastapi import HTTPException
+
 
 def create_user_safe(session: Session, user: UserCreate):
     """Create user with comprehensive error handling"""
@@ -451,8 +444,7 @@ def create_user_safe(session: Session, user: UserCreate):
         session.rollback()
         if "unique constraint" in str(e).lower():
             raise HTTPException(
-                status_code=409,
-                detail="User with this email already exists"
+                status_code=409, detail="User with this email already exists"
             )
         raise HTTPException(status_code=409, detail="Database constraint violation")
 
@@ -480,12 +472,14 @@ from time import time
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 # Log slow queries
 @event.listens_for(engine, "before_cursor_execute")
 def receive_before_cursor_execute(
     conn, cursor, statement, parameters, context, executemany
 ):
     context._query_start_time = time()
+
 
 @event.listens_for(engine, "after_cursor_execute")
 def receive_after_cursor_execute(
@@ -494,9 +488,7 @@ def receive_after_cursor_execute(
     total_time = time() - context._query_start_time
 
     if total_time > 1.0:  # Log queries slower than 1 second
-        logger.warning(
-            f"Slow query ({total_time:.2f}s): {statement[:100]}"
-        )
+        logger.warning(f"Slow query ({total_time:.2f}s): {statement[:100]}")
 ```
 
 ## Testing Best Practices
@@ -505,16 +497,17 @@ def receive_after_cursor_execute(
 import pytest
 from sqlmodel import create_engine, SQLModel, Session
 
+
 @pytest.fixture(scope="function")
 def test_engine():
     """Create test database for each test"""
     engine = create_engine(
-        "sqlite:///:memory:",
-        connect_args={"check_same_thread": False}
+        "sqlite:///:memory:", connect_args={"check_same_thread": False}
     )
     SQLModel.metadata.create_all(engine)
     yield engine
     engine.dispose()
+
 
 @pytest.fixture(scope="function")
 def test_session(test_engine):
@@ -523,14 +516,11 @@ def test_session(test_engine):
         yield session
         session.rollback()  # Rollback after each test
 
+
 # Factory pattern for test data
 def create_test_user(session: Session, **kwargs):
     """Factory for creating test users"""
-    defaults = {
-        "username": "testuser",
-        "email": "test@example.com",
-        "is_active": True
-    }
+    defaults = {"username": "testuser", "email": "test@example.com", "is_active": True}
     defaults.update(kwargs)
 
     user = User(**defaults)
@@ -538,6 +528,7 @@ def create_test_user(session: Session, **kwargs):
     session.commit()
     session.refresh(user)
     return user
+
 
 # Usage in tests
 def test_user_creation(test_session):

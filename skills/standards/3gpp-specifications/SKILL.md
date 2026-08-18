@@ -274,13 +274,14 @@ for link in soup.find_all("a", href=True):
 ```python
 import re
 
+
 def parse_spec_number(filename: str) -> tuple:
     """Parse spec number from filename."""
     # Extract series number and spec number
     match = re.match(r"(\d{2})(\d{3})(\.doc|\.zip)", filename)
     if not match:
         return (None, None)
-    
+
     return (match.group(1), match.group(2))
 ```
 

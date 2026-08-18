@@ -8,6 +8,52 @@ import ast
 from pathlib import Path
 
 
+def audit_codebase(directory: Path) -> dict:
+    """Audit all Python files in directory."""
+    files = list(directory.rglob("*.py"))
+    print(f"Analyzing {len(files)} files...")
+
+    issues = {
+        "high_complexity": [],
+        "large_files": [],
+    }
+
+    for file in files:
+        analysis = analyze_file_complexity(file)
+
+        # Flag high complexity
+        if analysis.get("avg_complexity", 0) > 10:
+            issues["high_complexity"].append(
+                {
+                    "file": str(file),
+                    "avg_complexity": analysis["avg_complexity"],
+                }
+            )
+
+        # Flag large files
+        if analysis.get("lines", 0) > 500:
+            issues["large_files"].append(
+                {
+                    "file": str(file),
+                    "lines": analysis["lines"],
+                }
+            )
+
+    # Return summary only (NOT all the data!)
+    return {
+        "files_audited": len(files),
+        "issues": {
+            "high_complexity": len(issues["high_complexity"]),
+            "large_files": len(issues["large_files"]),
+        },
+        "top_complexity": sorted(
+            issues["high_complexity"],
+            key=lambda x: x["avg_complexity"],
+            reverse=True,
+        )[:5],  # Only top 5
+    }
+
+
 def analyze_file_complexity(file_path: Path) -> dict:
     """Extract complexity metrics from Python file."""
     try:
@@ -40,52 +86,10 @@ def analyze_file_complexity(file_path: Path) -> dict:
     }
 
 
-def audit_codebase(directory: Path) -> dict:
-    """Audit all Python files in directory."""
-    files = list(directory.rglob("*.py"))
-    print(f"Analyzing {len(files)} files...")
-
-    issues = {
-        "high_complexity": [],
-        "large_files": [],
-    }
-
-    for file in files:
-        analysis = analyze_file_complexity(file)
-
-        # Flag high complexity
-        if analysis.get("avg_complexity", 0) > 10:
-            issues["high_complexity"].append({
-                "file": str(file),
-                "avg_complexity": analysis["avg_complexity"],
-            })
-
-        # Flag large files
-        if analysis.get("lines", 0) > 500:
-            issues["large_files"].append({
-                "file": str(file),
-                "lines": analysis["lines"],
-            })
-
-    # Return summary only (NOT all the data!)
-    return {
-        "files_audited": len(files),
-        "issues": {
-            "high_complexity": len(issues["high_complexity"]),
-            "large_files": len(issues["large_files"]),
-        },
-        "top_complexity": sorted(
-            issues["high_complexity"],
-            key=lambda x: x["avg_complexity"],
-            reverse=True,
-        )[:5],  # Only top 5
-    }
-
-
 # Example usage
 if __name__ == "__main__":
     result = audit_codebase(Path("src"))
-    print(f"\nAudit complete:")
+    print("\nAudit complete:")
     print(f"  Files audited: {result['files_audited']}")
     print(f"  High complexity files: {result['issues']['high_complexity']}")
     print(f"  Large files (>500 lines): {result['issues']['large_files']}")

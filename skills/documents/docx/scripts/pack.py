@@ -24,7 +24,6 @@ import zipfile
 from pathlib import Path
 
 import defusedxml.minidom
-
 from helpers.simplify_redlines import infer_author
 from validators import DOCXSchemaValidator, PPTXSchemaValidator, RedliningValidator
 

@@ -107,6 +107,7 @@ Place reusable fixtures in `conftest.py` at the test directory root:
 # tests/conftest.py
 import pytest
 
+
 @pytest.fixture
 def cache_dir(tmp_path):
     """Standard cache directory for tests"""
@@ -120,12 +121,9 @@ ______________________________________________________________________
 ### Basic Parametrization
 
 ```python
-@pytest.mark.parametrize("input,expected", [
-    ([1, 2, 3], 6),
-    ([], 0),
-    ([-1, 0, 1], 0),
-    ([1.5, 2.5], 4.0)
-])
+@pytest.mark.parametrize(
+    "input,expected", [([1, 2, 3], 6), ([], 0), ([-1, 0, 1], 0), ([1.5, 2.5], 4.0)]
+)
 def test_sum_function(input, expected):
     """Test sum function with various inputs"""
     assert sum(input) == expected
@@ -134,11 +132,14 @@ def test_sum_function(input, expected):
 ### Multiple Parameters
 
 ```python
-@pytest.mark.parametrize("a,b,expected", [
-    (1, 2, 3),
-    (0, 0, 0),
-    (-1, 1, 0),
-])
+@pytest.mark.parametrize(
+    "a,b,expected",
+    [
+        (1, 2, 3),
+        (0, 0, 0),
+        (-1, 1, 0),
+    ],
+)
 def test_addition(a, b, expected):
     assert a + b == expected
 ```
@@ -151,6 +152,7 @@ ______________________________________________________________________
 
 ```python
 from unittest.mock import patch, MagicMock
+
 
 def test_api_call():
     """Test API call with mocking"""
@@ -193,6 +195,7 @@ ______________________________________________________________________
 ```python
 import time
 import pytest
+
 
 @pytest.mark.performance
 def test_processing_speed():

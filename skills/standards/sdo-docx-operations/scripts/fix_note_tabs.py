@@ -14,26 +14,6 @@ from pathlib import Path
 from officecli_xml_common import load_json_spec, raw_set, validate_doc
 
 
-def build_note_xml(number: int, text: str) -> str:
-    return (
-        f"<w:r><w:t>NOTE&#160;{number}:</w:t></w:r>"
-        "<w:r><w:tab/></w:r>"
-        f"<w:r><w:t xml:space=\"preserve\">{text}</w:t></w:r>"
-    )
-
-
-def validate_restart(notes: list[dict]) -> None:
-    by_section: dict[str, list[int]] = defaultdict(list)
-    for note in notes:
-        section = note.get("section_key", "")
-        num = int(note.get("note_number", 0))
-        if num > 0:
-            by_section[section].append(num)
-    for section, nums in by_section.items():
-        if nums and nums[0] != 1:
-            raise ValueError(f"Section {section!r} note numbering does not start at 1")
-
-
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--doc", required=True)
@@ -57,7 +37,7 @@ def main() -> int:
             xpath = f"(//w:p[w:pPr/w:pStyle/@w:val='{style}'])[{ordinal}]/w:r[1]"
         num = int(note.get("note_number", 0))
         if style == "TAN" and num == 0:
-            xml = f"<w:r><w:t xml:space=\"preserve\">{note['text']}</w:t></w:r>"
+            xml = f'<w:r><w:t xml:space="preserve">{note["text"]}</w:t></w:r>'
         else:
             xml = build_note_xml(num, note["text"])
 
@@ -69,6 +49,26 @@ def main() -> int:
     if not args.dry_run:
         validate_doc(args.doc, verbose=args.verbose)
     return 0
+
+
+def build_note_xml(number: int, text: str) -> str:
+    return (
+        f"<w:r><w:t>NOTE&#160;{number}:</w:t></w:r>"
+        "<w:r><w:tab/></w:r>"
+        f'<w:r><w:t xml:space="preserve">{text}</w:t></w:r>'
+    )
+
+
+def validate_restart(notes: list[dict]) -> None:
+    by_section: dict[str, list[int]] = defaultdict(list)
+    for note in notes:
+        section = note.get("section_key", "")
+        num = int(note.get("note_number", 0))
+        if num > 0:
+            by_section[section].append(num)
+    for section, nums in by_section.items():
+        if nums and nums[0] != 1:
+            raise ValueError(f"Section {section!r} note numbering does not start at 1")
 
 
 if __name__ == "__main__":

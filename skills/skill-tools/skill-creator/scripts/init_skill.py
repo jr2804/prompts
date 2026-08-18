@@ -185,9 +185,33 @@ Note: This is a text placeholder. Actual assets can be any file type.
 """
 
 
-def title_case_skill_name(skill_name):
-    """Convert hyphenated skill name to Title Case for display."""
-    return " ".join(word.capitalize() for word in skill_name.split("-"))
+def main():
+    if len(sys.argv) < 4 or sys.argv[2] != "--path":
+        print("Usage: init_skill.py <skill-name> --path <path>")
+        print("\nSkill name requirements:")
+        print("  - Hyphen-case identifier (e.g., 'data-analyzer')")
+        print("  - Lowercase letters, digits, and hyphens only")
+        print("  - Max 40 characters")
+        print("  - Must match directory name exactly")
+        print("\nExamples:")
+        print("  init_skill.py my-new-skill --path skills/public")
+        print("  init_skill.py my-api-helper --path skills/private")
+        print("  init_skill.py custom-skill --path /custom/location")
+        sys.exit(1)
+
+    skill_name = sys.argv[1]
+    path = sys.argv[3]
+
+    print(f"🚀 Initializing skill: {skill_name}")
+    print(f"   Location: {path}")
+    print()
+
+    result = init_skill(skill_name, path)
+
+    if result:
+        sys.exit(0)
+    else:
+        sys.exit(1)
 
 
 def init_skill(skill_name, path):
@@ -270,33 +294,9 @@ def init_skill(skill_name, path):
     return skill_dir
 
 
-def main():
-    if len(sys.argv) < 4 or sys.argv[2] != "--path":
-        print("Usage: init_skill.py <skill-name> --path <path>")
-        print("\nSkill name requirements:")
-        print("  - Hyphen-case identifier (e.g., 'data-analyzer')")
-        print("  - Lowercase letters, digits, and hyphens only")
-        print("  - Max 40 characters")
-        print("  - Must match directory name exactly")
-        print("\nExamples:")
-        print("  init_skill.py my-new-skill --path skills/public")
-        print("  init_skill.py my-api-helper --path skills/private")
-        print("  init_skill.py custom-skill --path /custom/location")
-        sys.exit(1)
-
-    skill_name = sys.argv[1]
-    path = sys.argv[3]
-
-    print(f"🚀 Initializing skill: {skill_name}")
-    print(f"   Location: {path}")
-    print()
-
-    result = init_skill(skill_name, path)
-
-    if result:
-        sys.exit(0)
-    else:
-        sys.exit(1)
+def title_case_skill_name(skill_name):
+    """Convert hyphenated skill name to Title Case for display."""
+    return " ".join(word.capitalize() for word in skill_name.split("-"))
 
 
 if __name__ == "__main__":

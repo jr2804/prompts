@@ -11,16 +11,16 @@ Real-world code examples demonstrating the four principles. Each example shows w
 #### ❌ What Goes Wrong (Wrong Assumptions)
 
 ```python
-def export_users(format='json'):
+def export_users(format="json"):
     """Export all users to a file."""
     users = User.query.all()
 
-    if format == 'json':
-        with open('users.json', 'w') as f:
+    if format == "json":
+        with open("users.json", "w") as f:
             json.dump([u.to_dict() for u in users], f)
-    elif format == 'csv':
-        with open('users.csv', 'w') as f:
-            writer = csv.DictWriter(f, fieldnames=['id', 'email', 'name'])
+    elif format == "csv":
+        with open("users.csv", "w") as f:
+            writer = csv.DictWriter(f, fieldnames=["id", "email", "name"])
             writer.writeheader()
             writer.writerows([u.to_dict() for u in users])
 
@@ -109,10 +109,12 @@ from enum import Enum
 from typing import Protocol, Union
 from dataclasses import dataclass
 
+
 class DiscountStrategy(ABC):
     @abstractmethod
     def calculate(self, amount: float) -> float:
         pass
+
 
 class PercentageDiscount(DiscountStrategy):
     def __init__(self, percentage: float):
@@ -121,6 +123,7 @@ class PercentageDiscount(DiscountStrategy):
     def calculate(self, amount: float) -> float:
         return amount * (self.percentage / 100)
 
+
 class FixedDiscount(DiscountStrategy):
     def __init__(self, fixed_amount: float):
         self.fixed_amount = fixed_amount
@@ -128,11 +131,13 @@ class FixedDiscount(DiscountStrategy):
     def calculate(self, amount: float) -> float:
         return min(self.fixed_amount, amount)
 
+
 @dataclass
 class DiscountConfig:
     strategy: DiscountStrategy
     min_purchase: float = 0.0
-    max_discount: float = float('inf')
+    max_discount: float = float("inf")
+
 
 class DiscountCalculator:
     def __init__(self, config: DiscountConfig):
@@ -144,6 +149,7 @@ class DiscountCalculator:
         discount = self.config.strategy.calculate(amount)
         return min(discount, self.config.max_discount)
 
+
 # Usage requires 30+ lines of setup for a simple calculation
 ```
 
@@ -153,6 +159,7 @@ class DiscountCalculator:
 def calculate_discount(amount: float, percent: float) -> float:
     """Calculate discount amount. percent should be 0-100."""
     return amount * (percent / 100)
+
 
 # Usage
 discount = calculate_discount(100.0, 10.0)  # $10 off
@@ -175,10 +182,14 @@ class PreferenceManager:
         self.cache = cache or InMemoryCache()
         self.validator = validator or DefaultValidator()
 
-    def save(self, user_id: int, prefs: dict,
-             merge: bool = True,
-             validate: bool = True,
-             notify: bool = False) -> bool:
+    def save(
+        self,
+        user_id: int,
+        prefs: dict,
+        merge: bool = True,
+        validate: bool = True,
+        notify: bool = False,
+    ) -> bool:
         """Save preferences with optional merging, validation, and notifications."""
 
         if validate:
@@ -194,7 +205,7 @@ class PreferenceManager:
 
         self.db.execute(
             "UPDATE users SET preferences = ? WHERE id = ?",
-            (json.dumps(prefs), user_id)
+            (json.dumps(prefs), user_id),
         )
 
         if self.cache:
@@ -213,7 +224,7 @@ def save_preferences(db, user_id: int, preferences: dict):
     """Save user preferences to database."""
     db.execute(
         "UPDATE users SET preferences = ? WHERE id = ?",
-        (json.dumps(preferences), user_id)
+        (json.dumps(preferences), user_id),
     )
 ```
 
@@ -467,7 +478,7 @@ ______________________________________________________________________
 ```python
 # Immediately changes sort logic without confirming the bug
 def sort_scores(scores):
-    return sorted(scores, key=lambda x: (-x['score'], x['name']))
+    return sorted(scores, key=lambda x: (-x["score"], x["name"]))
 ```
 
 #### ✅ What Should Happen (Reproduce First)
@@ -477,25 +488,28 @@ def sort_scores(scores):
 def test_sort_with_duplicate_scores():
     """Test sorting when multiple items have same score."""
     scores = [
-        {'name': 'Alice', 'score': 100},
-        {'name': 'Bob', 'score': 100},
-        {'name': 'Charlie', 'score': 90},
+        {"name": "Alice", "score": 100},
+        {"name": "Bob", "score": 100},
+        {"name": "Charlie", "score": 90},
     ]
 
     result = sort_scores(scores)
 
     # The bug: order is non-deterministic for duplicates
     # Run this test multiple times, it should be consistent
-    assert result[0]['score'] == 100
-    assert result[1]['score'] == 100
-    assert result[2]['score'] == 90
+    assert result[0]["score"] == 100
+    assert result[1]["score"] == 100
+    assert result[2]["score"] == 90
+
 
 # Verify: Run test 10 times → fails with inconsistent ordering
+
 
 # 2. Now fix with stable sort
 def sort_scores(scores):
     """Sort by score descending, then name ascending for ties."""
-    return sorted(scores, key=lambda x: (-x['score'], x['name']))
+    return sorted(scores, key=lambda x: (-x["score"], x["name"]))
+
 
 # Verify: Test passes consistently
 ```

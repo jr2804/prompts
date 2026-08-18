@@ -226,19 +226,20 @@ When validating TDocs via portal page, parse these fields:
 ```python
 from bs4 import BeautifulSoup
 
+
 def parse_tdoc_metadata(html_content: str, tdoc_id: str) -> dict[str, str]:
     """Parse TDoc metadata from portal HTML page."""
     soup = BeautifulSoup(html_content, "html.parser")
-    
+
     metadata = {}
-    
+
     # Parse form fields (simplified example)
     for label in soup.find_all("label"):
         value_element = label.find_next_sibling("input")
         if value_element and value_element.get("value"):
             field_name = label.get_text().strip(": ").lower()
             metadata[field_name] = value_element.get("value")
-    
+
     return metadata
 ```
 

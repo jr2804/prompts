@@ -30,13 +30,17 @@ Choose the right framework based on project complexity:
 import typer
 from typing import Optional
 
+
 def main(
     input_file: str = typer.Argument(..., help="Input file path"),
-    output_file: Optional[str] = typer.Option(None, "-o", "--output", help="Output file path"),
-    verbose: bool = typer.Option(False, "-v", "--verbose", help="Verbose output")
+    output_file: Optional[str] = typer.Option(
+        None, "-o", "--output", help="Output file path"
+    ),
+    verbose: bool = typer.Option(False, "-v", "--verbose", help="Verbose output"),
 ):
     """Universal CLI entry point"""
     typer.echo(f"Processing {input_file}")
+
 
 if __name__ == "__main__":
     typer.run(main)
@@ -46,10 +50,12 @@ if __name__ == "__main__":
 # Click - Complex CLIs with nested commands
 import click
 
+
 @click.group()
 def cli():
     """Main CLI entry point"""
     pass
+
 
 @cli.command()
 @click.argument("input_file")
@@ -57,6 +63,7 @@ def cli():
 def process(input_file, output):
     """Process a file"""
     click.echo(f"Processing {input_file}")
+
 
 if __name__ == "__main__":
     cli()
@@ -109,14 +116,16 @@ from typing import Optional
 
 app = typer.Typer(help="Project CLI", no_args_is_help=True)
 
+
 @app.command()
 def process(
     input_file: str = typer.Argument(..., help="Input file path"),
     output: Optional[str] = typer.Option(None, "-o", "--output", help="Output file"),
-    verbose: bool = typer.Option(False, "-v", "--verbose", help="Verbose output")
+    verbose: bool = typer.Option(False, "-v", "--verbose", help="Verbose output"),
 ):
     """Process the input file"""
     ...
+
 
 if __name__ == "__main__":
     app()
@@ -134,9 +143,11 @@ import os
 from dataclasses import dataclass, field
 from typing import Optional
 
+
 @dataclass
 class CLIParameters:
     """Structured CLI parameters with validation"""
+
     input_file: str
     output_file: Optional[str] = None
     verbose: bool = False
@@ -146,11 +157,7 @@ class CLIParameters:
     def from_args(cls, args) -> "CLIParameters":
         """Parse arguments into structured parameters"""
         output = args.output or cls._default_output(args.input_file)
-        return cls(
-            input_file=args.input_file,
-            output_file=output,
-            verbose=args.verbose
-        )
+        return cls(input_file=args.input_file, output_file=output, verbose=args.verbose)
 
     @staticmethod
     def _default_output(input_file: str) -> str:
@@ -181,7 +188,9 @@ count: int = typer.Option(1, "-c", "--count", help="Number of iterations")
 force: bool = typer.Option(False, "--force/--no-force", help="Force operation")
 
 # Multiple values
-files: list[str] = typer.Option([], "-f", "--file", help="Input files (multiple allowed)")
+files: list[str] = typer.Option(
+    [], "-f", "--file", help="Input files (multiple allowed)"
+)
 ```
 
 ______________________________________________________________________
@@ -207,10 +216,7 @@ console.print("[cyan]?[/cyan] Processing: file.txt")
 
 # Panel output
 panel = Panel.fit(
-    "Result content",
-    title="Results",
-    border_style="blue",
-    padding=(1, 2)
+    "Result content", title="Results", border_style="blue", padding=(1, 2)
 )
 console.print(panel)
 
@@ -227,7 +233,7 @@ console.print(table)
 with Progress(
     SpinnerColumn(),
     TextColumn("[progress.description]{task.description}"),
-    console=console
+    console=console,
 ) as progress:
     task = progress.add_task("Processing...", total=100)
     # Work here
@@ -249,9 +255,11 @@ from dataclasses import dataclass
 # Load .env file in development
 load_dotenv()
 
+
 @dataclass
 class EnvConfig:
     """Environment-based configuration"""
+
     debug: bool = False
     timeout: int = 30
     api_key: str = ""
@@ -264,7 +272,7 @@ class EnvConfig:
             debug=os.getenv("DEBUG", "false").lower() == "true",
             timeout=int(os.getenv("TIMEOUT", "30")),
             api_key=os.getenv("API_KEY", ""),
-            max_retries=int(os.getenv("MAX_RETRIES", "3"))
+            max_retries=int(os.getenv("MAX_RETRIES", "3")),
         )
 
     def validate(self) -> None:
@@ -282,10 +290,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 @click.option("--config", envvar="APP_CONFIG", help="Config file path")
 @click.option("--debug", envvar="DEBUG", is_flag=True, help="Debug mode")
-def process(config, debug):
-    ...
+def process(config, debug): ...
 ```
 
 ______________________________________________________________________
@@ -359,28 +367,21 @@ Write clear, useful help text:
 # Good help text patterns
 def main(
     input_file: str = typer.Argument(
-        ...,
-        help="Path to input file",
-        show_default=False
+        ..., help="Path to input file", show_default=False
     ),
     output: Optional[str] = typer.Option(
         None,
-        "-o", "--output",
+        "-o",
+        "--output",
         help="Output file path [default: auto-generated from input]",
-        show_default=False
+        show_default=False,
     ),
     workers: int = typer.Option(
-        4,
-        "-w", "--workers",
-        help="Number of parallel workers",
-        min=1,
-        max=32
+        4, "-w", "--workers", help="Number of parallel workers", min=1, max=32
     ),
     verbose: bool = typer.Option(
-        False,
-        "-v", "--verbose",
-        help="Enable verbose output"
-    )
+        False, "-v", "--verbose", help="Enable verbose output"
+    ),
 ):
     """
     Process INPUT_FILE and generate formatted output.
@@ -416,11 +417,13 @@ from project.cli.main import app
 
 runner = CliRunner()
 
+
 def test_cli_basic_invocation():
     """Test basic CLI invocation"""
     result = runner.invoke(app, ["--help"])
     assert result.exit_code == 0
     assert "--help" in result.output
+
 
 def test_cli_process_file(tmp_path):
     """Test file processing command"""
@@ -431,30 +434,31 @@ def test_cli_process_file(tmp_path):
     assert result.exit_code == 0
     assert "Processing" in result.output
 
+
 def test_cli_missing_file():
     """Test error handling for missing file"""
     result = runner.invoke(app, ["process", "/nonexistent/file.txt"])
     assert result.exit_code == 1
     assert "not found" in result.output.lower()
 
+
 def test_cli_with_options(tmp_path):
     """Test CLI with various options"""
     input_file = tmp_path / "input.txt"
     input_file.write_text("test content")
 
-    result = runner.invoke(app, [
-        "process",
-        str(input_file),
-        "-o", str(tmp_path / "output.txt"),
-        "-v"
-    ])
+    result = runner.invoke(
+        app, ["process", str(input_file), "-o", str(tmp_path / "output.txt"), "-v"]
+    )
     assert result.exit_code == 0
+
 
 # Fixture for CLI runner
 @pytest.fixture
 def cli_runner():
     """Provide a CLI runner for tests"""
     return CliRunner()
+
 
 # Isolated filesystem tests
 def test_cli_isolated_filesystem(cli_runner):

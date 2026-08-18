@@ -97,20 +97,22 @@ temp file and use `--input <file>` for large payloads:
 ```python
 import subprocess, json, tempfile, pathlib
 
+
 def run_batch(doc, commands, env):
     cmd_json = json.dumps(commands)
-    if len(cmd_json) > 20000:          # Windows ~32 KB command-line limit
-        tmp = pathlib.Path(tempfile.mktemp(suffix='.json'))
-        tmp.write_text(cmd_json, encoding='utf-8')
-        args = ['officecli', 'batch', doc, '--input', str(tmp), '--json']
+    if len(cmd_json) > 20000:  # Windows ~32 KB command-line limit
+        tmp = pathlib.Path(tempfile.mktemp(suffix=".json"))
+        tmp.write_text(cmd_json, encoding="utf-8")
+        args = ["officecli", "batch", doc, "--input", str(tmp), "--json"]
     else:
         tmp = None
-        args = ['officecli', 'batch', doc, '--commands', cmd_json, '--json']
+        args = ["officecli", "batch", doc, "--commands", cmd_json, "--json"]
     try:
         r = subprocess.run(args, capture_output=True, text=True, env=env)
         return json.loads(r.stdout)
     finally:
-        if tmp and tmp.exists(): tmp.unlink()
+        if tmp and tmp.exists():
+            tmp.unlink()
 ```
 
 **Problem 2 — Windows CLI length limit:** `--commands` with large replacement
@@ -134,13 +136,13 @@ def extract_paragraphs(xml):
     results = []
     for m in re.finditer(r'<w:p [^>]*w14:paraId="([^"]+)"[^>]*>', xml, re.DOTALL):
         pid = m.group(1)
-        tag_end = m.end() - 1          # position of final '>'
-        if xml[tag_end - 1] == '/':    # self-closing: ends with '/>'  
-            results.append((pid, xml[m.start():m.end() - 1] + '/>'))
+        tag_end = m.end() - 1  # position of final '>'
+        if xml[tag_end - 1] == "/":  # self-closing: ends with '/>'
+            results.append((pid, xml[m.start() : m.end() - 1] + "/>"))
         else:
-            close = xml.find('</w:p>', m.end())
+            close = xml.find("</w:p>", m.end())
             if close >= 0:
-                results.append((pid, xml[m.start():close + 6]))
+                results.append((pid, xml[m.start() : close + 6]))
     return results
 ```
 

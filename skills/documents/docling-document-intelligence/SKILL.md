@@ -251,7 +251,7 @@ chunks = list(chunker.chunk(result.document))
 
 for chunk in chunks:
     embed_text = chunker.contextualize(chunk)
-    print(chunk.meta.headings)        # heading breadcrumb list
+    print(chunk.meta.headings)  # heading breadcrumb list
     print(chunk.meta.origin.page_no)  # source page number
 ```
 
@@ -279,15 +279,15 @@ Use the `DoclingDocument` object directly to inspect structure:
 doc = result.document
 
 for item, level in doc.iterate_items():
-    if hasattr(item, 'label') and item.label.name == 'SECTION_HEADER':
+    if hasattr(item, "label") and item.label.name == "SECTION_HEADER":
         print(f"{'#' * level} {item.text}")
 
 for table in doc.tables:
-    print(table.export_to_dataframe())   # pandas DataFrame
+    print(table.export_to_dataframe())  # pandas DataFrame
     print(table.export_to_markdown())
 
 for picture in doc.pictures:
-    print(picture.caption_text(doc))     # caption if present
+    print(picture.caption_text(doc))  # caption if present
 ```
 
 For the full API surface, see Docling's structure and table export docs.
@@ -397,6 +397,7 @@ Check installed versions (prefer distribution metadata — `docling` may not set
 
 ```python
 from importlib.metadata import version
+
 print(version("docling"), version("docling-core"))
 ```
 

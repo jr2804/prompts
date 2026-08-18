@@ -33,6 +33,7 @@ if config.config_file_name is not None:
 # Set target metadata from SQLModel
 target_metadata = SQLModel.metadata
 
+
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode."""
     url = config.get_main_option("sqlalchemy.url")
@@ -46,6 +47,7 @@ def run_migrations_offline() -> None:
     with context.begin_transaction():
         context.run_migrations()
 
+
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode."""
     connectable = engine_from_config(
@@ -55,13 +57,11 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection,
-            target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()
+
 
 if context.is_offline_mode():
     run_migrations_offline()
@@ -91,8 +91,7 @@ load_dotenv()  # Load .env file
 
 # Override database URL from environment
 config.set_main_option(
-    "sqlalchemy.url",
-    os.getenv("DATABASE_URL", "postgresql://localhost/dbname")
+    "sqlalchemy.url", os.getenv("DATABASE_URL", "postgresql://localhost/dbname")
 )
 ```
 
@@ -146,83 +145,77 @@ Revises:
 Create Date: 2024-01-01 12:00:00.000000
 
 """
+
 from alembic import op
 import sqlalchemy as sa
 import sqlmodel
 
 # revision identifiers
-revision = 'abc123def456'
+revision = "abc123def456"
 down_revision = None
 branch_labels = None
 depends_on = None
 
+
 def upgrade() -> None:
     """Apply migration"""
     op.create_table(
-        'user',
-        sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('username', sa.String(length=50), nullable=False),
-        sa.Column('email', sa.String(length=100), nullable=False),
-        sa.Column('is_active', sa.Boolean(), nullable=False),
-        sa.Column('created_at', sa.DateTime(), nullable=False),
-        sa.PrimaryKeyConstraint('id'),
-        sa.UniqueConstraint('email'),
-        sa.UniqueConstraint('username')
+        "user",
+        sa.Column("id", sa.Integer(), nullable=False),
+        sa.Column("username", sa.String(length=50), nullable=False),
+        sa.Column("email", sa.String(length=100), nullable=False),
+        sa.Column("is_active", sa.Boolean(), nullable=False),
+        sa.Column("created_at", sa.DateTime(), nullable=False),
+        sa.PrimaryKeyConstraint("id"),
+        sa.UniqueConstraint("email"),
+        sa.UniqueConstraint("username"),
     )
-    op.create_index('ix_user_username', 'user', ['username'])
+    op.create_index("ix_user_username", "user", ["username"])
+
 
 def downgrade() -> None:
     """Revert migration"""
-    op.drop_index('ix_user_username', table_name='user')
-    op.drop_table('user')
+    op.drop_index("ix_user_username", table_name="user")
+    op.drop_table("user")
 ```
 
 ## Common Migration Operations
 
 ```python
 # Add column
-op.add_column('user', sa.Column('phone', sa.String(20), nullable=True))
+op.add_column("user", sa.Column("phone", sa.String(20), nullable=True))
 
 # Drop column
-op.drop_column('user', 'phone')
+op.drop_column("user", "phone")
 
 # Rename column
-op.alter_column('user', 'username', new_column_name='user_name')
+op.alter_column("user", "username", new_column_name="user_name")
 
 # Change column type
-op.alter_column('user', 'age',
-    type_=sa.Integer(),
-    existing_type=sa.String()
-)
+op.alter_column("user", "age", type_=sa.Integer(), existing_type=sa.String())
 
 # Add NOT NULL constraint
-op.alter_column('user', 'email',
-    nullable=False,
-    existing_type=sa.String()
-)
+op.alter_column("user", "email", nullable=False, existing_type=sa.String())
 
 # Create index
-op.create_index('ix_user_email', 'user', ['email'])
+op.create_index("ix_user_email", "user", ["email"])
 
 # Drop index
-op.drop_index('ix_user_email', table_name='user')
+op.drop_index("ix_user_email", table_name="user")
 
 # Add unique constraint
-op.create_unique_constraint('uq_user_email', 'user', ['email'])
+op.create_unique_constraint("uq_user_email", "user", ["email"])
 
 # Drop unique constraint
-op.drop_constraint('uq_user_email', 'user', type_='unique')
+op.drop_constraint("uq_user_email", "user", type_="unique")
 
 # Add foreign key
 op.create_foreign_key(
-    'fk_post_user_id',
-    'post', 'user',
-    ['user_id'], ['id'],
-    ondelete='CASCADE'
+    "fk_post_user_id", "post", "user", ["user_id"], ["id"], ondelete="CASCADE"
 )
 
 # Drop foreign key
-op.drop_constraint('fk_post_user_id', 'post', type_='foreignkey')
+op.drop_constraint("fk_post_user_id", "post", type_="foreignkey")
 ```
 
 ## Data Migrations
@@ -230,6 +223,7 @@ op.drop_constraint('fk_post_user_id', 'post', type_='foreignkey')
 ```python
 from alembic import op
 import sqlalchemy as sa
+
 
 def upgrade() -> None:
     """Populate default data"""
@@ -255,6 +249,7 @@ def upgrade() -> None:
             WHERE role IS NULL
         """)
     )
+
 
 def downgrade() -> None:
     """Revert data changes"""
@@ -353,6 +348,7 @@ from fastapi import FastAPI
 from alembic.config import Config
 from alembic import command
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Run migrations on startup"""
@@ -364,6 +360,7 @@ async def lifespan(app: FastAPI):
 
     # Cleanup on shutdown
     pass
+
 
 app = FastAPI(lifespan=lifespan)
 ```

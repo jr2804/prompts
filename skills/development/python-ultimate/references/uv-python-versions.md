@@ -112,8 +112,8 @@ For projects that must run on 32-bit:
 ```python
 import platform, struct
 
-print(platform.architecture())   # ('32bit', 'WindowsPE') or ('64bit', 'WindowsPE')
-print(struct.calcsize('P') * 8)  # 32 or 64 — bits per pointer
+print(platform.architecture())  # ('32bit', 'WindowsPE') or ('64bit', 'WindowsPE')
+print(struct.calcsize("P") * 8)  # 32 or 64 — bits per pointer
 ```
 
 ### Working example

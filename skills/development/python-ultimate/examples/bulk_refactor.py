@@ -4,8 +4,8 @@ Example: Bulk Refactoring Across Entire Codebase
 Rename identifiers across Python files using standard library.
 """
 
-from pathlib import Path
 import re
+from pathlib import Path
 
 
 def rename_identifier(

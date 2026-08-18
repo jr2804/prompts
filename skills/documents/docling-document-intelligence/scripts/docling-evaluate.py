@@ -28,36 +28,71 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+from docling_core.types.doc.document import DoclingDocument
+
+
+def main() -> None:
+    args = parse_args()
+    if not args.json_path.is_file():
+        print(json.dumps({"error": f"not found: {args.json_path}"}), file=sys.stderr)
+        sys.exit(1)
+
+    doc, raw = load_document(args.json_path)
+    if doc is not None:
+        m = metrics_from_doc(doc)
+    else:
+        m = heuristic_metrics(raw)
+
+    if args.markdown and args.markdown.is_file():
+        md_len = len(args.markdown.read_text(encoding="utf-8"))
+        m["markdown_file_chars"] = md_len
+        if m.get("markdown_chars", 0) == 0:
+            m["markdown_chars"] = md_len
+
+    status, issues, actions = evaluate(
+        m,
+        expect_tables=args.expect_tables,
+        min_chars_per_page=args.min_chars_per_page,
+        min_markdown_chars=args.min_markdown_chars,
+    )
+
+    report = {
+        "status": status,
+        "metrics": m,
+        "issues": issues,
+        "recommended_actions": actions,
+        "next_steps_for_agent": [
+            "Re-run docling with flags from recommended_actions.",
+            "Re-export JSON and run this script again until status is pass.",
+            "Append a row to improvement-log.md (see SKILL.md).",
+        ],
+    }
+
+    print(json.dumps(report, indent=2, ensure_ascii=False))
+    if not args.quiet:
+        print(f"\nstatus={status}", file=sys.stderr)
+        if issues:
+            print("issues:", file=sys.stderr)
+            for i in issues:
+                print(f"  - {i}", file=sys.stderr)
+        if actions:
+            print("recommended_actions:", file=sys.stderr)
+            for a in actions:
+                print(f"  - {a}", file=sys.stderr)
+
+    if status == "fail":
+        sys.exit(1)
+    if status == "warn" and args.fail_on_warn:
+        sys.exit(1)
+    sys.exit(0)
+
 
 def load_document(path: Path):
     data = json.loads(path.read_text(encoding="utf-8"))
     try:
-        from docling_core.types.doc.document import DoclingDocument
-
         return DoclingDocument.model_validate(data), data
     except Exception:
         return None, data
-
-
-def page_numbers_from_doc(doc) -> set[int]:
-    pages: set[int] = set()
-    for item, _ in doc.iterate_items():
-        for prov in getattr(item, "prov", None) or []:
-            p = getattr(prov, "page_no", None)
-            if p is not None:
-                pages.add(int(p))
-    return pages
-
-
-def collect_text_samples(doc, limit: int = 200) -> list[str]:
-    texts: list[str] = []
-    for item, _ in doc.iterate_items():
-        t = getattr(item, "text", None)
-        if t and str(t).strip():
-            texts.append(str(t).strip())
-            if len(texts) >= limit:
-                break
-    return texts
 
 
 def metrics_from_doc(doc) -> dict[str, Any]:
@@ -107,6 +142,27 @@ def metrics_from_doc(doc) -> dict[str, Any]:
         "most_repeated_text_count": int(top_rep[1]) if top_rep else 0,
         "duplicate_heavy": dup_ratio > 0.15 and len(samples) > 10,
     }
+
+
+def page_numbers_from_doc(doc) -> set[int]:
+    pages: set[int] = set()
+    for item, _ in doc.iterate_items():
+        for prov in getattr(item, "prov", None) or []:
+            p = getattr(prov, "page_no", None)
+            if p is not None:
+                pages.add(int(p))
+    return pages
+
+
+def collect_text_samples(doc, limit: int = 200) -> list[str]:
+    texts: list[str] = []
+    for item, _ in doc.iterate_items():
+        t = getattr(item, "text", None)
+        if t and str(t).strip():
+            texts.append(str(t).strip())
+            if len(texts) >= limit:
+                break
+    return texts
 
 
 def heuristic_metrics(data: dict) -> dict[str, Any]:
@@ -241,62 +297,6 @@ def parse_args():
         "--quiet", action="store_true", help="Only print JSON report to stdout"
     )
     return p.parse_args()
-
-
-def main() -> None:
-    args = parse_args()
-    if not args.json_path.is_file():
-        print(json.dumps({"error": f"not found: {args.json_path}"}), file=sys.stderr)
-        sys.exit(1)
-
-    doc, raw = load_document(args.json_path)
-    if doc is not None:
-        m = metrics_from_doc(doc)
-    else:
-        m = heuristic_metrics(raw)
-
-    if args.markdown and args.markdown.is_file():
-        md_len = len(args.markdown.read_text(encoding="utf-8"))
-        m["markdown_file_chars"] = md_len
-        if m.get("markdown_chars", 0) == 0:
-            m["markdown_chars"] = md_len
-
-    status, issues, actions = evaluate(
-        m,
-        expect_tables=args.expect_tables,
-        min_chars_per_page=args.min_chars_per_page,
-        min_markdown_chars=args.min_markdown_chars,
-    )
-
-    report = {
-        "status": status,
-        "metrics": m,
-        "issues": issues,
-        "recommended_actions": actions,
-        "next_steps_for_agent": [
-            "Re-run docling with flags from recommended_actions.",
-            "Re-export JSON and run this script again until status is pass.",
-            "Append a row to improvement-log.md (see SKILL.md).",
-        ],
-    }
-
-    print(json.dumps(report, indent=2, ensure_ascii=False))
-    if not args.quiet:
-        print(f"\nstatus={status}", file=sys.stderr)
-        if issues:
-            print("issues:", file=sys.stderr)
-            for i in issues:
-                print(f"  - {i}", file=sys.stderr)
-        if actions:
-            print("recommended_actions:", file=sys.stderr)
-            for a in actions:
-                print(f"  - {a}", file=sys.stderr)
-
-    if status == "fail":
-        sys.exit(1)
-    if status == "warn" and args.fail_on_warn:
-        sys.exit(1)
-    sys.exit(0)
 
 
 if __name__ == "__main__":

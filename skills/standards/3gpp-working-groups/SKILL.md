@@ -220,17 +220,19 @@ When parsing CLI arguments or user input:
 ```python
 from tdoc_crawler.models import WorkingGroup
 
+
 def normalize_meeting_code(code: str) -> str:
     """Normalize meeting codes to canonical format."""
     plenary_aliases = {"RP": "RAN", "SP": "SA", "CP": "CT"}
     upper = code.upper().strip()
-    
+
     if upper in plenary_aliases:
         return plenary_aliases[upper]
-    
+
     # Extract prefix for subgroups (R1, S4, C1, etc.)
     # Code example: "R1" → RAN group, subgroup RAN1
     return upper[0] if len(upper) > 1 else upper
+
 
 def get_tbid_from_wg(wg: WorkingGroup) -> int:
     """Get TBID from WorkingGroup enum."""

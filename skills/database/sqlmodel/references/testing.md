@@ -7,17 +7,17 @@ import pytest
 from sqlmodel import SQLModel, create_engine, Session
 from fastapi.testclient import TestClient
 
+
 # Test engine using SQLite in-memory
 @pytest.fixture(name="engine")
 def engine_fixture():
     """Create test database engine"""
     engine = create_engine(
-        "sqlite:///:memory:",
-        connect_args={"check_same_thread": False},
-        echo=False
+        "sqlite:///:memory:", connect_args={"check_same_thread": False}, echo=False
     )
     SQLModel.metadata.create_all(engine)
     return engine
+
 
 @pytest.fixture(name="session")
 def session_fixture(engine):
@@ -32,6 +32,7 @@ def session_fixture(engine):
 from typing import Generator
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+
 
 @pytest.fixture(name="client")
 def client_fixture(session: Session) -> Generator[TestClient, None, None]:
@@ -55,11 +56,7 @@ def client_fixture(session: Session) -> Generator[TestClient, None, None]:
 ```python
 def test_create_user(session: Session):
     """Test creating a user"""
-    user = User(
-        username="testuser",
-        email="test@example.com",
-        is_active=True
-    )
+    user = User(username="testuser", email="test@example.com", is_active=True)
     session.add(user)
     session.commit()
     session.refresh(user)
@@ -67,6 +64,7 @@ def test_create_user(session: Session):
     assert user.id is not None
     assert user.username == "testuser"
     assert user.email == "test@example.com"
+
 
 def test_get_user(session: Session):
     """Test retrieving a user"""
@@ -81,6 +79,7 @@ def test_get_user(session: Session):
     assert retrieved is not None
     assert retrieved.username == "testuser"
 
+
 def test_update_user(session: Session):
     """Test updating a user"""
     user = User(username="testuser", email="test@example.com")
@@ -94,6 +93,7 @@ def test_update_user(session: Session):
     session.refresh(user)
 
     assert user.email == "newemail@example.com"
+
 
 def test_delete_user(session: Session):
     """Test deleting a user"""
@@ -117,16 +117,13 @@ def test_delete_user(session: Session):
 def test_create_user_endpoint(client: TestClient):
     """Test POST /users endpoint"""
     response = client.post(
-        "/users",
-        json={
-            "username": "testuser",
-            "email": "test@example.com"
-        }
+        "/users", json={"username": "testuser", "email": "test@example.com"}
     )
     assert response.status_code == 201
     data = response.json()
     assert data["username"] == "testuser"
     assert "id" in data
+
 
 def test_get_user_endpoint(client: TestClient, session: Session):
     """Test GET /users/{id} endpoint"""
@@ -142,18 +139,17 @@ def test_get_user_endpoint(client: TestClient, session: Session):
     data = response.json()
     assert data["username"] == "testuser"
 
+
 def test_get_nonexistent_user(client: TestClient):
     """Test GET /users/{id} with invalid ID"""
     response = client.get("/users/9999")
     assert response.status_code == 404
 
+
 def test_list_users_endpoint(client: TestClient, session: Session):
     """Test GET /users endpoint"""
     # Create multiple users
-    users = [
-        User(username=f"user{i}", email=f"user{i}@example.com")
-        for i in range(5)
-    ]
+    users = [User(username=f"user{i}", email=f"user{i}@example.com") for i in range(5)]
     session.add_all(users)
     session.commit()
 
@@ -163,6 +159,7 @@ def test_list_users_endpoint(client: TestClient, session: Session):
     data = response.json()
     assert len(data) == 5
 
+
 def test_update_user_endpoint(client: TestClient, session: Session):
     """Test PUT /users/{id} endpoint"""
     user = User(username="testuser", email="test@example.com")
@@ -171,13 +168,11 @@ def test_update_user_endpoint(client: TestClient, session: Session):
     session.refresh(user)
 
     # Update user
-    response = client.put(
-        f"/users/{user.id}",
-        json={"email": "newemail@example.com"}
-    )
+    response = client.put(f"/users/{user.id}", json={"email": "newemail@example.com"})
     assert response.status_code == 200
     data = response.json()
     assert data["email"] == "newemail@example.com"
+
 
 def test_delete_user_endpoint(client: TestClient, session: Session):
     """Test DELETE /users/{id} endpoint"""
@@ -201,28 +196,23 @@ def test_delete_user_endpoint(client: TestClient, session: Session):
 @pytest.fixture
 def sample_user(session: Session) -> User:
     """Create a sample user for testing"""
-    user = User(
-        username="testuser",
-        email="test@example.com",
-        is_active=True
-    )
+    user = User(username="testuser", email="test@example.com", is_active=True)
     session.add(user)
     session.commit()
     session.refresh(user)
     return user
 
+
 @pytest.fixture
 def sample_users(session: Session) -> List[User]:
     """Create multiple sample users"""
-    users = [
-        User(username=f"user{i}", email=f"user{i}@example.com")
-        for i in range(10)
-    ]
+    users = [User(username=f"user{i}", email=f"user{i}@example.com") for i in range(10)]
     session.add_all(users)
     session.commit()
     for user in users:
         session.refresh(user)
     return users
+
 
 # Use fixtures in tests
 def test_with_fixture(sample_user: User):
@@ -254,14 +244,12 @@ def test_user_posts_relationship(session: Session):
     assert len(user.posts) == 3
     assert all(post.user_id == user.id for post in user.posts)
 
+
 def test_many_to_many_relationship(session: Session):
     """Test many-to-many relationship"""
     # Create students and courses
     student = Student(name="John")
-    courses = [
-        Course(title="Math"),
-        Course(title="Science")
-    ]
+    courses = [Course(title="Math"), Course(title="Science")]
 
     session.add(student)
     session.add_all(courses)
@@ -285,10 +273,11 @@ def test_email_validation(client: TestClient):
         "/users",
         json={
             "username": "testuser",
-            "email": "invalid-email"  # Invalid email
-        }
+            "email": "invalid-email",  # Invalid email
+        },
     )
     assert response.status_code == 422  # Validation error
+
 
 def test_unique_constraint(client: TestClient, session: Session):
     """Test unique constraint violation"""
@@ -302,8 +291,8 @@ def test_unique_constraint(client: TestClient, session: Session):
         "/users",
         json={
             "username": "testuser",  # Duplicate username
-            "email": "other@example.com"
-        }
+            "email": "other@example.com",
+        },
     )
     assert response.status_code == 400
 ```
@@ -327,6 +316,7 @@ def test_transaction_rollback(session: Session):
     users = session.exec(select(User)).all()
     assert len(users) == 0
 
+
 def test_transaction_commit(session: Session):
     """Test successful transaction"""
     user = User(username="testuser", email="test@example.com")
@@ -341,22 +331,19 @@ def test_transaction_commit(session: Session):
 ## Parametrized Tests
 
 ```python
-@pytest.mark.parametrize("username,email,expected", [
-    ("user1", "user1@example.com", True),
-    ("user2", "user2@example.com", True),
-    ("user3", "invalid-email", False),
-])
+@pytest.mark.parametrize(
+    "username,email,expected",
+    [
+        ("user1", "user1@example.com", True),
+        ("user2", "user2@example.com", True),
+        ("user3", "invalid-email", False),
+    ],
+)
 def test_create_user_variations(
-    client: TestClient,
-    username: str,
-    email: str,
-    expected: bool
+    client: TestClient, username: str, email: str, expected: bool
 ):
     """Test user creation with various inputs"""
-    response = client.post(
-        "/users",
-        json={"username": username, "email": email}
-    )
+    response = client.post("/users", json={"username": username, "email": email})
 
     if expected:
         assert response.status_code == 201
@@ -380,13 +367,12 @@ def reset_database(engine):
 import pytest
 from sqlmodel import create_engine
 
+
 @pytest.fixture(scope="session")
 def postgres_engine():
     """Create PostgreSQL test database"""
     # Create test database
-    engine = create_engine(
-        "postgresql://user:password@localhost:5432/test_db"
-    )
+    engine = create_engine("postgresql://user:password@localhost:5432/test_db")
 
     # Create tables
     SQLModel.metadata.create_all(engine)
@@ -396,6 +382,7 @@ def postgres_engine():
     # Drop all tables after tests
     SQLModel.metadata.drop_all(engine)
     engine.dispose()
+
 
 @pytest.fixture
 def postgres_session(postgres_engine):
@@ -434,9 +421,10 @@ open htmlcov/index.html
 ```python
 from unittest.mock import Mock, patch
 
+
 def test_with_mocked_external_api(session: Session):
     """Test with mocked external API call"""
-    with patch('app.services.external_api.call') as mock_api:
+    with patch("app.services.external_api.call") as mock_api:
         mock_api.return_value = {"status": "success"}
 
         user = User(username="testuser", email="test@example.com")

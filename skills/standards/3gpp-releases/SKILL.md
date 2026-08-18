@@ -115,7 +115,7 @@ Older releases that are "closed" - no further Change Requests accepted.
 base_url = "https://www.3gpp.org/ftp/Specs/2018-12/"
 
 # List all spec files
-spec_list = requests.get(base_url).text.split('\n')
+spec_list = requests.get(base_url).text.split("\n")
 ```
 
 ### Spec Number Pattern

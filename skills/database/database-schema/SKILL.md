@@ -71,6 +71,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from database.base import Base
 
+
 class User(Base):
     __tablename__ = "users"
 
@@ -83,9 +84,10 @@ class User(Base):
     # Relationships
     posts = relationship("Post", back_populates="author", cascade="all, delete-orphan")
 
+
 # PostgreSQL-specific indexes
-Index('idx_user_email', 'email', unique=True)
-Index('idx_user_created_at', 'created_at')
+Index("idx_user_email", "email", unique=True)
+Index("idx_user_created_at", "created_at")
 ```
 
 ### MongoDB Schema Generation (ODMantic)
@@ -95,18 +97,17 @@ from odmantic import Model, Field, Index
 from datetime import datetime
 from typing import List, Optional
 
+
 class User(Model):
-    email: str = Field(unique=True, regex=r'^[\w\.-]+@[\w\.-]+\.\w+$')
+    email: str = Field(unique=True, regex=r"^[\w\.-]+@[\w\.-]+\.\w+$")
     name: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
     class Config:
         collection = "users"
-        indexes = [
-            Index("email", unique=True),
-            Index("created_at")
-        ]
+        indexes = [Index("email", unique=True), Index("created_at")]
+
 
 class Post(Model):
     title: str
@@ -120,11 +121,7 @@ class Post(Model):
 
     class Config:
         collection = "posts"
-        indexes = [
-            Index("author_id"),
-            Index("created_at"),
-            Index("tags")
-        ]
+        indexes = [Index("author_id"), Index("created_at"), Index("tags")]
 ```
 
 ### SQLite Schema Generation
@@ -134,6 +131,7 @@ from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from database.base import Base
+
 
 class User(Base):
     __tablename__ = "users"
@@ -159,32 +157,37 @@ Revises: 7d5c8b1a2c3d
 Create Date: 2023-10-15 10:30:00.000000
 
 """
+
 from alembic import op
 import sqlalchemy as sa
 
 # revision identifiers
-revision = 'abc123def456'
-down_revision = '7d5c8b1a2c3d'
+revision = "abc123def456"
+down_revision = "7d5c8b1a2c3d"
 branch_labels = None
 depends_on = None
 
+
 def upgrade():
     # Add new columns
-    op.add_column('users', sa.Column('bio', sa.Text(), nullable=True))
-    op.add_column('users', sa.Column('avatar_url', sa.String(500), nullable=True))
-    op.add_column('users', sa.Column('is_verified', sa.Boolean(), nullable=True, default=False))
+    op.add_column("users", sa.Column("bio", sa.Text(), nullable=True))
+    op.add_column("users", sa.Column("avatar_url", sa.String(500), nullable=True))
+    op.add_column(
+        "users", sa.Column("is_verified", sa.Boolean(), nullable=True, default=False)
+    )
 
     # Create indexes
-    op.create_index('ix_users_bio', 'users', ['bio'])
-    op.create_index('ix_users_is_verified', 'users', ['is_verified'])
+    op.create_index("ix_users_bio", "users", ["bio"])
+    op.create_index("ix_users_is_verified", "users", ["is_verified"])
+
 
 def downgrade():
     # Remove columns (in reverse order)
-    op.drop_index('ix_users_is_verified')
-    op.drop_index('ix_users_bio')
-    op.drop_column('users', 'is_verified')
-    op.drop_column('users', 'avatar_url')
-    op.drop_column('users', 'bio')
+    op.drop_index("ix_users_is_verified")
+    op.drop_index("ix_users_bio")
+    op.drop_column("users", "is_verified")
+    op.drop_column("users", "avatar_url")
+    op.drop_column("users", "bio")
 ```
 
 ## FastAPI Integration Patterns
@@ -196,9 +199,9 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 from database.session import get_db
 
+
 async def get_current_user(
-    token: str = Security(oauth2_scheme),
-    db: Session = Depends(get_db)
+    token: str = Security(oauth2_scheme), db: Session = Depends(get_db)
 ):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,

@@ -99,9 +99,9 @@ PYTHONPATH=/path/to/docx-skill uv run your_script.py
 ```python
 from scripts.document import Document, DocxXMLEditor
 
-doc = Document('unpacked', author="Claude", initials="C")
+doc = Document("unpacked", author="Claude", initials="C")
 node = doc["word/document.xml"].get_node(tag="w:r", contains="old text")
-doc["word/document.xml"].replace_node(node, '<w:del>...<w:ins>...')
+doc["word/document.xml"].replace_node(node, "<w:del>...<w:ins>...")
 doc.save()
 ```
 

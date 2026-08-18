@@ -4,6 +4,7 @@ Validator for tracked changes in Word documents.
 
 import subprocess
 import tempfile
+import xml.etree.ElementTree as ET
 import zipfile
 from pathlib import Path
 
@@ -34,8 +35,6 @@ class RedliningValidator:
 
         # First, check if there are any tracked changes by Claude to validate
         try:
-            import xml.etree.ElementTree as ET
-
             tree = ET.parse(modified_file)
             root = tree.getroot()
 
@@ -85,8 +84,6 @@ class RedliningValidator:
 
             # Parse both XML files using xml.etree.ElementTree for redlining validation
             try:
-                import xml.etree.ElementTree as ET
-
                 modified_tree = ET.parse(modified_file)
                 modified_root = modified_tree.getroot()
                 original_tree = ET.parse(original_file)

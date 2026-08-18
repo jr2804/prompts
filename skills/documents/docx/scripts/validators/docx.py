@@ -2,10 +2,12 @@
 Validator for Word document XML files against XSD schemas.
 """
 
+import random
 import re
 import tempfile
 import zipfile
 
+import defusedxml.minidom
 import lxml.etree
 
 from .base import BaseSchemaValidator
@@ -28,8 +30,6 @@ class DOCXSchemaValidator(BaseSchemaValidator):
 
     def repair_durableId(self) -> int:
         """Fix durableId values >= 0x7FFFFFFF which cause validation failures."""
-        import defusedxml.minidom
-        import random
 
         repairs = 0
 
@@ -48,18 +48,26 @@ class DOCXSchemaValidator(BaseSchemaValidator):
 
                     if xml_file.name == "numbering.xml":
                         try:
-                            needs_repair = self._parse_id_value(durable_id, base=10) >= 0x7FFFFFFF
+                            needs_repair = (
+                                self._parse_id_value(durable_id, base=10) >= 0x7FFFFFFF
+                            )
                         except ValueError:
                             needs_repair = True
                     else:
                         try:
-                            needs_repair = self._parse_id_value(durable_id, base=16) >= 0x7FFFFFFF
+                            needs_repair = (
+                                self._parse_id_value(durable_id, base=16) >= 0x7FFFFFFF
+                            )
                         except ValueError:
                             needs_repair = True
 
                     if needs_repair:
                         value = random.randint(1, 0x7FFFFFFE)
-                        new_id = str(value) if xml_file.name == "numbering.xml" else f"{value:08X}"
+                        new_id = (
+                            str(value)
+                            if xml_file.name == "numbering.xml"
+                            else f"{value:08X}"
+                        )
                         elem.setAttribute("w16cid:durableId", new_id)
                         repairs += 1
                         modified = True
@@ -71,11 +79,6 @@ class DOCXSchemaValidator(BaseSchemaValidator):
                 pass
 
         return repairs
-
-    @staticmethod
-    def _parse_id_value(value: str, base: int) -> int:
-        """Parse an ID value in the given base."""
-        return int(value, base)
 
     def validate(self):
         """Run all validation checks and return True if all pass."""
@@ -323,6 +326,11 @@ class DOCXSchemaValidator(BaseSchemaValidator):
         diff = new_count - original_count
         diff_str = f"+{diff}" if diff > 0 else str(diff)
         print(f"\nParagraphs: {original_count} → {new_count} ({diff_str})")
+
+    @staticmethod
+    def _parse_id_value(value: str, base: int) -> int:
+        """Parse an ID value in the given base."""
+        return int(value, base)
 
 
 if __name__ == "__main__":

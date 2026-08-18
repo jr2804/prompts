@@ -32,6 +32,7 @@ if TYPE_CHECKING:
 if TYPE_CHECKING:
     from .external import HeavyModel
 
+
 class Service:
     def process(self, data: "HeavyModel") -> None:  # type: ignore
         ...
@@ -71,47 +72,46 @@ ______________________________________________________________________
 # user.py
 from .order import Order  # causes cycle
 
+
 class User:
-    def last_order(self) -> "Order":
-        ...
+    def last_order(self) -> "Order": ...
 ```
 
 ```python
 # order.py
 from .user import User  # causes cycle
 
+
 class Order:
-    def customer(self) -> User:
-        ...
+    def customer(self) -> User: ...
 ```
 
 **Solution:** Move shared domain types to a third module.
 
 ```python
 # domain.py
-class User:
-    ...
+class User: ...
 
-class Order:
-    ...
+
+class Order: ...
 ```
 
 ```python
 # user.py
 from .domain import Order, User
 
+
 class User(User):
-    def last_order(self) -> Order:
-        ...
+    def last_order(self) -> Order: ...
 ```
 
 ```python
 # order.py
 from .domain import Order, User
 
+
 class Order(Order):
-    def customer(self) -> User:
-        ...
+    def customer(self) -> User: ...
 ```
 
 **Guidelines:**
@@ -129,6 +129,7 @@ ______________________________________________________________________
 # interfaces.py
 from typing import Protocol
 
+
 class Storage(Protocol):
     def write(self, key: str, data: bytes) -> None: ...
     def read(self, key: str) -> bytes: ...
@@ -138,13 +139,14 @@ class Storage(Protocol):
 # storage_fs.py
 from .interfaces import Storage
 
-class FileSystemStorage(Storage):
-    ...
+
+class FileSystemStorage(Storage): ...
 ```
 
 ```python
 # service.py
 from .interfaces import Storage
+
 
 class Service:
     def __init__(self, storage: Storage) -> None:
@@ -173,6 +175,7 @@ class Node:
 
 ```python
 from __future__ import annotations
+
 
 class Node:
     def __init__(self, parent: Node | None = None) -> None:

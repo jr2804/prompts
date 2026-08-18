@@ -125,10 +125,8 @@ Use modern type hint syntax:
 ```python
 # Use | instead of Union or Optional
 def process_data(
-    input_data: list[dict[str, int | str]],
-    config: dict[str, str] | None = None
-) -> dict[str, list[float]]:
-    ...
+    input_data: list[dict[str, int | str]], config: dict[str, str] | None = None
+) -> dict[str, list[float]]: ...
 ```
 
 ______________________________________________________________________

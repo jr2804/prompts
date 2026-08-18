@@ -31,15 +31,19 @@ Use sequential-thinking when:
 ## Parameters
 
 ```python
-thought: str                    # Your current thinking step
-nextThoughtNeeded: bool         # True if you need more thinking, even if at what seemed like the end
-thoughtNumber: int              # Current number in sequence (can go beyond initial total if needed)
-totalThoughts: int             # Current estimate of thoughts needed (can be adjusted up/down)
-isRevision: bool                # A boolean indicating if this thought revises previous thinking
-revisesThought: int           # If is_revision is true, which thought number is being reconsidered
-branchFromThought: int         # If branching, which thought number is the branching point
-branchId: str                 # Identifier for the current branch (if any)
-needsMoreThoughts: bool         # If reaching end but realizing more thoughts needed
+thought: str  # Your current thinking step
+nextThoughtNeeded: (
+    bool  # True if you need more thinking, even if at what seemed like the end
+)
+thoughtNumber: int  # Current number in sequence (can go beyond initial total if needed)
+totalThoughts: int  # Current estimate of thoughts needed (can be adjusted up/down)
+isRevision: bool  # A boolean indicating if this thought revises previous thinking
+revisesThought: (
+    int  # If is_revision is true, which thought number is being reconsidered
+)
+branchFromThought: int  # If branching, which thought number is the branching point
+branchId: str  # Identifier for the current branch (if any)
+needsMoreThoughts: bool  # If reaching end but realizing more thoughts needed
 ```
 
 ## Workflow

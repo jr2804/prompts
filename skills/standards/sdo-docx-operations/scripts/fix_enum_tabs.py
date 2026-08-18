@@ -13,14 +13,6 @@ from pathlib import Path
 from officecli_xml_common import load_json_spec, raw_set, validate_doc
 
 
-def build_xml(bullet: str, text: str) -> str:
-    return (
-        f"<w:r><w:t>{bullet}</w:t></w:r>"
-        "<w:r><w:tab/></w:r>"
-        f"<w:r><w:t xml:space=\"preserve\">{text}</w:t></w:r>"
-    )
-
-
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--doc", required=True)
@@ -48,6 +40,14 @@ def main() -> int:
     if not args.dry_run:
         validate_doc(args.doc, verbose=args.verbose)
     return 0
+
+
+def build_xml(bullet: str, text: str) -> str:
+    return (
+        f"<w:r><w:t>{bullet}</w:t></w:r>"
+        "<w:r><w:tab/></w:r>"
+        f'<w:r><w:t xml:space="preserve">{text}</w:t></w:r>'
+    )
 
 
 if __name__ == "__main__":

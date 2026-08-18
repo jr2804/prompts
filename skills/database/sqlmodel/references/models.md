@@ -7,6 +7,7 @@ from sqlmodel import SQLModel, Field
 from typing import Optional
 from datetime import datetime
 
+
 class User(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     username: str = Field(index=True, unique=True, max_length=50)
@@ -21,10 +22,12 @@ class User(SQLModel, table=True):
 from decimal import Decimal
 from enum import Enum
 
+
 class Status(str, Enum):
     ACTIVE = "active"
     INACTIVE = "inactive"
     PENDING = "pending"
+
 
 class Product(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -86,20 +89,24 @@ class UserBase(SQLModel):
     username: str = Field(max_length=50)
     email: str = Field(max_length=100)
 
+
 # Table model
 class User(UserBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     hashed_password: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
+
 # Request model (no password hash, no timestamps)
 class UserCreate(UserBase):
     password: str = Field(min_length=8)
+
 
 # Update model (all fields optional)
 class UserUpdate(SQLModel):
     username: Optional[str] = Field(default=None, max_length=50)
     email: Optional[str] = Field(default=None, max_length=100)
+
 
 # Response model (no password, includes timestamps)
 class UserRead(UserBase):
@@ -113,6 +120,7 @@ class UserRead(UserBase):
 from sqlmodel import Field, Column
 from sqlalchemy import String, computed
 
+
 class Order(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     first_name: str
@@ -122,16 +130,9 @@ class Order(SQLModel, table=True):
 
     # Computed column (database-level)
     full_name: str = Field(
-        sa_column=Column(
-            String,
-            computed("first_name || ' ' || last_name")
-        )
+        sa_column=Column(String, computed("first_name || ' ' || last_name"))
     )
-    total_price: Decimal = Field(
-        sa_column=Column(
-            computed("quantity * unit_price")
-        )
-    )
+    total_price: Decimal = Field(sa_column=Column(computed("quantity * unit_price")))
 ```
 
 ## JSON Fields
@@ -140,6 +141,7 @@ class Order(SQLModel, table=True):
 from typing import Dict, Any
 from sqlmodel import Column
 from sqlalchemy.dialects.postgresql import JSON, JSONB
+
 
 class Settings(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -155,6 +157,7 @@ class Settings(SQLModel, table=True):
 
 ```python
 from uuid import UUID, uuid4
+
 
 class Session(SQLModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)

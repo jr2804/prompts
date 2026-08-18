@@ -49,8 +49,10 @@ def process_data(item_id: str, group_id: int) -> dict[str, str]:
     """Process a data item and return metadata."""
     return {"id": item_id, "group": group_id}
 
+
 # Use pipe syntax for optional types
 from pathlib import Path
+
 
 def fetch_data(item_id: str, cache_dir: Path | None = None) -> dict[str, str] | None:
     """Fetch data metadata, returns None if not found."""
@@ -112,6 +114,7 @@ cache_dir.mkdir(parents=True, exist_ok=True)
 
 # WRONG
 import os.path
+
 cache_dir = os.path.join(os.path.expanduser("~"), ".project-cache", "data")
 ```
 
@@ -134,6 +137,7 @@ Use `with` statements when working with files.
 ```python
 # CORRECT
 from pathlib import Path
+
 with open("data.json") as f:
     data = json.load(f)
 
@@ -293,6 +297,7 @@ Choose the right tool based on **what the data does**, not just what it holds.
 ```python
 from dataclasses import dataclass
 
+
 # CORRECT — lightweight internal point, never leaves the process
 @dataclass(frozen=True, slots=True)
 class Point:
@@ -302,6 +307,7 @@ class Point:
 
 ```python
 from pydantic import BaseModel, Field, EmailStr
+
 
 # CORRECT — user-facing data with validation at a trust boundary
 class UserRegistration(BaseModel):
@@ -313,6 +319,7 @@ class UserRegistration(BaseModel):
 ```python
 from dataclasses import dataclass
 
+
 # CORRECT — CLI parameter bundle, validated by Typer before reaching this struct
 @dataclass
 class RenderOptions:
@@ -323,6 +330,7 @@ class RenderOptions:
 
 ```python
 from typing import TypedDict
+
 
 # CORRECT — dict-shaped data from an external JSON API you don't control
 class GithubRepo(TypedDict):
@@ -336,9 +344,12 @@ class GithubRepo(TypedDict):
 ```python
 # WRONG — pydantic is overkill for a simple internal struct
 from pydantic import BaseModel
+
+
 class Point(BaseModel):
     x: float
     y: float
+
 
 # WRONG — dataclass provides no runtime validation for untrusted input
 @dataclass
@@ -349,12 +360,17 @@ class UserInput:
 ```python
 # CORRECT
 from dataclasses import dataclass
+
+
 @dataclass(frozen=True, slots=True)
 class Point:
     x: float
     y: float
 
+
 from pydantic import BaseModel, EmailStr
+
+
 class UserInput(BaseModel):
     email: EmailStr
 ```
@@ -386,6 +402,7 @@ _ASSET_PREFIX: Final[dict[AssetKind, str]] = {
     AssetKind.EQUATION: "eq",
 }
 
+
 class AssetKind(StrEnum):
     TABLE = "table"
     FIGURE = "figure"
@@ -393,13 +410,14 @@ class AssetKind(StrEnum):
 
     @property
     def prefix(self) -> str:
-        return _ASSET_PREFIX[self]   # forward ref to the dict above
+        return _ASSET_PREFIX[self]  # forward ref to the dict above
 ```
 
 ```python
 # CORRECT — one member list, associated values declared inline
 from enum import StrEnum
 from aenum import MultiValueEnum
+
 
 class AssetKind(StrEnum, MultiValueEnum):
     def __init__(self, value: str, *aliases: str) -> None:
@@ -477,6 +495,7 @@ class FeatureFlags:
 ```python
 import os
 
+
 def get_env_var(name: str, default: str | None = None) -> str:
     """Get environment variable with validation."""
     value = os.environ.get(name, default)
@@ -512,12 +531,15 @@ Canonical deep-dive guidance for this rule lives in [type-checking.md](type-chec
 ```python
 # WRONG - permanent TYPE_CHECKING guard
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from my_project.database import ItemDatabase
+
 
 # RIGHT - lazy import (temporary fix) or refactor
 def _resolve_data_id(db_file: Path) -> int:
     from my_project.database import ItemDatabase  # Lazy import
+
     with ItemDatabase(db_file) as db:
         return db.resolve_data_id(name)
 ```
@@ -590,14 +612,15 @@ def process_item(item_id: int) -> dict[str, Any]:
     """Process a single item by its integer ID."""
     ...
 
+
 # Output: use a dedicated result type instead of None-as-error
 @dataclass
 class ProcessResult:
     value: int
     reason: str | None = None
 
-def process_item(item_id: int) -> ProcessResult:
-    ...
+
+def process_item(item_id: int) -> ProcessResult: ...
 ```
 
 **When `T | None` is acceptable:**
@@ -622,6 +645,7 @@ linter warnings. There is always a more precise option.
 ```python
 from typing import Any
 
+
 # WRONG — callers and type checkers gain nothing from these signatures
 def save_to_db(record: object) -> object: ...
 def process(data: Any) -> Any: ...
@@ -645,14 +669,17 @@ protocol without explicit inheritance, which is cleaner and more flexible:
 ```python
 from typing import Protocol
 
+
 class Serializable(Protocol):
     """Anything with a to_dict method."""
+
     def to_dict(self) -> dict[str, str]: ...
 
 
 def persist(obj: Serializable) -> None:
     data = obj.to_dict()
     ...
+
 
 # No inheritance needed — any object with to_dict() works
 persist(my_object)  # OK if my_object has to_dict()
@@ -689,12 +716,14 @@ signatures (see `https://github.com/ArjanCodes/examples/tree/main/2026/none`).
 from dataclasses import dataclass
 from typing import Any
 
+
 # WRONG — callers must handle None, type checker sees Optional
 @dataclass
 class Delivery:
     destination: Coordinates
     required_battery: int
     avoid_zones: list[GeoFence] | None = None  # None as empty-list sentinel
+
 
 # Caller: always checked defensively
 if delivery.avoid_zones is not None:
@@ -710,6 +739,7 @@ class Delivery:
     destination: Coordinates
     required_battery: int
     avoid_zones: list[GeoFence] = field(default_factory=list)
+
 
 # Caller: no None check needed, empty list iteration is a no-op
 for zone in delivery.avoid_zones:
@@ -743,10 +773,14 @@ if result is None:  # What failed? Why?
 class RouteRejected(Exception):
     """Raised when route conditions are not met."""
 
-def assign_delivery(drone: ReadyDrone, delivery: Delivery, weather: WeatherReport) -> Route:
+
+def assign_delivery(
+    drone: ReadyDrone, delivery: Delivery, weather: WeatherReport
+) -> Route:
     if weather.wind_speed > drone.max_wind_speed:
         raise RouteRejected("Too windy for this drone")
     ...
+
 
 try:
     route = assign_delivery(drone, delivery, weather)
@@ -841,16 +875,20 @@ def assign_delivery(
 ```python
 from typing import Protocol
 
+
 class RouteDiagnostics(Protocol):
     def record(self, message: str) -> None: ...
+
 
 class ConsoleDiagnostics:
     def record(self, message: str) -> None:
         print(f"[diagnostics] {message}")
 
+
 class NullDiagnostics:
     def record(self, message: str) -> None:
         pass  # Silent no-op
+
 
 # Function uses a concrete default, no Optional, no None checks
 def assign_delivery(
@@ -876,6 +914,7 @@ checks anywhere.
 class WeatherReport:
     wind_speed: int | None  # When would this be None?
 
+
 def process(weather: WeatherReport) -> None:
     if weather.wind_speed is not None:
         ...  # Always defended, never triggered
@@ -888,8 +927,8 @@ def process(weather: WeatherReport) -> None:
 class WeatherReport:
     wind_speed: int  # Always available
 
-def process(weather: WeatherReport) -> None:
-    ...  # No None check
+
+def process(weather: WeatherReport) -> None: ...  # No None check
 ```
 
 If the data source sometimes lacks the value, validate at the boundary

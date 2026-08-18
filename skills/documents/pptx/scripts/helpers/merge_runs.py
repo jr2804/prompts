@@ -39,6 +39,17 @@ def merge_runs(input_dir: str) -> tuple[int, str]:
         return 0, f"Error: {e}"
 
 
+def _remove_elements(root, tag: str):
+    for elem in _find_elements(root, tag):
+        if elem.parentNode:
+            elem.parentNode.removeChild(elem)
+
+
+def _strip_run_rsid_attrs(root):
+    for run in _find_elements(root, "r"):
+        for attr in list(run.attributes.values()):
+            if "rsid" in attr.name.lower():
+                run.removeAttribute(attr.name)
 
 
 def _find_elements(root, tag: str) -> list:
@@ -54,55 +65,6 @@ def _find_elements(root, tag: str) -> list:
 
     traverse(root)
     return results
-
-
-def _get_child(parent, tag: str):
-    for child in parent.childNodes:
-        if child.nodeType == child.ELEMENT_NODE:
-            name = child.localName or child.tagName
-            if name == tag or name.endswith(f":{tag}"):
-                return child
-    return None
-
-
-def _get_children(parent, tag: str) -> list:
-    results = []
-    for child in parent.childNodes:
-        if child.nodeType == child.ELEMENT_NODE:
-            name = child.localName or child.tagName
-            if name == tag or name.endswith(f":{tag}"):
-                results.append(child)
-    return results
-
-
-def _is_adjacent(elem1, elem2) -> bool:
-    node = elem1.nextSibling
-    while node:
-        if node == elem2:
-            return True
-        if node.nodeType == node.ELEMENT_NODE:
-            return False
-        if node.nodeType == node.TEXT_NODE and node.data.strip():
-            return False
-        node = node.nextSibling
-    return False
-
-
-
-
-def _remove_elements(root, tag: str):
-    for elem in _find_elements(root, tag):
-        if elem.parentNode:
-            elem.parentNode.removeChild(elem)
-
-
-def _strip_run_rsid_attrs(root):
-    for run in _find_elements(root, "r"):
-        for attr in list(run.attributes.values()):
-            if "rsid" in attr.name.lower():
-                run.removeAttribute(attr.name)
-
-
 
 
 def _merge_runs_in(container) -> int:
@@ -144,9 +106,8 @@ def _next_element_sibling(node):
 def _next_sibling_run(node):
     sibling = node.nextSibling
     while sibling:
-        if sibling.nodeType == sibling.ELEMENT_NODE:
-            if _is_run(sibling):
-                return sibling
+        if sibling.nodeType == sibling.ELEMENT_NODE and _is_run(sibling):
+            return sibling
         sibling = sibling.nextSibling
     return None
 
@@ -164,7 +125,16 @@ def _can_merge(run1, run2) -> bool:
         return False
     if rpr1 is None:
         return True
-    return rpr1.toxml() == rpr2.toxml()  
+    return rpr1.toxml() == rpr2.toxml()
+
+
+def _get_child(parent, tag: str):
+    for child in parent.childNodes:
+        if child.nodeType == child.ELEMENT_NODE:
+            name = child.localName or child.tagName
+            if name == tag or name.endswith(f":{tag}"):
+                return child
+    return None
 
 
 def _merge_run_content(target, source):
@@ -197,3 +167,26 @@ def _consolidate_text(run):
                 prev.removeAttribute("xml:space")
 
             run.removeChild(curr)
+
+
+def _get_children(parent, tag: str) -> list:
+    results = []
+    for child in parent.childNodes:
+        if child.nodeType == child.ELEMENT_NODE:
+            name = child.localName or child.tagName
+            if name == tag or name.endswith(f":{tag}"):
+                results.append(child)
+    return results
+
+
+def _is_adjacent(elem1, elem2) -> bool:
+    node = elem1.nextSibling
+    while node:
+        if node == elem2:
+            return True
+        if node.nodeType == node.ELEMENT_NODE:
+            return False
+        if node.nodeType == node.TEXT_NODE and node.data.strip():
+            return False
+        node = node.nextSibling
+    return False

@@ -35,15 +35,15 @@ import html
 import random
 import shutil
 import tempfile
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from defusedxml import minidom
+
 from .pack import pack_document
+from .utilities import XMLEditor
 from .validators.docx import DOCXSchemaValidator
 from .validators.redlining import RedliningValidator
-
-from .utilities import XMLEditor
 
 # Path to template files
 TEMPLATE_DIR = Path(__file__).parent / "templates"
@@ -485,9 +485,8 @@ class DocxXMLEditor(XMLEditor):
         Args:
             nodes: List of DOM nodes to process
         """
-        from datetime import datetime, timezone
 
-        timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        timestamp = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
         def is_inside_deletion(elem):
             """Check if element is inside a w:del element."""
@@ -594,22 +593,6 @@ class DocxXMLEditor(XMLEditor):
                 add_comment_attrs(elem)
             for elem in node.getElementsByTagName("w16cex:commentExtensible"):
                 add_comment_extensible_date(elem)
-
-
-def _generate_hex_id() -> str:
-    """Generate random 8-character hex ID for para/durable IDs.
-
-    Values are constrained to be less than 0x7FFFFFFF per OOXML spec:
-    - paraId must be < 0x80000000
-    - durableId must be < 0x7FFFFFFF
-    We use the stricter constraint (0x7FFFFFFF) for both.
-    """
-    return f"{random.randint(1, 0x7FFFFFFE):08X}"
-
-
-def _generate_rsid() -> str:
-    """Generate random 8-character hex RSID."""
-    return "".join(random.choices("0123456789ABCDEF", k=8))
 
 
 class Document:
@@ -733,7 +716,7 @@ class Document:
         comment_id = self.next_comment_id
         para_id = _generate_hex_id()
         durable_id = _generate_hex_id()
-        timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        timestamp = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
         # Add comment ranges to document.xml immediately
         self._document.insert_before(start, self._comment_range_start_xml(comment_id))
@@ -790,7 +773,7 @@ class Document:
         comment_id = self.next_comment_id
         para_id = _generate_hex_id()
         durable_id = _generate_hex_id()
-        timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        timestamp = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
         # Add comment ranges to document.xml immediately
         parent_start_elem = self._document.get_node(
@@ -1277,3 +1260,19 @@ class Document:
                 f'<Override PartName="{part_name}" ContentType="{content_type}"/>'
             )
             editor.append_to(root, override_xml)
+
+
+def _generate_hex_id() -> str:
+    """Generate random 8-character hex ID for para/durable IDs.
+
+    Values are constrained to be less than 0x7FFFFFFF per OOXML spec:
+    - paraId must be < 0x80000000
+    - durableId must be < 0x7FFFFFFF
+    We use the stricter constraint (0x7FFFFFFF) for both.
+    """
+    return f"{random.randint(1, 0x7FFFFFFE):08X}"
+
+
+def _generate_rsid() -> str:
+    """Generate random 8-character hex RSID."""
+    return "".join(random.choices("0123456789ABCDEF", k=8))

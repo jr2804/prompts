@@ -10,9 +10,10 @@ from datetime import datetime
 from typing import List, Optional
 import uuid
 
+
 class User(Model):
     # Automatic _id field provided by ODMantic
-    email: str = Field(unique=True, regex=r'^[\w\.-]+@[\w\.-]+\.\w+$')
+    email: str = Field(unique=True, regex=r"^[\w\.-]+@[\w\.-]+\.\w+$")
     name: str
     is_active: bool = True
     created_at: datetime = Field(default_factory=datetime.utcnow)
@@ -20,11 +21,7 @@ class User(Model):
 
     class Config:
         collection = "users"
-        indexes = [
-            Index("email", unique=True),
-            Index("created_at"),
-            Index("is_active")
-        ]
+        indexes = [Index("email", unique=True), Index("created_at"), Index("is_active")]
 ```
 
 ### Embedded Documents
@@ -33,11 +30,13 @@ class User(Model):
 from odmantic import Model, Field, EmbeddedModel
 from typing import List, Optional
 
+
 class Address(EmbeddedModel):
     street: str
     city: str
     country: str
     zip_code: str
+
 
 class User(Model):
     email: str
@@ -55,12 +54,14 @@ class User(Model):
 from odmantic import Model, Field, Reference
 from typing import List
 
+
 class Author(Model):
     name: str
     email: str
 
     class Config:
         collection = "authors"
+
 
 class Book(Model):
     title: str
@@ -89,7 +90,7 @@ user_doc = {
     "email": "user@example.com",
     "name": "John Doe",
     "created_at": datetime.utcnow(),
-    "is_active": True
+    "is_active": True,
 }
 result = db.users.insert_one(user_doc)
 user_id = result.inserted_id
@@ -100,7 +101,7 @@ user = db.users.find_one({"email": "user@example.com"})
 # Update document
 db.users.update_one(
     {"_id": ObjectId(user_id)},
-    {"$set": {"name": "Jane Doe", "updated_at": datetime.utcnow()}}
+    {"$set": {"name": "Jane Doe", "updated_at": datetime.utcnow()}},
 )
 
 # Delete document
@@ -113,18 +114,22 @@ db.users.delete_one({"_id": ObjectId(user_id)})
 # Aggregation pipeline
 pipeline = [
     {"$match": {"status": "active"}},
-    {"$lookup": {
-        "from": "orders",
-        "localField": "_id",
-        "foreignField": "user_id",
-        "as": "orders"
-    }},
-    {"$addFields": {
-        "order_count": {"$size": "$orders"},
-        "total_spent": {"$sum": "$orders.amount"}
-    }},
+    {
+        "$lookup": {
+            "from": "orders",
+            "localField": "_id",
+            "foreignField": "user_id",
+            "as": "orders",
+        }
+    },
+    {
+        "$addFields": {
+            "order_count": {"$size": "$orders"},
+            "total_spent": {"$sum": "$orders.amount"},
+        }
+    },
     {"$sort": {"total_spent": -1}},
-    {"$limit": 10}
+    {"$limit": 10},
 ]
 
 top_users = list(db.users.aggregate(pipeline))
@@ -146,6 +151,7 @@ class User(Model):
 
     class Config:
         collection = "users"
+
 
 # Good: Normalized for write efficiency
 class User(Model):
@@ -178,16 +184,13 @@ class Product(Model):
             Index("category"),
             Index("price"),
             Index("created_at"),
-
             # Compound indexes
             Index([("category", 1), ("price", 1)]),
             Index([("name", "text"), ("description", "text")]),  # Text index
-
             # Array indexes
             Index("tags"),
-
             # Partial indexes (with filter)
-            Index("price", partial_filter_expression={"active": True})
+            Index("price", partial_filter_expression={"active": True}),
         ]
 ```
 
@@ -208,7 +211,7 @@ def migrate_user_schema():
             "schema_version": 2,
             "created_at": user.get("created_at", datetime.utcnow()),
             "updated_at": datetime.utcnow(),
-            "preferences": user.get("preferences", {})
+            "preferences": user.get("preferences", {}),
         }
 
         # Remove old fields
@@ -235,14 +238,14 @@ def migrate_collection_structure():
             "profile": {
                 "bio": user.get("bio", ""),
                 "avatar_url": user.get("avatar_url", ""),
-                "location": user.get("location", "")
+                "location": user.get("location", ""),
             },
             "settings": {
                 "notifications": user.get("notifications", True),
-                "theme": user.get("theme", "light")
+                "theme": user.get("theme", "light"),
             },
             "created_at": user.get("created_at", datetime.utcnow()),
-            "updated_at": datetime.utcnow()
+            "updated_at": datetime.utcnow(),
         }
         db.users_v2.insert_one(new_user)
 
@@ -263,6 +266,7 @@ from contextlib import asynccontextmanager
 # Global engine instance
 engine = None
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
@@ -273,7 +277,9 @@ async def lifespan(app: FastAPI):
     # Shutdown
     client.close()
 
+
 app = FastAPI(lifespan=lifespan)
+
 
 async def get_engine():
     return engine
@@ -284,6 +290,7 @@ async def get_engine():
 ```python
 from typing import List, Optional
 from odmantic import AIOEngine, QueryExpression
+
 
 class UserRepository:
     def __init__(self, engine: AIOEngine):
@@ -323,8 +330,9 @@ async def get_user_summary(self, user_id: str):
     return await self.engine.find_one(
         User,
         User.id == user_id,
-        projection=UserSummary  # Only return specified fields
+        projection=UserSummary,  # Only return specified fields
     )
+
 
 # Use indexes effectively
 async def find_users_by_category(self, category: str):
@@ -332,7 +340,7 @@ async def find_users_by_category(self, category: str):
     return await self.engine.find(
         User,
         User.category == category,
-        sort=(User.created_at, -1)  # Sort by creation date, descending
+        sort=(User.created_at, -1),  # Sort by creation date, descending
     )
 ```
 
@@ -346,12 +354,12 @@ MONGODB_DATABASE = "myapp"
 # Connection options for better performance
 client = AsyncIOMotorClient(
     MONGODB_URL,
-    maxPoolSize=50,          # Maximum connection pool size
-    minPoolSize=10,          # Minimum connection pool size
-    maxIdleTimeMS=30000,     # Close connections after 30 seconds of inactivity
+    maxPoolSize=50,  # Maximum connection pool size
+    minPoolSize=10,  # Minimum connection pool size
+    maxIdleTimeMS=30000,  # Close connections after 30 seconds of inactivity
     serverSelectionTimeoutMS=5000,  # Wait 5 seconds for server selection
     connectTimeoutMS=20000,  # Wait 20 seconds for connection
-    socketTimeoutMS=20000    # Wait 20 seconds for socket operations
+    socketTimeoutMS=20000,  # Wait 20 seconds for socket operations
 )
 ```
 
@@ -363,7 +371,8 @@ client = AsyncIOMotorClient(
 # Schema validation at database level
 collection = db.create_collection("products")
 collection.command(
-    "collMod", "products",
+    "collMod",
+    "products",
     validator={
         "$jsonSchema": {
             "bsonType": "object",
@@ -372,10 +381,10 @@ collection.command(
                 "name": {"bsonType": "string"},
                 "price": {"bsonType": "number", "minimum": 0},
                 "category": {"bsonType": "string"},
-                "tags": {"bsonType": "array", "items": {"bsonType": "string"}}
-            }
+                "tags": {"bsonType": "array", "items": {"bsonType": "string"}},
+            },
         }
-    }
+    },
 )
 ```
 
@@ -386,19 +395,18 @@ collection.command(
 pipeline = [
     # Stage 1: Filter first to reduce document count early
     {"$match": {"status": "active", "created_at": {"$gte": start_date}}},
-
     # Stage 2: Project only needed fields
     {"$project": {"name": 1, "category": 1, "price": 1, "created_at": 1}},
-
     # Stage 3: Group operations
-    {"$group": {
-        "_id": "$category",
-        "avg_price": {"$avg": "$price"},
-        "count": {"$sum": 1}
-    }},
-
+    {
+        "$group": {
+            "_id": "$category",
+            "avg_price": {"$avg": "$price"},
+            "count": {"$sum": 1},
+        }
+    },
     # Stage 4: Sort and limit
     {"$sort": {"count": -1}},
-    {"$limit": 10}
+    {"$limit": 10},
 ]
 ```

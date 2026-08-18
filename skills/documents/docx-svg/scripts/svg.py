@@ -50,49 +50,23 @@ Usage
 
 from __future__ import annotations
 
+import re
 import xml.etree.ElementTree as ET
 from io import BytesIO
 from pathlib import Path
 
 import docx
+from docx.image import SIGNATURES
 from docx.image.constants import MIME_TYPE
 from docx.image.exceptions import UnrecognizedImageError
 from docx.image.image import BaseImageHeader
 from docx.shared import Mm
 from docxtpl import DocxTemplate, InlineImage
 
-
-# ---------------------------------------------------------------------------
-# Patch: extended image header factory that recognises SVG
-# ---------------------------------------------------------------------------
-
-def _ImageHeaderFactory(stream: BytesIO) -> BaseImageHeader:
-    """Return a |BaseImageHeader| subclass for the image in *stream*.
-
-    This patched version adds SVG support to python-docx's standard image
-    header detection.  It reads the first 256 bytes (instead of 64) so that
-    XML-declared SVGs are recognised.
-
-    Raises:
-        UnrecognizedImageError: If the image format cannot be determined.
-    """
-    from docx.image import SIGNATURES
-
-    def _read_256(s: BytesIO) -> bytes:
-        s.seek(0)
-        return s.read(256)
-
-    header = _read_256(stream)
-    for cls, offset, signature_bytes in SIGNATURES:
-        end = offset + len(signature_bytes)
-        if header[offset:end] == signature_bytes:
-            return cls.from_stream(stream)
-    raise UnrecognizedImageError
-
-
 # ---------------------------------------------------------------------------
 # SVG image header parser
 # ---------------------------------------------------------------------------
+
 
 class Svg(BaseImageHeader):
     """Image header parser for SVG images.
@@ -101,12 +75,6 @@ class Svg(BaseImageHeader):
     attributes or, when those are absent, from the ``viewBox``.
     """
 
-    @classmethod
-    def from_stream(cls, stream: BytesIO) -> Svg:
-        """Construct |Svg| from an SVG byte stream."""
-        px_width, px_height = cls._dimensions_from_stream(stream)
-        return cls(px_width, px_height, 72, 72)
-
     @property
     def content_type(self) -> str:
         return MIME_TYPE.SVG  # type: ignore[attr-defined]
@@ -114,6 +82,12 @@ class Svg(BaseImageHeader):
     @property
     def default_ext(self) -> str:
         return "svg"
+
+    @classmethod
+    def from_stream(cls, stream: BytesIO) -> Svg:
+        """Construct |Svg| from an SVG byte stream."""
+        px_width, px_height = cls._dimensions_from_stream(stream)
+        return cls(px_width, px_height, 72, 72)
 
     @classmethod
     def _dimensions_from_stream(cls, stream: BytesIO) -> tuple[int, int]:
@@ -126,7 +100,7 @@ class Svg(BaseImageHeader):
         """
         stream.seek(0)
         data = stream.read()
-        root = ET.fromstring(data)  # noqa: S314
+        root = ET.fromstring(data)
 
         # -- explicit width / height attributes --
         if "width" in root.attrib and "height" in root.attrib:
@@ -147,9 +121,36 @@ class Svg(BaseImageHeader):
         return width, height
 
 
+# ---------------------------------------------------------------------------
+# Patch: extended image header factory that recognises SVG
+# ---------------------------------------------------------------------------
+
+
+def _ImageHeaderFactory(stream: BytesIO) -> BaseImageHeader:
+    """Return a |BaseImageHeader| subclass for the image in *stream*.
+
+    This patched version adds SVG support to python-docx's standard image
+    header detection.  It reads the first 256 bytes (instead of 64) so that
+    XML-declared SVGs are recognised.
+
+    Raises:
+        UnrecognizedImageError: If the image format cannot be determined.
+    """
+
+    def _read_256(s: BytesIO) -> bytes:
+        s.seek(0)
+        return s.read(256)
+
+    header = _read_256(stream)
+    for cls, offset, signature_bytes in SIGNATURES:
+        end = offset + len(signature_bytes)
+        if header[offset:end] == signature_bytes:
+            return cls.from_stream(stream)
+    raise UnrecognizedImageError
+
+
 def _parse_dimension(value: str) -> int:
     """Strip units from an SVG dimension string and return pixels as int."""
-    import re
 
     num = re.sub(r"[^\d.]", "", value)
     try:
@@ -166,9 +167,9 @@ docx.image.Svg = Svg  # type: ignore[attr-defined]
 docx.image.constants.MIME_TYPE.SVG = "image/svg+xml"  # type: ignore[attr-defined]
 
 _SVG_SIGNATURES = [
-    (Svg, 0, b"<?xml version="),   # XML declaration first
-    (Svg, 0, b"<svg "),            # bare SVG start
-    (Svg, 0, b"<!DOCTYPE svg"),    # DOCTYPE preamble
+    (Svg, 0, b"<?xml version="),  # XML declaration first
+    (Svg, 0, b"<svg "),  # bare SVG start
+    (Svg, 0, b"<!DOCTYPE svg"),  # DOCTYPE preamble
 ]
 docx.image.SIGNATURES = tuple(list(docx.image.SIGNATURES) + _SVG_SIGNATURES)  # type: ignore[attr-defined]
 docx.image.image._ImageHeaderFactory = _ImageHeaderFactory  # type: ignore[attr-defined]
@@ -177,6 +178,7 @@ docx.image.image._ImageHeaderFactory = _ImageHeaderFactory  # type: ignore[attr-
 # ==========================================================================
 # SvgInlineImage -- docxtpl-compatible InlineImage with SVG support
 # ==========================================================================
+
 
 class SvgInlineImage(InlineImage):
     """Extended ``InlineImage`` for **docxtpl** that accepts SVG files.
@@ -201,8 +203,8 @@ class SvgInlineImage(InlineImage):
         self,
         tpl: DocxTemplate,
         image_descriptor: Path | str | BytesIO,
-        width: float | int | None = None,
-        height: float | int | None = None,
+        width: float | None = None,
+        height: float | None = None,
     ) -> None:
         if width is None and height is None:
             width = self._get_page_width(tpl)
@@ -233,6 +235,7 @@ class SvgInlineImage(InlineImage):
 # ==========================================================================
 # Utilities
 # ==========================================================================
+
 
 def is_svg(file_path: Path) -> bool:
     """Return ``True`` if *file_path* looks like an SVG image.

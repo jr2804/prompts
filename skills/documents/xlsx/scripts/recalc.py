@@ -11,7 +11,6 @@ import sys
 from pathlib import Path
 
 from office.soffice import get_soffice_env
-
 from openpyxl import load_workbook
 
 MACRO_DIR_MACOS = "~/Library/Application Support/LibreOffice/4/user/basic/Standard"
@@ -29,42 +28,23 @@ RECALCULATE_MACRO = """<?xml version="1.0" encoding="UTF-8"?>
 </script:module>"""
 
 
-def has_gtimeout():
-    try:
-        subprocess.run(
-            ["gtimeout", "--version"], capture_output=True, timeout=1, check=False
-        )
-        return True
-    except (FileNotFoundError, subprocess.TimeoutExpired):
-        return False
+def main():
+    if len(sys.argv) < 2:
+        print("Usage: python recalc.py <excel_file> [timeout_seconds]")
+        print("\nRecalculates all formulas in an Excel file using LibreOffice")
+        print("\nReturns JSON with error details:")
+        print("  - status: 'success' or 'errors_found'")
+        print("  - total_errors: Total number of Excel errors found")
+        print("  - total_formulas: Number of formulas in the file")
+        print("  - error_summary: Breakdown by error type with locations")
+        print("    - #VALUE!, #DIV/0!, #REF!, #NAME?, #NULL!, #NUM!, #N/A")
+        sys.exit(1)
 
+    filename = sys.argv[1]
+    timeout = int(sys.argv[2]) if len(sys.argv) > 2 else 30
 
-def setup_libreoffice_macro():
-    macro_dir = os.path.expanduser(
-        MACRO_DIR_MACOS if platform.system() == "Darwin" else MACRO_DIR_LINUX
-    )
-    macro_file = os.path.join(macro_dir, MACRO_FILENAME)
-
-    if (
-        os.path.exists(macro_file)
-        and "RecalculateAndSave" in Path(macro_file).read_text()
-    ):
-        return True
-
-    if not os.path.exists(macro_dir):
-        subprocess.run(
-            ["soffice", "--headless", "--terminate_after_init"],
-            capture_output=True,
-            timeout=10,
-            env=get_soffice_env(),
-        )
-        os.makedirs(macro_dir, exist_ok=True)
-
-    try:
-        Path(macro_file).write_text(RECALCULATE_MACRO)
-        return True
-    except Exception:
-        return False
+    result = recalc(filename, timeout)
+    print(json.dumps(result, indent=2))
 
 
 def recalc(filename, timeout=30):
@@ -91,7 +71,7 @@ def recalc(filename, timeout=30):
 
     result = subprocess.run(cmd, capture_output=True, text=True, env=get_soffice_env())
 
-    if result.returncode != 0 and result.returncode != 124:  
+    if result.returncode != 0 and result.returncode != 124:
         error_msg = result.stderr or "Unknown error during recalculation"
         if "Module1" in error_msg or "RecalculateAndSave" not in error_msg:
             return {"error": "LibreOffice macro not configured properly"}
@@ -136,7 +116,7 @@ def recalc(filename, timeout=30):
             if locations:
                 result["error_summary"][err_type] = {
                     "count": len(locations),
-                    "locations": locations[:20],  
+                    "locations": locations[:20],
                 }
 
         wb_formulas = load_workbook(filename, data_only=False)
@@ -161,23 +141,42 @@ def recalc(filename, timeout=30):
         return {"error": str(e)}
 
 
-def main():
-    if len(sys.argv) < 2:
-        print("Usage: python recalc.py <excel_file> [timeout_seconds]")
-        print("\nRecalculates all formulas in an Excel file using LibreOffice")
-        print("\nReturns JSON with error details:")
-        print("  - status: 'success' or 'errors_found'")
-        print("  - total_errors: Total number of Excel errors found")
-        print("  - total_formulas: Number of formulas in the file")
-        print("  - error_summary: Breakdown by error type with locations")
-        print("    - #VALUE!, #DIV/0!, #REF!, #NAME?, #NULL!, #NUM!, #N/A")
-        sys.exit(1)
+def has_gtimeout():
+    try:
+        subprocess.run(
+            ["gtimeout", "--version"], capture_output=True, timeout=1, check=False
+        )
+        return True
+    except FileNotFoundError, subprocess.TimeoutExpired:
+        return False
 
-    filename = sys.argv[1]
-    timeout = int(sys.argv[2]) if len(sys.argv) > 2 else 30
 
-    result = recalc(filename, timeout)
-    print(json.dumps(result, indent=2))
+def setup_libreoffice_macro():
+    macro_dir = os.path.expanduser(
+        MACRO_DIR_MACOS if platform.system() == "Darwin" else MACRO_DIR_LINUX
+    )
+    macro_file = os.path.join(macro_dir, MACRO_FILENAME)
+
+    if (
+        os.path.exists(macro_file)
+        and "RecalculateAndSave" in Path(macro_file).read_text()
+    ):
+        return True
+
+    if not os.path.exists(macro_dir):
+        subprocess.run(
+            ["soffice", "--headless", "--terminate_after_init"],
+            capture_output=True,
+            timeout=10,
+            env=get_soffice_env(),
+        )
+        os.makedirs(macro_dir, exist_ok=True)
+
+    try:
+        Path(macro_file).write_text(RECALCULATE_MACRO)
+        return True
+    except Exception:
+        return False
 
 
 if __name__ == "__main__":

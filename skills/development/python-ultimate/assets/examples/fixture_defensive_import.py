@@ -1,6 +1,9 @@
+import requests
+
+
 def build_optional_backend() -> object | None:
     try:
-        import requests
+        pass
     except ImportError:
         return None
 

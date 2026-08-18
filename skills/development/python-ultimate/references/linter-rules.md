@@ -43,10 +43,13 @@ ______________________________________________________________________
 # BEFORE (linter error)
 def get_platform():
     import platform  # Error: import after code
+
     return platform.system()
+
 
 # AFTER (fixed)
 import platform
+
 
 def get_platform():
     return platform.system()
@@ -95,9 +98,11 @@ ______________________________________________________________________
 def create_list():
     return [1, 2, 3]
 
+
 def process_data(items: list[int] = create_list()):
     items.append(4)
     return items
+
 
 # AFTER (fixed)
 def process_data(items: list[int] | None = None):
@@ -145,6 +150,7 @@ def test_file_processing():
     with open(test_file, "w") as f:
         f.write("test")
 
+
 # AFTER (fixed)
 def test_file_processing(tmp_path: Path):
     test_file = tmp_path / "test_data.txt"
@@ -169,10 +175,13 @@ ______________________________________________________________________
 # BEFORE (linter error)
 def print_version():
     import platform
+
     print(platform.python_version())
+
 
 # AFTER (fixed)
 import platform
+
 
 def print_version():
     print(platform.python_version())
@@ -241,10 +250,12 @@ ______________________________________________________________________
 ```python
 # BEFORE (security risk)
 import random
+
 token = random.randrange(1000000)
 
 # AFTER (secure)
 import secrets
+
 token = secrets.randbelow(1000000)
 ```
 
@@ -253,6 +264,7 @@ token = secrets.randbelow(1000000)
 ```python
 # Use NumPy for simulation/data analysis
 import numpy as np
+
 rng = np.random.default_rng()
 data = rng.random(100)
 ```
@@ -267,10 +279,10 @@ When using `typer.Option()` or `typer.Argument()`, function calls in defaults ar
 from typing import Annotated
 import typer
 
+
 def main(
     config: Annotated[
-        str,
-        typer.Option(help="Configuration file path")
+        str, typer.Option(help="Configuration file path")
     ] = "config.yaml",
 ) -> None:
     """CLI command with proper Typer annotations."""

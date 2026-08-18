@@ -31,8 +31,10 @@ def get_users_with_posts_bad(session: Session):
         # Each access triggers a new query!
         print(f"{user.username}: {len(user.posts)} posts")
 
+
 # ✅ GOOD: Eager loading with selectinload
 from sqlalchemy.orm import selectinload
+
 
 def get_users_with_posts_good(session: Session):
     statement = select(User).options(selectinload(User.posts))
@@ -57,12 +59,7 @@ statement = select(User).options(joinedload(User.posts))
 statement = select(User).options(subqueryload(User.posts))
 
 # Multiple levels
-statement = (
-    select(User)
-    .options(
-        selectinload(User.posts).selectinload(Post.comments)
-    )
-)
+statement = select(User).options(selectinload(User.posts).selectinload(Post.comments))
 
 # Load only specific columns
 statement = select(User.id, User.username, User.email)
@@ -73,6 +70,7 @@ statement = select(User.id, User.username, User.email)
 ```python
 from sqlmodel import Field, Column, Index
 
+
 class User(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
 
@@ -81,9 +79,8 @@ class User(SQLModel, table=True):
     username: str = Field(index=True)
 
     # Composite index (defined at class level)
-    __table_args__ = (
-        Index('ix_user_email_username', 'email', 'username'),
-    )
+    __table_args__ = (Index("ix_user_email_username", "email", "username"),)
+
 
 class Post(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -94,9 +91,9 @@ class Post(SQLModel, table=True):
     # Partial index (PostgreSQL)
     __table_args__ = (
         Index(
-            'ix_published_posts',
-            'created_at',
-            postgresql_where=sa.text('published = true')
+            "ix_published_posts",
+            "created_at",
+            postgresql_where=sa.text("published = true"),
         ),
     )
 ```
@@ -106,11 +103,13 @@ class Post(SQLModel, table=True):
 ```python
 from sqlalchemy import insert, update, delete
 
+
 # Bulk insert (fastest)
 def bulk_create_users(session: Session, users_data: List[dict]):
     """Insert multiple users efficiently"""
     session.execute(insert(User), users_data)
     session.commit()
+
 
 # Bulk update
 def bulk_update_users(session: Session, updates: List[dict]):
@@ -119,12 +118,17 @@ def bulk_update_users(session: Session, updates: List[dict]):
     session.execute(update(User), updates)
     session.commit()
 
+
 # Example usage
-bulk_update_users(session, [
-    {"id": 1, "is_active": False},
-    {"id": 2, "is_active": False},
-    {"id": 3, "is_active": False},
-])
+bulk_update_users(
+    session,
+    [
+        {"id": 1, "is_active": False},
+        {"id": 2, "is_active": False},
+        {"id": 3, "is_active": False},
+    ],
+)
+
 
 # Bulk delete
 def bulk_delete_inactive(session: Session):
@@ -141,7 +145,8 @@ def bulk_delete_inactive(session: Session):
 from typing import Generic, TypeVar, List
 from pydantic import BaseModel
 
-T = TypeVar('T')
+T = TypeVar("T")
+
 
 class Page(BaseModel, Generic[T]):
     items: List[T]
@@ -150,11 +155,10 @@ class Page(BaseModel, Generic[T]):
     size: int
     pages: int
 
+
 # Cursor-based pagination (better performance for large datasets)
 def get_users_cursor(
-    session: Session,
-    cursor: Optional[int] = None,
-    limit: int = 20
+    session: Session, cursor: Optional[int] = None, limit: int = 20
 ) -> List[User]:
     """Cursor-based pagination"""
     statement = select(User).order_by(User.id)
@@ -165,12 +169,9 @@ def get_users_cursor(
     statement = statement.limit(limit)
     return session.exec(statement).all()
 
+
 # Offset-based pagination (with total count)
-def get_users_page(
-    session: Session,
-    page: int = 1,
-    size: int = 20
-) -> Page[User]:
+def get_users_page(session: Session, page: int = 1, size: int = 20) -> Page[User]:
     """Offset-based pagination with total count"""
     # Get total count efficiently
     count_statement = select(func.count()).select_from(User)
@@ -182,11 +183,7 @@ def get_users_page(
     items = session.exec(statement).all()
 
     return Page(
-        items=items,
-        total=total,
-        page=page,
-        size=size,
-        pages=(total + size - 1) // size
+        items=items, total=total, page=page, size=size, pages=(total + size - 1) // size
     )
 ```
 
@@ -196,6 +193,7 @@ def get_users_page(
 from functools import lru_cache
 import redis
 
+
 # In-memory caching (simple)
 @lru_cache(maxsize=100)
 def get_user_by_email_cached(email: str) -> Optional[User]:
@@ -204,10 +202,12 @@ def get_user_by_email_cached(email: str) -> Optional[User]:
         statement = select(User).where(User.email == email)
         return session.exec(statement).first()
 
+
 # Redis caching
 import json
 
-redis_client = redis.Redis(host='localhost', port=6379, db=0)
+redis_client = redis.Redis(host="localhost", port=6379, db=0)
+
 
 def get_user_with_redis(session: Session, user_id: int) -> Optional[User]:
     """Cache user in Redis"""
@@ -222,19 +222,14 @@ def get_user_with_redis(session: Session, user_id: int) -> Optional[User]:
     user = session.get(User, user_id)
     if user:
         # Cache for 5 minutes
-        redis_client.setex(
-            cache_key,
-            300,
-            json.dumps(user.dict())
-        )
+        redis_client.setex(cache_key, 300, json.dumps(user.dict()))
 
     return user
 
+
 # Cache invalidation
 def update_user_with_cache_invalidation(
-    session: Session,
-    user_id: int,
-    user_data: UserUpdate
+    session: Session, user_id: int, user_data: UserUpdate
 ):
     """Update user and invalidate cache"""
     user = update_user(session, user_id, user_data)
@@ -254,28 +249,26 @@ primary_engine = create_engine("postgresql://localhost/primary")
 # Read replica (reads)
 replica_engine = create_engine("postgresql://localhost/replica")
 
+
 def get_primary_session():
     with Session(primary_engine) as session:
         yield session
+
 
 def get_replica_session():
     with Session(replica_engine) as session:
         yield session
 
+
 # Use in endpoints
 @app.post("/users")
-def create_user(
-    user: UserCreate,
-    session: Session = Depends(get_primary_session)
-):
+def create_user(user: UserCreate, session: Session = Depends(get_primary_session)):
     # Write to primary
     return create_user(session, user)
 
+
 @app.get("/users/{user_id}")
-def get_user(
-    user_id: int,
-    session: Session = Depends(get_replica_session)
-):
+def get_user(user_id: int, session: Session = Depends(get_replica_session)):
     # Read from replica
     return get_user(session, user_id)
 ```
@@ -317,9 +310,10 @@ engine = create_engine(DATABASE_URL, echo=True)
 # Analyze query execution
 from sqlalchemy import text
 
+
 def analyze_query_performance(session: Session):
     """Analyze query execution plan (PostgreSQL)"""
-    query = select(User).where(User.email.like('%example.com'))
+    query = select(User).where(User.email.like("%example.com"))
 
     # Get execution plan
     explain = session.execute(
@@ -339,11 +333,7 @@ def process_users_in_batches(session: Session, batch_size: int = 1000):
 
     while True:
         # Fetch batch
-        statement = (
-            select(User)
-            .offset(offset)
-            .limit(batch_size)
-        )
+        statement = select(User).offset(offset).limit(batch_size)
         users = session.exec(statement).all()
 
         if not users:
@@ -374,6 +364,7 @@ def check_pool_status(engine):
     print(f"Overflow: {pool.overflow()}")
     print(f"Checked in: {pool.checkedin()}")
 
+
 # Dispose connections
 def cleanup_connections(engine):
     """Close all connections"""
@@ -389,7 +380,7 @@ from sqlalchemy.sql.cache_key import CacheKey
 # Enable compiled query caching (enabled by default)
 engine = create_engine(
     DATABASE_URL,
-    query_cache_size=1000  # Cache up to 1000 compiled queries
+    query_cache_size=1000,  # Cache up to 1000 compiled queries
 )
 ```
 
@@ -400,6 +391,7 @@ engine = create_engine(
 class User(SQLModel, table=True):
     email: str = Field(index=True)
     created_at: datetime = Field(index=True)
+
 
 # ✅ GOOD: Use eager loading to avoid N+1 queries
 statement = select(User).options(selectinload(User.posts))

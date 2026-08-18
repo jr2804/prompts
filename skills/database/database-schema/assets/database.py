@@ -8,6 +8,9 @@ with proper connection management and session handling.
 import os
 from collections.abc import Generator
 
+from motor.motor_asyncio import AsyncIOMotorClient
+from odmantic import AIOEngine
+from pymongo import MongoClient
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -66,7 +69,6 @@ def get_mongo_client():
     """
     Get MongoDB client connection
     """
-    from pymongo import MongoClient
 
     mongo_url = os.getenv("MONGO_URL", "mongodb://localhost:27017/")
     return MongoClient(mongo_url)
@@ -77,8 +79,6 @@ def get_odmantic_engine():
     """
     Get ODMantic engine for MongoDB
     """
-    from motor.motor_asyncio import AsyncIOMotorClient
-    from odmantic import AIOEngine
 
     mongo_url = os.getenv("MONGO_URL", "mongodb://localhost:27017/")
     client = AsyncIOMotorClient(mongo_url)

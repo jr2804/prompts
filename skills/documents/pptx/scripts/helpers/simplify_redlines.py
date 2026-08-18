@@ -77,15 +77,6 @@ def _is_element(node, tag: str) -> bool:
     return name == tag or name.endswith(f":{tag}")
 
 
-def _get_author(elem) -> str:
-    author = elem.getAttribute("w:author")
-    if not author:
-        for attr in elem.attributes.values():
-            if attr.localName == "author" or attr.name.endswith(":author"):
-                return attr.value
-    return author
-
-
 def _can_merge_tracked(elem1, elem2) -> bool:
     if _get_author(elem1) != _get_author(elem2):
         return False
@@ -99,6 +90,15 @@ def _can_merge_tracked(elem1, elem2) -> bool:
         node = node.nextSibling
 
     return True
+
+
+def _get_author(elem) -> str:
+    author = elem.getAttribute("w:author")
+    if not author:
+        for attr in elem.attributes.values():
+            if attr.localName == "author" or attr.name.endswith(":author"):
+                return attr.value
+    return author
 
 
 def _merge_tracked_content(target, source):
@@ -121,6 +121,36 @@ def _find_elements(root, tag: str) -> list:
 
     traverse(root)
     return results
+
+
+def infer_author(
+    modified_dir: Path, original_docx: Path, default: str = "Claude"
+) -> str:
+    modified_xml = modified_dir / "word" / "document.xml"
+    modified_authors = get_tracked_change_authors(modified_xml)
+
+    if not modified_authors:
+        return default
+
+    original_authors = _get_authors_from_docx(original_docx)
+
+    new_changes: dict[str, int] = {}
+    for author, count in modified_authors.items():
+        original_count = original_authors.get(author, 0)
+        diff = count - original_count
+        if diff > 0:
+            new_changes[author] = diff
+
+    if not new_changes:
+        return default
+
+    if len(new_changes) == 1:
+        return next(iter(new_changes))
+
+    raise ValueError(
+        f"Multiple authors added new changes: {new_changes}. "
+        "Cannot infer which author to validate."
+    )
 
 
 def get_tracked_change_authors(doc_xml_path: Path) -> dict[str, int]:
@@ -165,33 +195,5 @@ def _get_authors_from_docx(docx_path: Path) -> dict[str, int]:
                         if author:
                             authors[author] = authors.get(author, 0) + 1
                 return authors
-    except (zipfile.BadZipFile, ET.ParseError):
+    except zipfile.BadZipFile, ET.ParseError:
         return {}
-
-
-def infer_author(modified_dir: Path, original_docx: Path, default: str = "Claude") -> str:
-    modified_xml = modified_dir / "word" / "document.xml"
-    modified_authors = get_tracked_change_authors(modified_xml)
-
-    if not modified_authors:
-        return default
-
-    original_authors = _get_authors_from_docx(original_docx)
-
-    new_changes: dict[str, int] = {}
-    for author, count in modified_authors.items():
-        original_count = original_authors.get(author, 0)
-        diff = count - original_count
-        if diff > 0:
-            new_changes[author] = diff
-
-    if not new_changes:
-        return default
-
-    if len(new_changes) == 1:
-        return next(iter(new_changes))
-
-    raise ValueError(
-        f"Multiple authors added new changes: {new_changes}. "
-        "Cannot infer which author to validate."
-    )

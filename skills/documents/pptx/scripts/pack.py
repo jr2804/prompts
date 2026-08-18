@@ -20,11 +20,15 @@ import zipfile
 from pathlib import Path
 
 import defusedxml.minidom
-
 from validators import PPTXSchemaValidator
 
 
-def pack(input_directory: str, output_file: str, original_file: str | None = None, validate: bool = True) -> tuple[None, str]:
+def pack(
+    input_directory: str,
+    output_file: str,
+    original_file: str | None = None,
+    validate: bool = True,
+) -> tuple[None, str]:
     input_dir = Path(input_directory)
     output_path = Path(output_file)
 
@@ -83,7 +87,11 @@ def _condense_xml(xml_file: Path) -> None:
             if element.tagName.endswith(":t"):
                 continue
             for child in list(element.childNodes):
-                if (child.nodeType == child.TEXT_NODE and child.nodeValue and child.nodeValue.strip() == "") or child.nodeType == child.COMMENT_NODE:
+                if (
+                    child.nodeType == child.TEXT_NODE
+                    and child.nodeValue
+                    and child.nodeValue.strip() == ""
+                ) or child.nodeType == child.COMMENT_NODE:
                     element.removeChild(child)
 
         xml_file.write_bytes(dom.toxml(encoding="UTF-8"))
@@ -97,10 +105,21 @@ if __name__ == "__main__":
     parser.add_argument("input_directory", help="Unpacked PPTX directory")
     parser.add_argument("output_file", help="Output PPTX file")
     parser.add_argument("--original", help="Original file for validation comparison")
-    parser.add_argument("--validate", type=lambda x: x.lower() == "true", default=True, metavar="true|false", help="Run validation (default: true)")
+    parser.add_argument(
+        "--validate",
+        type=lambda x: x.lower() == "true",
+        default=True,
+        metavar="true|false",
+        help="Run validation (default: true)",
+    )
     args = parser.parse_args()
 
-    _, message = pack(args.input_directory, args.output_file, original_file=args.original, validate=args.validate)
+    _, message = pack(
+        args.input_directory,
+        args.output_file,
+        original_file=args.original,
+        validate=args.validate,
+    )
     print(message)
 
     if "Error" in message:

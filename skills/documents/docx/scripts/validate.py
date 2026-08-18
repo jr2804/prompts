@@ -57,10 +57,14 @@ def main():
                 print(f"Warning: {e} Using default author 'Claude'.", file=sys.stderr)
             validators = [
                 DOCXSchemaValidator(unpacked_dir, original_file, verbose=args.verbose),
-                RedliningValidator(unpacked_dir, original_file, verbose=args.verbose, author=author),
+                RedliningValidator(
+                    unpacked_dir, original_file, verbose=args.verbose, author=author
+                ),
             ]
         case ".pptx":
-            validators = [PPTXSchemaValidator(unpacked_dir, original_file, verbose=args.verbose)]
+            validators = [
+                PPTXSchemaValidator(unpacked_dir, original_file, verbose=args.verbose)
+            ]
         case _:
             print(f"Error: Validation not supported for file type {file_extension}")
             sys.exit(1)

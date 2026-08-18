@@ -95,10 +95,14 @@ the required edit (e.g., inserting hyperlink relationships in `.rels` files).
 
 ```python
 # Required namespace registrations for even a simple docx:
-ET.register_namespace('w', 'http://schemas.openxmlformats.org/wordprocessingml/2006/main')
-ET.register_namespace('r', 'http://schemas.openxmlformats.org/officeDocument/2006/relationships')
-ET.register_namespace('w14', 'http://schemas.microsoft.com/office/word/2010/wordml')
-ET.register_namespace('w15', 'http://schemas.microsoft.com/office/word/2012/wordml')
+ET.register_namespace(
+    "w", "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+)
+ET.register_namespace(
+    "r", "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+)
+ET.register_namespace("w14", "http://schemas.microsoft.com/office/word/2010/wordml")
+ET.register_namespace("w15", "http://schemas.microsoft.com/office/word/2012/wordml")
 # ... and potentially 20+ more (wp14, w16, w16se, w16cid, w16sdtdh, etc.)
 ```
 

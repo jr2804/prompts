@@ -4,12 +4,12 @@ Validator for tracked changes in Word documents.
 
 import subprocess
 import tempfile
+import xml.etree.ElementTree as ET
 import zipfile
 from pathlib import Path
 
 
 class RedliningValidator:
-
     def __init__(self, unpacked_dir, original_docx, verbose=False, author="Claude"):
         self.unpacked_dir = Path(unpacked_dir)
         self.original_docx = Path(original_docx)
@@ -29,8 +29,6 @@ class RedliningValidator:
             return False
 
         try:
-            import xml.etree.ElementTree as ET
-
             tree = ET.parse(modified_file)
             root = tree.getroot()
 
@@ -74,8 +72,6 @@ class RedliningValidator:
                 return False
 
             try:
-                import xml.etree.ElementTree as ET
-
                 modified_tree = ET.parse(modified_file)
                 modified_root = modified_tree.getroot()
                 original_tree = ET.parse(original_file)
@@ -140,8 +136,8 @@ class RedliningValidator:
                         "git",
                         "diff",
                         "--word-diff=plain",
-                        "--word-diff-regex=.",  
-                        "-U0",  
+                        "--word-diff-regex=.",
+                        "-U0",
                         "--no-index",
                         str(original_file),
                         str(modified_file),
@@ -169,7 +165,7 @@ class RedliningValidator:
                         "git",
                         "diff",
                         "--word-diff=plain",
-                        "-U0",  
+                        "-U0",
                         "--no-index",
                         str(original_file),
                         str(modified_file),
@@ -190,7 +186,7 @@ class RedliningValidator:
                             content_lines.append(line)
                     return "\n".join(content_lines)
 
-        except (subprocess.CalledProcessError, FileNotFoundError, Exception):
+        except subprocess.CalledProcessError, FileNotFoundError, Exception:
             pass
 
         return None

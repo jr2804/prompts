@@ -60,8 +60,8 @@ A user may ask you to create, edit, or analyze the contents of an .xlsx file.
 ```python
 import pandas as pd
 
-df = pd.read_excel('file.xlsx')
-all_sheets = pd.read_excel('file.xlsx', sheet_name=None)
+df = pd.read_excel("file.xlsx")
+all_sheets = pd.read_excel("file.xlsx", sheet_name=None)
 ```
 
 ### CRITICAL: Use Formulas, Not Hardcoded Values
@@ -71,14 +71,14 @@ all_sheets = pd.read_excel('file.xlsx', sheet_name=None)
 #### ❌ WRONG
 
 ```python
-total = df['Sales'].sum()
-sheet['B10'] = total  # Hardcodes 5000
+total = df["Sales"].sum()
+sheet["B10"] = total  # Hardcodes 5000
 ```
 
 #### ✅ CORRECT
 
 ```python
-sheet['B10'] = '=SUM(B2:B9)'
+sheet["B10"] = "=SUM(B2:B9)"
 ```
 
 ### Common Workflow
@@ -103,11 +103,11 @@ from openpyxl.styles import Font, PatternFill, Alignment
 
 wb = Workbook()
 sheet = wb.active
-sheet['A1'] = 'Hello'
-sheet['B1'] = 'World'
-sheet['B2'] = '=SUM(A1:A10)'
-sheet['A1'].font = Font(bold=True, color='FF0000')
-wb.save('output.xlsx')
+sheet["A1"] = "Hello"
+sheet["B1"] = "World"
+sheet["B2"] = "=SUM(A1:A10)"
+sheet["A1"].font = Font(bold=True, color="FF0000")
+wb.save("output.xlsx")
 ```
 
 #### Editing existing Excel files
@@ -115,10 +115,10 @@ wb.save('output.xlsx')
 ```python
 from openpyxl import load_workbook
 
-wb = load_workbook('existing.xlsx')
+wb = load_workbook("existing.xlsx")
 sheet = wb.active
-sheet['A1'] = 'New Value'
-wb.save('modified.xlsx')
+sheet["A1"] = "New Value"
+wb.save("modified.xlsx")
 ```
 
 ### Recalculating formulas

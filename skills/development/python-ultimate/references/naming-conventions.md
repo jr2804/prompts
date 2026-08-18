@@ -240,11 +240,13 @@ MAX_RETRY_COUNT = 3
 DEFAULT_TIMEOUT_SECONDS = 30
 SUPPORTED_FORMATS = ["json", "xml", "yaml"]
 
+
 # Enum values also use UPPER_SNAKE_CASE
 class Status(Enum):
     PENDING = "pending"
     COMPLETED = "completed"
     FAILED = "failed"
+
 
 # WRONG
 maxRetryCount = 3

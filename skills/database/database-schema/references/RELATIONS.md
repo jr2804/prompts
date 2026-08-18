@@ -9,6 +9,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from database.base import Base
 
+
 class Author(Base):
     __tablename__ = "authors"
 
@@ -21,6 +22,7 @@ class Author(Base):
 
     def __repr__(self):
         return f"<Author(id={self.id}, name='{self.name}')>"
+
 
 class Post(Base):
     __tablename__ = "posts"
@@ -45,11 +47,13 @@ from sqlalchemy.orm import relationship
 from database.base import Base
 
 # Association table for many-to-many relationship
-post_tags = Table('post_tags',
+post_tags = Table(
+    "post_tags",
     Base.metadata,
-    Column('post_id', Integer, ForeignKey('posts.id'), primary_key=True),
-    Column('tag_id', Integer, ForeignKey('tags.id'), primary_key=True)
+    Column("post_id", Integer, ForeignKey("posts.id"), primary_key=True),
+    Column("tag_id", Integer, ForeignKey("tags.id"), primary_key=True),
 )
+
 
 class Post(Base):
     __tablename__ = "posts"
@@ -60,6 +64,7 @@ class Post(Base):
 
     # Many-to-Many: Posts can have many tags, tags can be on many posts
     tags = relationship("Tag", secondary=post_tags, back_populates="posts")
+
 
 class Tag(Base):
     __tablename__ = "tags"
@@ -84,7 +89,13 @@ class User(Base):
     email = Column(String, unique=True, nullable=False)
 
     # One-to-One: One user has one profile
-    profile = relationship("UserProfile", back_populates="user", uselist=False, cascade="all, delete-orphan")
+    profile = relationship(
+        "UserProfile",
+        back_populates="user",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )
+
 
 class UserProfile(Base):
     __tablename__ = "user_profiles"
@@ -113,7 +124,9 @@ class Category(Base):
     children = relationship("Category", back_populates="parent")
 
     def __repr__(self):
-        return f"<Category(id={self.id}, name='{self.name}', parent_id={self.parent_id})>"
+        return (
+            f"<Category(id={self.id}, name='{self.name}', parent_id={self.parent_id})>"
+        )
 ```
 
 ## Advanced Relationship Patterns
@@ -135,6 +148,7 @@ class UserProject(Base):
     user = relationship("User", back_populates="project_associations")
     project = relationship("Project", back_populates="user_associations")
 
+
 class User(Base):
     __tablename__ = "users"
 
@@ -143,7 +157,10 @@ class User(Base):
 
     # Relationship through association object
     project_associations = relationship("UserProject", back_populates="user")
-    projects = relationship("Project", secondary="user_projects", back_populates="users")
+    projects = relationship(
+        "Project", secondary="user_projects", back_populates="users"
+    )
+
 
 class Project(Base):
     __tablename__ = "projects"
@@ -161,6 +178,7 @@ class Project(Base):
 ```python
 from sqlalchemy.ext.declarative import declared_attr
 
+
 class Comment(Base):
     __tablename__ = "comments"
 
@@ -172,9 +190,8 @@ class Comment(Base):
     commentable_id = Column(Integer, nullable=False)
     commentable_type = Column(String, nullable=False)
 
-    __table_args__ = (
-        Index('ix_commentable', 'commentable_type', 'commentable_id'),
-    )
+    __table_args__ = (Index("ix_commentable", "commentable_type", "commentable_id"),)
+
 
 class Post(Base):
     __tablename__ = "posts"
@@ -184,9 +201,12 @@ class Post(Base):
     content = Column(String)
 
     # Relationship to comments
-    comments = relationship("Comment",
+    comments = relationship(
+        "Comment",
         primaryjoin="and_(Comment.commentable_id==Post.id, Comment.commentable_type=='post')",
-        backref="post")
+        backref="post",
+    )
+
 
 class Product(Base):
     __tablename__ = "products"
@@ -196,9 +216,11 @@ class Product(Base):
     price = Column(Integer)
 
     # Relationship to comments
-    comments = relationship("Comment",
+    comments = relationship(
+        "Comment",
         primaryjoin="and_(Comment.commentable_id==Product.id, Comment.commentable_type=='product')",
-        backref="product")
+        backref="product",
+    )
 ```
 
 ## MongoDB Relationships
@@ -209,6 +231,7 @@ class Product(Base):
 from odmantic import Model, Field, Reference
 from datetime import datetime
 
+
 class Author(Model):
     name: str
     email: str
@@ -216,6 +239,7 @@ class Author(Model):
 
     class Config:
         collection = "authors"
+
 
 class Post(Model):
     title: str
@@ -235,10 +259,12 @@ from odmantic import Model, Field, EmbeddedModel
 from datetime import datetime
 from typing import List
 
+
 class Comment(EmbeddedModel):
     author: str
     content: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
+
 
 class Post(Model):
     title: str
@@ -258,17 +284,22 @@ from odmantic import Model, Field, EmbeddedModel, Reference
 from datetime import datetime
 from typing import List, Optional
 
+
 class AuthorSummary(EmbeddedModel):
     """Embedded summary of author to avoid extra lookup"""
+
     id: str
     name: str
     email: str
 
+
 class Comment(EmbeddedModel):
     """Embedded comments for fast retrieval"""
+
     author: AuthorSummary
     content: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
+
 
 class Post(Model):
     title: str
@@ -302,14 +333,21 @@ users_with_posts = db.query(User).options(joinedload(User.posts)).all()
 users_with_posts = db.query(User).options(selectinload(User.posts)).all()
 
 # Complex query with multiple relationships
-active_users_with_posts = db.query(User).options(
-    selectinload(User.posts).selectinload(Post.tags)
-).filter(User.is_active == True).all()
+active_users_with_posts = (
+    db.query(User)
+    .options(selectinload(User.posts).selectinload(Post.tags))
+    .filter(User.is_active == True)
+    .all()
+)
 
 # Query with relationship conditions
-users_with_published_posts = db.query(User).join(Post).filter(
-    Post.status == 'published'
-).options(selectinload(User.posts)).all()
+users_with_published_posts = (
+    db.query(User)
+    .join(Post)
+    .filter(Post.status == "published")
+    .options(selectinload(User.posts))
+    .all()
+)
 ```
 
 ### MongoDB Query Patterns
@@ -322,20 +360,18 @@ pipeline = [
             "from": "authors",
             "localField": "author_ref",
             "foreignField": "_id",
-            "as": "author_details"
+            "as": "author_details",
         }
     },
-    {
-        "$unwind": "$author_details"
-    },
+    {"$unwind": "$author_details"},
     {
         "$project": {
             "title": 1,
             "content": 1,
             "author_name": "$author_details.name",
-            "author_email": "$author_details.email"
+            "author_email": "$author_details.email",
         }
-    }
+    },
 ]
 
 posts_with_authors = await engine.find(Post, pipeline=pipeline)
@@ -357,26 +393,32 @@ from typing import List
 
 app = FastAPI()
 
+
 @app.get("/users/{user_id}/posts", response_model=List[PostResponse])
-async def get_user_posts(
-    user_id: int,
-    db: Session = Depends(get_db)
-):
+async def get_user_posts(user_id: int, db: Session = Depends(get_db)):
     # Query user with posts loaded to avoid N+1 problem
-    user = db.query(User).options(selectinload(User.posts)).filter(User.id == user_id).first()
+    user = (
+        db.query(User)
+        .options(selectinload(User.posts))
+        .filter(User.id == user_id)
+        .first()
+    )
 
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
     return user.posts
 
+
 @app.get("/posts/{post_id}", response_model=PostWithAuthorResponse)
-async def get_post_with_author(
-    post_id: int,
-    db: Session = Depends(get_db)
-):
+async def get_post_with_author(post_id: int, db: Session = Depends(get_db)):
     # Query post with author loaded
-    post = db.query(Post).options(joinedload(Post.author)).filter(Post.id == post_id).first()
+    post = (
+        db.query(Post)
+        .options(joinedload(Post.author))
+        .filter(Post.id == post_id)
+        .first()
+    )
 
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
@@ -390,11 +432,9 @@ async def get_post_with_author(
 from fastapi import FastAPI, HTTPException
 from typing import List
 
+
 @app.get("/posts/{post_id}", response_model=PostResponse)
-async def get_post_with_author(
-    post_id: str,
-    engine: AIOEngine = Depends(get_engine)
-):
+async def get_post_with_author(post_id: str, engine: AIOEngine = Depends(get_engine)):
     # Fetch post with referenced author
     post = await engine.find_one(Post, Post.id == post_id)
 
@@ -404,11 +444,9 @@ async def get_post_with_author(
     # Author is automatically fetched due to reference field
     return post
 
+
 @app.get("/authors/{author_id}/posts", response_model=List[PostResponse])
-async def get_author_posts(
-    author_id: str,
-    engine: AIOEngine = Depends(get_engine)
-):
+async def get_author_posts(author_id: str, engine: AIOEngine = Depends(get_engine)):
     # Find posts by author reference
     posts = await engine.find(Post, Post.author_ref == author_id)
     return posts
@@ -420,9 +458,10 @@ async def get_author_posts(
 
 ```python
 # Use proper indexing for foreign keys
-Index('ix_posts_author_id', 'author_id')
-Index('ix_post_tags_post_id', 'post_id')
-Index('ix_post_tags_tag_id', 'tag_id')
+Index("ix_posts_author_id", "author_id")
+Index("ix_post_tags_post_id", "post_id")
+Index("ix_post_tags_tag_id", "tag_id")
+
 
 # Consider when to use eager vs lazy loading
 class Post(Base):
@@ -430,10 +469,14 @@ class Post(Base):
     author = relationship("Author", back_populates="posts")
 
     # Eager loading for frequently accessed relationships
-    tags = relationship("Tag", secondary=post_tags, back_populates="posts", lazy="selectin")
+    tags = relationship(
+        "Tag", secondary=post_tags, back_populates="posts", lazy="selectin"
+    )
+
 
 # Use explicit loading when needed
 from sqlalchemy.orm import selectinload
+
 
 def get_posts_with_authors(db: Session):
     return db.query(Post).options(selectinload(Post.author)).all()
@@ -453,8 +496,9 @@ class Post(Model):
         indexes = [
             Index("author_ref"),  # Index on reference field
             Index("created_at"),
-            Index([("author_ref", 1), ("created_at", -1)])  # Compound index
+            Index([("author_ref", 1), ("created_at", -1)]),  # Compound index
         ]
+
 
 # Consider embedding vs referencing based on access patterns
 # Embed when:
@@ -485,11 +529,13 @@ class Post(Base):
     __table_args__ = (
         # Foreign key constraint with cascade options
         ForeignKeyConstraint(
-            ['author_id'], ['authors.id'],
+            ["author_id"],
+            ["authors.id"],
             ondelete="CASCADE",  # Delete posts when author is deleted
-            onupdate="CASCADE"   # Update author_id when author.id changes
+            onupdate="CASCADE",  # Update author_id when author.id changes
         ),
     )
+
 
 # Alternative approach with relationship-level constraints
 class Post(Base):
@@ -497,7 +543,9 @@ class Post(Base):
 
     id = Column(Integer, primary_key=True)
     title = Column(String, nullable=False)
-    author_id = Column(Integer, ForeignKey("authors.id", ondelete="CASCADE"), nullable=False)
+    author_id = Column(
+        Integer, ForeignKey("authors.id", ondelete="CASCADE"), nullable=False
+    )
 
     author = relationship("Author", back_populates="posts")
 ```
@@ -508,7 +556,8 @@ class Post(Base):
 # Schema validation at database level
 def setup_collection_validation():
     db.command(
-        "collMod", "posts",
+        "collMod",
+        "posts",
         validator={
             "$jsonSchema": {
                 "bsonType": "object",
@@ -517,10 +566,10 @@ def setup_collection_validation():
                     "title": {"bsonType": "string"},
                     "author_ref": {
                         "bsonType": "objectId",
-                        "description": "Must be a valid ObjectId reference to authors collection"
-                    }
-                }
+                        "description": "Must be a valid ObjectId reference to authors collection",
+                    },
+                },
             }
-        }
+        },
     )
 ```

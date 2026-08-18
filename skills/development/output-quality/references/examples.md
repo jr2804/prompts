@@ -123,6 +123,7 @@ class DataProcessor:
         """Finalize processing."""
         return self.data
 
+
 # Usage:
 processor = DataProcessor()
 result = processor.process([1, 2, 3])
@@ -141,6 +142,7 @@ result = processor.process([1, 2, 3])
 def double_values(numbers):
     """Return each value doubled."""
     return [x * 2 for x in numbers]
+
 
 # Usage:
 result = double_values([1, 2, 3])
@@ -195,7 +197,8 @@ if '@' in user_email and '.' in user_email:
 # utils/validate.py
 def is_valid_email(email: str) -> bool:
     """Validate email format. Requires @ and domain."""
-    return email and '@' in email and '.' in email.split('@')[1]
+    return email and "@" in email and "." in email.split("@")[1]
+
 
 # Update CODE_INDEX.md:
 # | isValidEmail() | utils/validate.py:5 | Validates email format | (email: str) |
@@ -204,8 +207,8 @@ def is_valid_email(email: str) -> bool:
 from utils.validate import is_valid_email
 
 # forms/user.py
-if not is_valid_email(data.get('email')):
-    raise ValueError('Invalid email')
+if not is_valid_email(data.get("email")):
+    raise ValueError("Invalid email")
 
 # api/users.py
 if not is_valid_email(email):

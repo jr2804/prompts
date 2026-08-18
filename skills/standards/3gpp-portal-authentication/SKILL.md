@@ -67,8 +67,7 @@ login_payload = {
 }
 
 response = session.post(
-    "https://portal.3gpp.org/ngppapp/LoginEOL.ashx",
-    data=login_payload
+    "https://portal.3gpp.org/ngppapp/LoginEOL.ashx", data=login_payload
 )
 
 # 3. Parse response
@@ -110,15 +109,13 @@ class PortalSession:
         response = self.session.post(
             "https://portal.3gpp.org/ngppapp/LoginEOL.ashx",
             json=payload,
-            timeout=self.timeout
+            timeout=self.timeout,
         )
 
         # 3. Parse response
         auth_result = response.json()
         if auth_result.get("success", False):
-            raise PortalAuthenticationError(
-                f"EOL authentication failed: {auth_result}"
-            )
+            raise PortalAuthenticationError(f"EOL authentication failed: {auth_result}")
 
         self._authenticated = True
 
@@ -163,6 +160,7 @@ Raised when EOL login fails.
 ```python
 class PortalAuthenticationError(Exception):
     """Raised when 3GPP portal authentication fails."""
+
     pass
 ```
 
@@ -173,6 +171,7 @@ Raised when portal page parsing fails.
 ```python
 class PortalParsingError(Exception):
     """Raised when portal page HTML parsing fails."""
+
     pass
 ```
 
@@ -183,8 +182,10 @@ class PortalParsingError(Exception):
 ```python
 from pydantic import BaseModel
 
+
 class PortalCredentials(BaseModel):
     """3GPP portal authentication credentials."""
+
     username: str
     password: str
 ```
@@ -235,8 +236,11 @@ session.authenticate()
 ```python
 # Direct HTTP access to FTP server
 import requests
+
 session = requests.Session()
-response = session.get("https://www.3gpp.org/ftp/tsg_ran/WG1_RL1/RAN1_98/Docs/R1-2301234.zip")
+response = session.get(
+    "https://www.3gpp.org/ftp/tsg_ran/WG1_RL1/RAN1_98/Docs/R1-2301234.zip"
+)
 # No authentication needed
 ```
 

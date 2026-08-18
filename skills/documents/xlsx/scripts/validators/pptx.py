@@ -4,11 +4,12 @@ Validator for PowerPoint presentation XML files against XSD schemas.
 
 import re
 
+import lxml.etree
+
 from .base import BaseSchemaValidator
 
 
 class PPTXSchemaValidator(BaseSchemaValidator):
-
     PRESENTATIONML_NAMESPACE = (
         "http://schemas.openxmlformats.org/presentationml/2006/main"
     )
@@ -60,7 +61,6 @@ class PPTXSchemaValidator(BaseSchemaValidator):
         return all_valid
 
     def validate_uuid_ids(self):
-        import lxml.etree
 
         errors = []
         uuid_pattern = re.compile(
@@ -97,12 +97,7 @@ class PPTXSchemaValidator(BaseSchemaValidator):
                 print("PASSED - All UUID-like IDs contain valid hex values")
             return True
 
-    def _looks_like_uuid(self, value):
-        clean_value = value.strip("{}()").replace("-", "")
-        return len(clean_value) == 32 and all(c.isalnum() for c in clean_value)
-
     def validate_slide_layout_ids(self):
-        import lxml.etree
 
         errors = []
 
@@ -170,7 +165,6 @@ class PPTXSchemaValidator(BaseSchemaValidator):
             return True
 
     def validate_no_duplicate_slide_layouts(self):
-        import lxml.etree
 
         errors = []
         slide_rels_files = list(self.unpacked_dir.glob("ppt/slides/_rels/*.xml.rels"))
@@ -208,10 +202,9 @@ class PPTXSchemaValidator(BaseSchemaValidator):
             return True
 
     def validate_notes_slide_references(self):
-        import lxml.etree
 
         errors = []
-        notes_slide_references = {}  
+        notes_slide_references = {}
 
         slide_rels_files = list(self.unpacked_dir.glob("ppt/slides/_rels/*.xml.rels"))
 
@@ -233,9 +226,7 @@ class PPTXSchemaValidator(BaseSchemaValidator):
                         if target:
                             normalized_target = target.replace("../", "")
 
-                            slide_name = rels_file.stem.replace(
-                                ".xml", ""
-                            )  
+                            slide_name = rels_file.stem.replace(".xml", "")
 
                             if normalized_target not in notes_slide_references:
                                 notes_slide_references[normalized_target] = []
@@ -269,6 +260,10 @@ class PPTXSchemaValidator(BaseSchemaValidator):
             if self.verbose:
                 print("PASSED - All notes slide references are unique")
             return True
+
+    def _looks_like_uuid(self, value):
+        clean_value = value.strip("{}()").replace("-", "")
+        return len(clean_value) == 32 and all(c.isalnum() for c in clean_value)
 
 
 if __name__ == "__main__":

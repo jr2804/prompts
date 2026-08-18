@@ -182,6 +182,7 @@ img = SvgInlineImage(tpl, "wide-chart.svg")  # auto-sizes to page width
 
 ```python
 from scripts.svg import is_svg
+
 assert is_svg("icon.svg")
 ```
 

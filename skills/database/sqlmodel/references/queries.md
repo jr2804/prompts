@@ -5,15 +5,18 @@
 ```python
 from sqlmodel import select, Session
 
+
 # Select all
 def get_all_users(session: Session) -> List[User]:
     statement = select(User)
     return session.exec(statement).all()
 
+
 # Select one
 def get_user_by_id(session: Session, user_id: int) -> Optional[User]:
     statement = select(User).where(User.id == user_id)
     return session.exec(statement).first()
+
 
 # Select with scalar result
 def get_user_scalar(session: Session, user_id: int) -> Optional[User]:
@@ -33,28 +36,14 @@ statement = select(User).where(User.username == "john")
 statement = select(User).where(User.status != "banned")
 
 # Multiple conditions (AND)
-statement = select(User).where(
-    User.is_active == True,
-    User.age >= 18
-)
+statement = select(User).where(User.is_active == True, User.age >= 18)
 
 # OR conditions
-statement = select(User).where(
-    or_(
-        User.role == "admin",
-        User.role == "moderator"
-    )
-)
+statement = select(User).where(or_(User.role == "admin", User.role == "moderator"))
 
 # AND + OR combination
 statement = select(User).where(
-    and_(
-        User.is_active == True,
-        or_(
-            User.role == "admin",
-            User.role == "moderator"
-        )
-    )
+    and_(User.is_active == True, or_(User.role == "admin", User.role == "moderator"))
 )
 
 # NOT condition
@@ -93,10 +82,7 @@ statement = select(User).order_by(User.created_at)
 statement = select(User).order_by(User.created_at.desc())
 
 # Multiple order by
-statement = select(User).order_by(
-    User.is_active.desc(),
-    User.username.asc()
-)
+statement = select(User).order_by(User.is_active.desc(), User.username.asc())
 ```
 
 ## Pagination
@@ -117,7 +103,7 @@ def get_users_page(session: Session, page: int = 1, page_size: int = 20):
         "total": total,
         "page": page,
         "page_size": page_size,
-        "pages": (total + page_size - 1) // page_size
+        "pages": (total + page_size - 1) // page_size,
     }
 ```
 
@@ -126,36 +112,34 @@ def get_users_page(session: Session, page: int = 1, page_size: int = 20):
 ```python
 from sqlalchemy import func, select
 
+
 # Count
 def count_users(session: Session) -> int:
     statement = select(func.count()).select_from(User)
     return session.exec(statement).one()
 
+
 # Count with filter
 def count_active_users(session: Session) -> int:
-    statement = (
-        select(func.count())
-        .select_from(User)
-        .where(User.is_active == True)
-    )
+    statement = select(func.count()).select_from(User).where(User.is_active == True)
     return session.exec(statement).one()
+
 
 # Sum
 def total_balance(session: Session) -> Decimal:
     statement = select(func.sum(User.balance))
     return session.exec(statement).one() or Decimal(0)
 
+
 # Average
 def average_age(session: Session) -> float:
     statement = select(func.avg(User.age))
     return session.exec(statement).one()
 
+
 # Min/Max
 def age_range(session: Session):
-    statement = select(
-        func.min(User.age),
-        func.max(User.age)
-    )
+    statement = select(func.min(User.age), func.max(User.age))
     min_age, max_age = session.exec(statement).one()
     return {"min": min_age, "max": max_age}
 ```
@@ -165,11 +149,9 @@ def age_range(session: Session):
 ```python
 # Group by with count
 def users_by_role(session: Session):
-    statement = (
-        select(User.role, func.count(User.id))
-        .group_by(User.role)
-    )
+    statement = select(User.role, func.count(User.id)).group_by(User.role)
     return session.exec(statement).all()
+
 
 # Group by with having
 def active_roles(session: Session):
@@ -187,24 +169,14 @@ def active_roles(session: Session):
 
 ```python
 # Inner join
-statement = (
-    select(User, Post)
-    .join(Post, User.id == Post.user_id)
-)
+statement = select(User, Post).join(Post, User.id == Post.user_id)
 results = session.exec(statement).all()
 
 # Left outer join
-statement = (
-    select(User, Post)
-    .outerjoin(Post, User.id == Post.user_id)
-)
+statement = select(User, Post).outerjoin(Post, User.id == Post.user_id)
 
 # Join with filter
-statement = (
-    select(User, Post)
-    .join(Post)
-    .where(Post.published == True)
-)
+statement = select(User, Post).join(Post).where(Post.published == True)
 
 # Multiple joins
 statement = (
@@ -222,9 +194,7 @@ from sqlalchemy import ScalarSelect
 
 # Get users with post count
 post_count_subq = (
-    select(func.count(Post.id))
-    .where(Post.user_id == User.id)
-    .scalar_subquery()
+    select(func.count(Post.id)).where(Post.user_id == User.id).scalar_subquery()
 )
 
 statement = select(User, post_count_subq.label("post_count"))
@@ -232,11 +202,7 @@ results = session.exec(statement).all()
 
 # Correlated subquery
 # Get users who have published posts
-published_subq = (
-    select(Post.user_id)
-    .where(Post.published == True)
-    .distinct()
-)
+published_subq = select(Post.user_id).where(Post.published == True).distinct()
 
 statement = select(User).where(User.id.in_(published_subq))
 users = session.exec(statement).all()
@@ -247,13 +213,14 @@ users = session.exec(statement).all()
 ```python
 from typing import Optional
 
+
 def get_users_filtered(
     session: Session,
     username: Optional[str] = None,
     email: Optional[str] = None,
     is_active: Optional[bool] = None,
     min_age: Optional[int] = None,
-    max_age: Optional[int] = None
+    max_age: Optional[int] = None,
 ) -> List[User]:
     """Get users with dynamic filters"""
     statement = select(User)
@@ -276,6 +243,7 @@ def get_users_filtered(
 
     return session.exec(statement).all()
 
+
 # FastAPI endpoint with filters
 @app.get("/users/search", response_model=List[UserRead])
 def search_users(
@@ -284,7 +252,7 @@ def search_users(
     is_active: Optional[bool] = None,
     min_age: Optional[int] = None,
     max_age: Optional[int] = None,
-    session: Session = Depends(get_session)
+    session: Session = Depends(get_session),
 ):
     return get_users_filtered(
         session,
@@ -292,7 +260,7 @@ def search_users(
         email=email,
         is_active=is_active,
         min_age=min_age,
-        max_age=max_age
+        max_age=max_age,
     )
 ```
 
@@ -301,17 +269,15 @@ def search_users(
 ```python
 from sqlalchemy import func, text
 
+
 # Full-text search
 def search_posts(session: Session, query: str):
     """Full-text search on posts"""
-    statement = (
-        select(Post)
-        .where(
-            func.to_tsvector('english', Post.title + ' ' + Post.content)
-            .match(query)
-        )
+    statement = select(Post).where(
+        func.to_tsvector("english", Post.title + " " + Post.content).match(query)
     )
     return session.exec(statement).all()
+
 
 # Raw SQL for complex searches
 def advanced_search(session: Session, query: str):
@@ -337,25 +303,24 @@ def advanced_search(session: Session, query: str):
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy import cast
 
+
 class Product(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str
     metadata: Dict[str, Any] = Field(sa_column=Column(JSONB))
 
+
 # Query JSON field
 def get_products_by_category(session: Session, category: str):
     """Get products by category in JSON field"""
-    statement = select(Product).where(
-        Product.metadata["category"].astext == category
-    )
+    statement = select(Product).where(Product.metadata["category"].astext == category)
     return session.exec(statement).all()
+
 
 # JSON contains
 def get_products_with_tag(session: Session, tag: str):
     """Get products with specific tag in JSON array"""
-    statement = select(Product).where(
-        Product.metadata["tags"].contains([tag])
-    )
+    statement = select(Product).where(Product.metadata["tags"].contains([tag]))
     return session.exec(statement).all()
 ```
 
@@ -364,23 +329,24 @@ def get_products_with_tag(session: Session, tag: str):
 ```python
 from sqlalchemy import func, over
 
+
 # Row number
 def get_ranked_users(session: Session):
     """Get users with ranking by score"""
-    row_number = func.row_number().over(
-        order_by=User.score.desc()
-    ).label("rank")
+    row_number = func.row_number().over(order_by=User.score.desc()).label("rank")
 
     statement = select(User, row_number)
     return session.exec(statement).all()
 
+
 # Partition by
 def get_top_user_per_team(session: Session):
     """Get highest scoring user in each team"""
-    rank = func.rank().over(
-        partition_by=User.team_id,
-        order_by=User.score.desc()
-    ).label("team_rank")
+    rank = (
+        func.rank()
+        .over(partition_by=User.team_id, order_by=User.score.desc())
+        .label("team_rank")
+    )
 
     subq = select(User, rank).subquery()
 
@@ -410,8 +376,10 @@ def user_exists(session: Session, email: str) -> bool:
     statement = select(User).where(User.email == email)
     return session.exec(statement).first() is not None
 
+
 # Using exists() for better performance
 from sqlalchemy import exists
+
 
 def user_exists_efficient(session: Session, email: str) -> bool:
     statement = select(exists().where(User.email == email))

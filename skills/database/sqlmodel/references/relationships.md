@@ -6,6 +6,7 @@
 from sqlmodel import SQLModel, Field, Relationship
 from typing import Optional, List
 
+
 # Parent model
 class Team(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -13,6 +14,7 @@ class Team(SQLModel, table=True):
 
     # Relationship to Hero (one team has many heroes)
     heroes: List["Hero"] = Relationship(back_populates="team")
+
 
 # Child model
 class Hero(SQLModel, table=True):
@@ -33,9 +35,9 @@ class User(SQLModel, table=True):
 
     # One-to-one: uselist=False
     profile: Optional["UserProfile"] = Relationship(
-        back_populates="user",
-        sa_relationship_kwargs={"uselist": False}
+        back_populates="user", sa_relationship_kwargs={"uselist": False}
     )
+
 
 class UserProfile(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -58,23 +60,23 @@ class StudentCourseLink(SQLModel, table=True):
     enrolled_at: datetime = Field(default_factory=datetime.utcnow)
     grade: Optional[float] = None
 
+
 class Student(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str
 
     # Many-to-many with link model
     courses: List["Course"] = Relationship(
-        back_populates="students",
-        link_model=StudentCourseLink
+        back_populates="students", link_model=StudentCourseLink
     )
+
 
 class Course(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     title: str
 
     students: List[Student] = Relationship(
-        back_populates="courses",
-        link_model=StudentCourseLink
+        back_populates="courses", link_model=StudentCourseLink
     )
 ```
 
@@ -84,6 +86,7 @@ class Course(SQLModel, table=True):
 from sqlalchemy import ForeignKey, Column, Integer
 from sqlalchemy.orm import relationship as sa_relationship
 
+
 class Author(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str
@@ -91,8 +94,9 @@ class Author(SQLModel, table=True):
     # Cascade delete: when author is deleted, all books are deleted
     books: List["Book"] = Relationship(
         back_populates="author",
-        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+        sa_relationship_kwargs={"cascade": "all, delete-orphan"},
     )
+
 
 class Book(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -115,7 +119,7 @@ class Employee(SQLModel, table=True):
         back_populates="subordinates",
         sa_relationship_kwargs={
             "remote_side": "Employee.id"  # Specify the remote side
-        }
+        },
     )
 
     # One manager has many subordinates
@@ -127,11 +131,13 @@ class Employee(SQLModel, table=True):
 ```python
 from sqlalchemy.orm import selectinload
 
+
 # Default: lazy loading (queries relationships only when accessed)
 class Post(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     title: str
     comments: List["Comment"] = Relationship(back_populates="post")
+
 
 # Eager loading in query
 from sqlmodel import select, Session
@@ -167,6 +173,7 @@ class Message(SQLModel, table=True):
         sa_relationship_kwargs={"foreign_keys": "[Message.recipient_id]"}
     )
 
+
 class User(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     username: str
@@ -186,6 +193,7 @@ class User(SQLModel, table=True):
 ```python
 from datetime import datetime, timedelta
 
+
 class Blog(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     title: str
@@ -197,9 +205,10 @@ class Blog(SQLModel, table=True):
     recent_posts: List["Post"] = Relationship(
         sa_relationship_kwargs={
             "primaryjoin": "and_(Post.blog_id==Blog.id, Post.created_at>=datetime.utcnow()-timedelta(days=30))",
-            "viewonly": True
+            "viewonly": True,
         }
     )
+
 
 class Post(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -228,12 +237,14 @@ class OrderItem(SQLModel, table=True):
     def total_price(self) -> Decimal:
         return self.quantity * self.unit_price
 
+
 class Order(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     customer_name: str
 
     # Direct access to association objects
     items: List[OrderItem] = Relationship(back_populates="order")
+
 
 class Product(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)

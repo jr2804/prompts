@@ -72,6 +72,7 @@ def calculate_score(data):
     # Magic number 0.5 for weighting
     return data * 0.5
 
+
 # TODO: fix this later
 # HACK: probably works
 # This is weird but necessary (why?)
@@ -84,6 +85,7 @@ def calculate_score(data):
     # Weight by 50% to normalize against historical max of 200
     NORMALIZED_WEIGHT = 0.5
     return data * NORMALIZED_WEIGHT
+
 
 # Known limitation: doesn't handle timezone offsets yet (bug #345)
 # Workaround for Node.js quirk where Promise.all({...}) fails on objects
@@ -123,10 +125,12 @@ def process_data(data):
 class Logger(metaclass=Singleton):
     pass
 
+
 # Observer pattern for a single event type
 class EventEmitter:
     def __init__(self):
         self.observers = {}
+
     # 50 lines of boilerplate
 ```
 
@@ -135,8 +139,10 @@ class EventEmitter:
 ```python
 logger = Logger()
 
+
 def on_event(callback):
     callbacks.append(callback)
+
 
 def emit(event):
     for cb in callbacks:
@@ -154,8 +160,9 @@ import re
 from typing import Pattern
 
 EMAIL_REGEX: Pattern = re.compile(
-    r'^[a-zA-Z0-9.!#$%&\'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$'
+    r"^[a-zA-Z0-9.!#$%&\'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
 )
+
 
 def validate_email(email: str) -> bool:
     """Validate email using RFC 5322 standard."""
@@ -170,7 +177,7 @@ def validate_email(email: str) -> bool:
 
 ```python
 def is_valid_email(email: str) -> bool:
-    return email and '@' in email
+    return email and "@" in email
 ```
 
 ### Premature Optimization
@@ -181,6 +188,7 @@ def is_valid_email(email: str) -> bool:
 from functools import lru_cache
 import asyncio
 from multiprocessing import Pool
+
 
 @lru_cache(maxsize=10000)
 async def fetch_user_async(user_id):
@@ -212,6 +220,7 @@ def calculate_discount(price, percent):
 def calculate_discount(price, percent):
     """Calculate price after discount. Percent is 0-100."""
     return price * (1 - percent / 100)
+
 
 def test_discount():
     assert calculate_discount(100, 10) == 90

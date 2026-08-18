@@ -9,9 +9,56 @@ seamlessly with FastAPI applications.
 
 import argparse
 import json
-import os
 from datetime import datetime
 from pathlib import Path
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Generate database schema for FastAPI applications"
+    )
+    parser.add_argument(
+        "--db-type",
+        required=True,
+        choices=["postgresql", "mongodb", "sqlite"],
+        help="Type of database to generate schema for",
+    )
+    parser.add_argument(
+        "--entities",
+        required=True,
+        help='JSON string defining entities and their fields, e.g., \'{"User": {"fields": {"name": {"type": "string", "nullable": false}}}}\'',
+    )
+    parser.add_argument(
+        "--output", default=".", help="Output directory for generated files"
+    )
+
+    args = parser.parse_args()
+
+    # Parse entities JSON
+    try:
+        entities = json.loads(args.entities)
+    except json.JSONDecodeError:
+        print("Error: Invalid JSON format for entities")
+        return
+
+    # Create project structure
+    create_project_structure(args.output)
+
+    # Generate models based on database type
+    if args.db_type in ["postgresql", "sqlite"]:
+        generate_sqlalchemy_models(entities, args.db_type, args.output)
+    elif args.db_type == "mongodb":
+        generate_odmantic_models(entities, args.output)
+
+    # Generate migration script if SQL database
+    if args.db_type in ["postgresql", "sqlite"]:
+        generate_migration_script(entities, args.db_type, args.output)
+
+    # Generate FastAPI endpoints
+    generate_fastapi_endpoints(entities, args.db_type, args.output)
+
+    print(f"\nDatabase schema for {args.db_type} has been generated successfully!")
+    print(f"Files created in: {args.output}")
 
 
 def create_project_structure(base_path):
@@ -41,7 +88,7 @@ Base = declarative_base()
         f.write(base_content)
 
     for entity_name, entity_config in entities.items():
-        model_content = f"""from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, ForeignKey
+        model_content = """from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from database.base import Base
@@ -130,7 +177,7 @@ from typing import List, Optional
         f.write(base_content)
 
     for entity_name, entity_config in entities.items():
-        model_content = f"""from odmantic import Model, Field, EmbeddedModel
+        model_content = """from odmantic import Model, Field, EmbeddedModel
 from datetime import datetime
 from typing import List, Optional
 
@@ -145,12 +192,7 @@ class {entity_name}(Model):
             field_type = field_config["type"]
             optional = field_config.get("nullable", True)
 
-            if field_type.lower() == "string":
-                if optional:
-                    model_content += f"    {field_name}: Optional[str] = None\n"
-                else:
-                    model_content += f"    {field_name}: str\n"
-            elif field_type.lower() == "text":
+            if field_type.lower() == "string" or field_type.lower() == "text":
                 if optional:
                     model_content += f"    {field_name}: Optional[str] = None\n"
                 else:
@@ -169,7 +211,7 @@ class {entity_name}(Model):
         # Add relationships if specified
         for rel_name, rel_config in entity_config.get("relationships", {}).items():
             rel_type = rel_config["type"]
-            target = rel_config["target"]
+            rel_config["target"]
 
             if rel_type.lower() == "reference":
                 model_content += f"    {rel_name}_id: str = Field(reference=True)\n"
@@ -250,28 +292,28 @@ def upgrade():
                 migration_content += f"        sa.Column('{field_name}', postgresql.JSONB(), nullable={str(not nullable).lower()}),\n"
 
         # Add foreign keys if relationships exist
-        for rel_name, rel_config in entity_config.get("relationships", {}).items():
+        for rel_config in entity_config.get("relationships", {}).values():
             rel_type = rel_config["type"]
             if rel_type.lower() == "many-to-one":
                 target = rel_config["target"]
                 foreign_key = rel_config.get("foreign_key", target.lower() + "_id")
                 migration_content += f"        sa.Column('{foreign_key}', sa.Integer(), sa.ForeignKey('{target.lower()}s.id')), \n"
 
-        migration_content += f"        sa.PrimaryKeyConstraint('id')\n"
+        migration_content += "        sa.PrimaryKeyConstraint('id')\n"
 
         # Add unique constraints
         for field_name, field_config in entity_config.get("fields", {}).items():
             if field_config.get("unique", False):
                 migration_content += f"        # sa.UniqueConstraint('{field_name}')  # Uncomment if needed\n"
 
-        migration_content += f"    )\n"
+        migration_content += "    )\n"
 
         # Add indexes
         for field_name, field_config in entity_config.get("fields", {}).items():
             if field_config.get("index", False):
                 migration_content += f"    op.create_index('ix_{entity_name.lower()}s_{field_name}', '{entity_name.lower()}s', ['{field_name}'])\n"
 
-    migration_content += f'''
+    migration_content += '''
 
 def downgrade():
     """Drop all tables for rollback."""
@@ -283,10 +325,7 @@ def downgrade():
         migration_content += f"    op.drop_table('{entity_name.lower()}s')\n"
 
     migration_file = (
-        Path(base_path)
-        / "migrations"
-        / f"versions"
-        / f"{revision_id}_initial_schema.py"
+        Path(base_path) / "migrations" / "versions" / f"{revision_id}_initial_schema.py"
     )
     migration_file.parent.mkdir(exist_ok=True)
 
@@ -298,8 +337,8 @@ def downgrade():
 
 def generate_fastapi_endpoints(entities, db_type, base_path):
     """Generate FastAPI endpoints for the entities."""
-    for entity_name, entity_config in entities.items():
-        endpoint_content = f"""from fastapi import APIRouter, Depends, HTTPException
+    for entity_name in entities:
+        endpoint_content = """from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 
@@ -419,54 +458,6 @@ async def delete_{entity_name.lower()}({entity_name.lower()}_id: str, engine: AI
             f.write(endpoint_content)
 
         print(f"Created API endpoints: {endpoint_file}")
-
-
-def main():
-    parser = argparse.ArgumentParser(
-        description="Generate database schema for FastAPI applications"
-    )
-    parser.add_argument(
-        "--db-type",
-        required=True,
-        choices=["postgresql", "mongodb", "sqlite"],
-        help="Type of database to generate schema for",
-    )
-    parser.add_argument(
-        "--entities",
-        required=True,
-        help='JSON string defining entities and their fields, e.g., \'{"User": {"fields": {"name": {"type": "string", "nullable": false}}}}\'',
-    )
-    parser.add_argument(
-        "--output", default=".", help="Output directory for generated files"
-    )
-
-    args = parser.parse_args()
-
-    # Parse entities JSON
-    try:
-        entities = json.loads(args.entities)
-    except json.JSONDecodeError:
-        print("Error: Invalid JSON format for entities")
-        return
-
-    # Create project structure
-    create_project_structure(args.output)
-
-    # Generate models based on database type
-    if args.db_type in ["postgresql", "sqlite"]:
-        generate_sqlalchemy_models(entities, args.db_type, args.output)
-    elif args.db_type == "mongodb":
-        generate_odmantic_models(entities, args.output)
-
-    # Generate migration script if SQL database
-    if args.db_type in ["postgresql", "sqlite"]:
-        generate_migration_script(entities, args.db_type, args.output)
-
-    # Generate FastAPI endpoints
-    generate_fastapi_endpoints(entities, args.db_type, args.output)
-
-    print(f"\nDatabase schema for {args.db_type} has been generated successfully!")
-    print(f"Files created in: {args.output}")
 
 
 if __name__ == "__main__":

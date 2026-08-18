@@ -19,17 +19,15 @@ SQLModel.metadata.create_all(engine)
 import os
 from sqlmodel import create_engine
 
+
 def get_database_url() -> str:
     """Get database URL from environment"""
-    return os.getenv(
-        "DATABASE_URL",
-        "postgresql://user:password@localhost:5432/dbname"
-    )
+    return os.getenv("DATABASE_URL", "postgresql://user:password@localhost:5432/dbname")
+
 
 # Create engine
 engine = create_engine(
-    get_database_url(),
-    echo=os.getenv("SQL_ECHO", "false").lower() == "true"
+    get_database_url(), echo=os.getenv("SQL_ECHO", "false").lower() == "true"
 )
 ```
 
@@ -44,15 +42,18 @@ from fastapi import Depends
 DATABASE_URL = "postgresql://user:password@localhost:5432/dbname"
 engine = create_engine(DATABASE_URL)
 
+
 def get_session() -> Generator[Session, None, None]:
     """FastAPI dependency for database session"""
     with Session(engine) as session:
         yield session
 
+
 # Usage in endpoint
 from fastapi import FastAPI, Depends
 
 app = FastAPI()
+
 
 @app.get("/users/{user_id}")
 def get_user(user_id: int, session: Session = Depends(get_session)):
@@ -91,6 +92,7 @@ with Session(
 
 ```python
 from sqlmodel import Session
+
 
 def transfer_funds(from_user_id: int, to_user_id: int, amount: Decimal):
     with Session(engine) as session:
@@ -136,7 +138,7 @@ engine = create_engine(
 # Disable connection pooling (for serverless)
 engine_no_pool = create_engine(
     DATABASE_URL,
-    poolclass=NullPool  # No connection pooling
+    poolclass=NullPool,  # No connection pooling
 )
 ```
 
@@ -149,20 +151,24 @@ primary_engine = create_engine("postgresql://localhost/primary")
 # Read replica
 replica_engine = create_engine("postgresql://localhost/replica")
 
+
 # Usage
 def get_primary_session():
     with Session(primary_engine) as session:
         yield session
 
+
 def get_replica_session():
     with Session(replica_engine) as session:
         yield session
+
 
 # In endpoints
 @app.post("/users")
 def create_user(user: UserCreate, session: Session = Depends(get_primary_session)):
     # Write to primary
     pass
+
 
 @app.get("/users")
 def list_users(session: Session = Depends(get_replica_session)):
@@ -179,29 +185,23 @@ from typing import AsyncGenerator
 
 # Async engine
 async_engine = create_async_engine(
-    "postgresql+asyncpg://user:password@localhost/dbname",
-    echo=True,
-    future=True
+    "postgresql+asyncpg://user:password@localhost/dbname", echo=True, future=True
 )
 
 # Async session maker
-async_session = sessionmaker(
-    async_engine,
-    class_=AsyncSession,
-    expire_on_commit=False
-)
+async_session = sessionmaker(async_engine, class_=AsyncSession, expire_on_commit=False)
+
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     async with async_session() as session:
         yield session
 
+
 # Usage in async endpoint
 @app.get("/users/{user_id}")
-async def get_user(
-    user_id: int,
-    session: AsyncSession = Depends(get_async_session)
-):
+async def get_user(user_id: int, session: AsyncSession = Depends(get_async_session)):
     from sqlalchemy import select
+
     statement = select(User).where(User.id == user_id)
     result = await session.execute(statement)
     user = result.scalar_one_or_none()
@@ -214,6 +214,7 @@ async def get_user(
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manage database lifecycle"""
@@ -222,6 +223,7 @@ async def lifespan(app: FastAPI):
     yield
     # Shutdown: cleanup
     engine.dispose()
+
 
 app = FastAPI(lifespan=lifespan)
 ```
@@ -238,6 +240,7 @@ def create_user(user_data: UserCreate):
         session.refresh(user)
         return user
 
+
 # ❌ BAD: Don't forget to close
 def create_user_bad(user_data: UserCreate):
     session = Session(engine)
@@ -247,17 +250,16 @@ def create_user_bad(user_data: UserCreate):
     # Session not closed!
     return user
 
+
 # ✅ GOOD: Use dependency injection in FastAPI
 @app.post("/users")
-def create_user(
-    user: UserCreate,
-    session: Session = Depends(get_session)
-):
+def create_user(user: UserCreate, session: Session = Depends(get_session)):
     db_user = User(**user.dict())
     session.add(db_user)
     session.commit()
     session.refresh(db_user)
     return db_user
+
 
 # ❌ BAD: Creating session inside endpoint
 @app.post("/users")
@@ -275,14 +277,14 @@ def create_user_bad(user: UserCreate):
 # Separate engine for testing
 from sqlmodel import create_engine, SQLModel, Session
 
+
 def get_test_engine():
     """Create in-memory SQLite engine for tests"""
     engine = create_engine(
-        "sqlite:///:memory:",
-        connect_args={"check_same_thread": False},
-        echo=False
+        "sqlite:///:memory:", connect_args={"check_same_thread": False}, echo=False
     )
     return engine
+
 
 def get_test_session():
     """Get test session"""
@@ -291,8 +293,10 @@ def get_test_session():
     with Session(engine) as session:
         yield session
 
+
 # Override dependency in tests
 from fastapi.testclient import TestClient
+
 
 def test_create_user():
     app.dependency_overrides[get_session] = get_test_session

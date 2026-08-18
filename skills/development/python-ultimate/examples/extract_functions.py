@@ -9,30 +9,6 @@ import re
 from pathlib import Path
 
 
-def find_functions(file_path: Path, pattern: str) -> list[dict]:
-    """Find function definitions matching regex pattern."""
-    content = file_path.read_text()
-    tree = ast.parse(content)
-
-    functions = []
-    lines = content.splitlines()
-
-    for node in ast.walk(tree):
-        if isinstance(node, ast.FunctionDef):
-            if re.search(pattern, node.name):
-                # Get function source lines
-                start_line = node.lineno - 1  # AST is 1-indexed
-                end_line = node.end_lineno
-                functions.append({
-                    "name": node.name,
-                    "start_line": start_line,
-                    "end_line": end_node,
-                    "source": "\n".join(lines[start_line:end_line]),
-                })
-
-    return functions
-
-
 def extract_functions_to_new_file(
     source_file: Path,
     target_file: Path,
@@ -59,7 +35,9 @@ def extract_functions_to_new_file(
     # Append each function
     with target_file.open("a") as f:
         for func in functions:
-            print(f"  Moving {func['name']} (lines {func['start_line']+1}-{func['end_line']})")
+            print(
+                f"  Moving {func['name']} (lines {func['start_line'] + 1}-{func['end_line']})"
+            )
             f.write(func["source"] + "\n\n")
 
     # Return summary only
@@ -67,6 +45,31 @@ def extract_functions_to_new_file(
         "functions_extracted": len(functions),
         "function_names": [f["name"] for f in functions],
     }
+
+
+def find_functions(file_path: Path, pattern: str) -> list[dict]:
+    """Find function definitions matching regex pattern."""
+    content = file_path.read_text()
+    tree = ast.parse(content)
+
+    functions = []
+    lines = content.splitlines()
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.FunctionDef) and re.search(pattern, node.name):
+            # Get function source lines
+            start_line = node.lineno - 1  # AST is 1-indexed
+            end_line = node.end_lineno
+            functions.append(
+                {
+                    "name": node.name,
+                    "start_line": start_line,
+                    "end_line": end_node,
+                    "source": "\n".join(lines[start_line:end_line]),
+                }
+            )
+
+    return functions
 
 
 # Example usage
