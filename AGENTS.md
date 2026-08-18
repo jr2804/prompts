@@ -94,7 +94,6 @@ When the user requests a durable behavior change, record it here or in the relev
 |------|--------|
 | `skills/AGENTS.md` | Skill authoring contract — spec compliance, script metadata, agent-neutrality, skill creation via `skill-creator` |
 | `skills/standards/AGENTS.md` | Standards-document skills — `.docx` generation for SDOs (ETSI, 3GPP, ITU-T) |
-| `agents-md/AGENTS.md` | AGENTS.md authoring template (`{{project-name}}` / `{{project-description}}`) — the file used to seed new project AGENTS.md files |
 
 ## .agents/ files — demand-loaded, not always injected
 

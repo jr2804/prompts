@@ -18,6 +18,18 @@ iwr -useb https://mise.sh/install | iex
 
 Run `bunx saddle-cli`, then follow the instructions to install the repository.
 
+## For AGENTS.md / DOX hierarchy
+
+This repository's DOX hierarchy (`AGENTS.md` + `.agents/*` files) follows the
+[agents-scaffold](https://codeberg.org/jr2804/agents-scaffold) project. To
+scaffold the same structure into a new project, fetch its
+[`INSTALL.md`](https://codeberg.org/jr2804/agents-scaffold/raw/branch/main/INSTALL.md)
+and feed it to your coding agent — it is the canonical setup recipe. For
+project-specific AGENTS.md authoring guidance, see
+[Writing a Good AGENTS.md](https://www.philschmid.de/writing-good-agents#the-data-says-less-is-more)
+and the empirical study
+[Evaluating AGENTS.md](https://arxiv.org/pdf/2602.11988).
+
 ## Content
 
 ### Commands
@@ -75,5 +87,4 @@ Related tools:
 
 ## References
 
-[Writing a Good AGENTS.md](https://www.philschmid.de/writing-good-agents#the-data-says-less-is-more)
-[Evaluating AGENTS.md: Are Repository-Level Context Files Helpful for Coding Agents?](https://arxiv.org/pdf/2602.11988)
+- [agents-scaffold](https://codeberg.org/jr2804/agents-scaffold) — canonical DOX/AGENTS.md setup; see also its `INSTALL.md` for the installation recipe referenced above.
