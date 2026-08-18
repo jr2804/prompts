@@ -5,6 +5,11 @@ skills-lock.json
 # Keep .agents/ DOX .md files tracked (override any blanket ignore)
 /.agents/*
 !/.agents/*.md
+!/.agents/history/
+!/.agents/history/**
+
+# Implementation plans — mutable working artifacts, never committed
+/.agents/plans/
 
 /.vscode
 /QWEN.md

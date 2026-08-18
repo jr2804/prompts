@@ -5,7 +5,7 @@ How to keep `.agents/` files current.
 ## Process
 
 1. When a rule changes, update the owning file — never another file.
-2. When adding a new `.agents/` file, add it to the index table in root `AGENTS.md`.
+2. When adding a new `.agents/` file or directory, add it to the index table in root `AGENTS.md`.
 3. After any `.agents/` change, check the index for stale entries.
 
 ## Principles
@@ -26,3 +26,5 @@ How to keep `.agents/` files current.
 | `MAINTENANCE.md` | Maintenance procedures, triggers, or principles change |
 | `.config/rumdl.toml` | Markdown lint/format rules, line length, or excludes change |
 | `.config/mise/config.toml` | Tools, tasks, or toolchain versions change |
+| `.agents/plans/` | New feature implementation starts |
+| `.agents/history/` | HISTORY.md overflow or completed plans archived |
