@@ -1,0 +1,33 @@
+# Auto-generated from style_presets.py - do not hand-edit.
+# Preset: nature
+figure.figsize: 3.5, 2.6
+figure.dpi: 100
+savefig.dpi: 600
+savefig.bbox: tight
+savefig.pad_inches: 0.05
+savefig.transparent: False
+font.family: sans-serif
+font.sans-serif: Arial, Helvetica, DejaVu Sans
+font.size: 7
+axes.labelsize: 8
+axes.titlesize: 8
+axes.linewidth: 0.5
+axes.spines.top: False
+axes.spines.right: False
+axes.edgecolor: black
+axes.labelcolor: black
+xtick.labelsize: 6
+ytick.labelsize: 6
+xtick.major.size: 2.5
+ytick.major.size: 2.5
+xtick.major.width: 0.5
+ytick.major.width: 0.5
+xtick.direction: out
+ytick.direction: out
+lines.linewidth: 1.2
+lines.markersize: 3
+lines.markeredgewidth: 0.4
+legend.fontsize: 6
+legend.frameon: False
+image.cmap: viridis
+figure.constrained_layout.use: True

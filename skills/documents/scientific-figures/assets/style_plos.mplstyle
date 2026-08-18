@@ -1,0 +1,21 @@
+# Auto-generated from style_presets.py - do not hand-edit.
+# Preset: plos
+figure.figsize: 5.2, 3.9
+figure.dpi: 100
+savefig.dpi: 300
+savefig.bbox: tight
+font.family: serif
+font.serif: Times New Roman, DejaVu Serif
+font.size: 9
+axes.labelsize: 10
+axes.titlesize: 10
+axes.linewidth: 0.8
+axes.spines.top: False
+axes.spines.right: False
+xtick.labelsize: 8
+ytick.labelsize: 8
+lines.linewidth: 1.5
+legend.fontsize: 8
+legend.frameon: False
+image.cmap: viridis
+figure.constrained_layout.use: True

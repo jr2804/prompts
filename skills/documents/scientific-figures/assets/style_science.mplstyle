@@ -1,0 +1,23 @@
+# Auto-generated from style_presets.py - do not hand-edit.
+# Preset: science
+figure.figsize: 3.27, 2.45
+figure.dpi: 100
+savefig.dpi: 300
+savefig.bbox: tight
+savefig.pad_inches: 0.05
+font.family: sans-serif
+font.sans-serif: Arial, Helvetica, DejaVu Sans
+font.size: 8
+axes.labelsize: 9
+axes.titlesize: 9
+axes.linewidth: 0.6
+axes.spines.top: False
+axes.spines.right: False
+xtick.labelsize: 7
+ytick.labelsize: 7
+lines.linewidth: 1.5
+lines.markersize: 4
+legend.fontsize: 7
+legend.frameon: False
+image.cmap: viridis
+figure.constrained_layout.use: True
