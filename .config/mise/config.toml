@@ -16,6 +16,8 @@ ripgrep = "latest"
 "npm:@llamaindex/liteparse" = "latest"
 "github:iOfficeAI/OfficeCLI" = "latest"
 
+"github:1broseidon/ketch" = "latest"
+
 [settings.npm]
 package_manager = "bun"
 
@@ -61,4 +63,15 @@ run = [
     "bun x skills add kreuzberg-dev/kreuzberg -a universal -y",
     "bun x skills add run-llama/llamaparse-agent-skills --skill liteparse -a universal -y",
 
+]
+
+[tasks.add-mcp-servers]
+description = "Register MCP servers with AI assistants"
+usage = '''
+arg "<ai_agent>" help="AI assistant: claude, gemini, copilot, opencode, ... (see https://github.com/neondatabase/add-mcp)"
+'''
+
+run = [
+	#"clear",
+	'bun x add-mcp "ketch mcp serve" -y -a {{usage.ai_agent}} -n ketch',
 ]
