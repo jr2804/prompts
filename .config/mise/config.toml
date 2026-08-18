@@ -10,7 +10,8 @@ ripgrep = "latest"
 "ruff" = "latest"
 "ty" = "latest"
 "rumdl" = "latest"
-"pipx:undersort" = "latest"
+"pipx:git+https://codeberg.org/jr2804/clean-sort.git" = "latest"
+
 
 "github:kreuzberg-dev/kreuzberg" = "latest"
 "npm:@llamaindex/liteparse" = "latest"
@@ -35,10 +36,14 @@ run = "uv sync -U --dev --all-extras --all-groups"
 [tasks.format]
 description = "Format source code and markdown files"
 run = [
-    "undersort .",
+    "csort run ./ --config .config/csort.toml",
     "ruff check --select I --fix", # isort-equivalent sorting of imports
     "ruff format .",
 ]
+
+[tasks.lint]
+description = "Run linter (ruff)"
+run = 'ruff check ./ --fix --unsafe-fixes'
 
 [tasks.format-md]
 description = "Format Markdown files with rumdl"
