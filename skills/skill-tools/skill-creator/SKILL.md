@@ -1,379 +1,367 @@
 ---
 name: skill-creator
-description: Guide for creating effective skills. This skill should be used when users want to create a new skill (or update an existing skill) that extends Claude's capabilities with specialized knowledge, workflows, or tool integrations.
+description: Guide for creating, validating, improving, and benchmarking skills. Use when users want to create a skill from scratch, edit or optimize an existing skill, run evals to test a skill, benchmark skill performance with variance analysis, or optimize a skill's description for better triggering accuracy.
 ---
 
 # Skill Creator
 
-This skill provides guidance for creating effective skills.
+A skill for creating new skills and iteratively improving them.
 
-## About Skills
+## Overview
 
-Skills are modular, self-contained packages that extend Claude's capabilities by providing
-specialized knowledge, workflows, and tools. Think of them as "onboarding guides" for specific
-domains or tasks—they transform Claude from a general-purpose agent into a specialized agent
-equipped with procedural knowledge that no model can fully possess.
+At a high level, creating a skill follows this loop:
 
-### What Skills Provide
+1. Decide what the skill should do and roughly how it should do it.
+2. Write a draft of the skill.
+3. Create test prompts and run the agent on them.
+4. Evaluate the results qualitatively and, if the runtime supports it, quantitatively.
+5. Rewrite the skill based on feedback.
+6. Repeat until satisfied.
+7. Expand the test set and try again at larger scale.
 
-1. Specialized workflows - Multi-step procedures for specific domains
-2. Tool integrations - Instructions for working with specific file formats or APIs
-3. Domain expertise - Company-specific knowledge, schemas, business logic
-4. Bundled resources - Scripts, references, and assets for complex and repetitive tasks
+Your job is to figure out where the user is in this process and help them progress. A user may arrive with just "I want a skill for X" — narrow the scope, write a draft, draft test cases, evaluate, and iterate. Or they may already have a draft — go straight to the eval/iterate step.
 
-## Core Principles
+## Skill Anatomy
 
-### Concise is Key
-
-The context window is a public good. Skills share the context window with everything else Claude needs: system prompt, conversation history, other Skills' metadata, and the actual user request.
-
-**Default assumption: Claude is already very smart.** Only add context Claude doesn't already have. Challenge each piece of information: "Does Claude really need this explanation?" and "Does this paragraph justify its token cost?"
-
-Prefer concise examples over verbose explanations.
-
-### Set Appropriate Degrees of Freedom
-
-Match the level of specificity to the task's fragility and variability:
-
-**High freedom (text-based instructions)**: Use when multiple approaches are valid, decisions depend on context, or heuristics guide the approach.
-
-**Medium freedom (pseudocode or scripts with parameters)**: Use when a preferred pattern exists, some variation is acceptable, or configuration affects behavior.
-
-**Low freedom (specific scripts, few parameters)**: Use when operations are fragile and error-prone, consistency is critical, or a specific sequence must be followed.
-
-Think of Claude as exploring a path: a narrow bridge with cliffs needs specific guardrails (low freedom), while an open field allows many routes (high freedom).
-
-### Anatomy of a Skill
-
-Every skill consists of a required SKILL.md file and optional bundled resources:
+A skill is a directory with at minimum a `SKILL.md`. Optional subdirectories organize supporting files:
 
 ```text
 skill-name/
-├── SKILL.md (required)
-│   ├── YAML frontmatter metadata (required)
-│   │   ├── name: (required)
-│   │   └── description: (required)
-│   └── Markdown instructions (required)
-└── Bundled Resources (optional)
-    ├── scripts/          - Executable code (Python/Bash/etc.)
-    ├── references/       - Documentation intended to be loaded into context as needed
-    └── assets/           - Files used in output (templates, icons, fonts, etc.)
+├── SKILL.md            (required)  — frontmatter + instructions
+├── scripts/            (optional)  — executable code (Python/Bash/etc.)
+├── references/        (optional)  — documentation loaded on demand
+├── assets/            (optional)  — templates, icons, fonts, static files
+├── agents/            (optional)  — sub-agent role definitions for evals
+├── eval-viewer/       (optional) — HTML viewer for eval results
+└── evals/             (optional)  — test prompts and grading criteria
 ```
 
-#### SKILL.md (required)
+### Frontmatter
 
-Every SKILL.md consists of:
+```yaml
+---
+name: skill-name           # required — hyphen-case, ≤64 chars
+description: >-            # required — what + when to use, ≤1024 chars
+  One paragraph. Use "Use when..." phrasing. Include the trigger
+  scenarios (file types, task keywords, user intent) that should
+  activate this skill.
+---
+```
 
-- **Frontmatter** (YAML): Contains `name` and `description` fields. These are the only fields that Claude reads to determine when the skill gets used, thus it is very important to be clear and comprehensive in describing what the skill is, and when it should be used.
-- **Body** (Markdown): Instructions and guidance for using the skill. Only loaded AFTER the skill triggers (if at all).
+Only these frontmatter fields are valid: `name`, `description`, `license`, `allowed-tools`, `metadata`, `compatibility`.
 
-#### Bundled Resources (optional)
+### scripts/
 
-##### Scripts (`scripts/`)
-
-Executable code (Python/Bash/etc.) for tasks that require deterministic reliability or are repeatedly rewritten.
-
-- **When to include**: When the same code is being rewritten repeatedly or deterministic reliability is needed
-- **Example**: `scripts/rotate_pdf.py` for PDF rotation tasks
-- **Benefits**: Token efficient, deterministic, may be executed without loading into context
-- **Note**: Scripts may still need to be read by Claude for patching or environment-specific adjustments
-
-Skill scripts must declare possible additional dependencies as well as required minimum/maximum Python version as inline script metadata, see:
-
-- <https://packaging.python.org/en/latest/specifications/inline-script-metadata/#inline-script-metadata>
-- <https://docs.astral.sh/uv/guides/scripts/#declaring-script-dependencies>
-
-Example:
+Executable code for tasks that need deterministic reliability or are written repeatedly. Every script must declare its Python version floor and dependencies via PEP 723 inline metadata — never assume packages are pre-installed:
 
 ```python
 # /// script
 # requires-python = ">=3.11"
-# dependencies = [
-#   "requests<3",
-#   "rich",
-# ]
+# dependencies = ["pypdf", "pillow"]
 # ///
 
-import requests
-from rich.pretty import pprint
-
-resp = requests.get("https://peps.python.org/api/peps.json")
-data = resp.json()
-pprint([(k, v["title"]) for k, v in data.items()][:10])
+import pypdf
+from PIL import Image
 ```
 
-##### References (`references/`)
+See [PEP 723 inline metadata](https://packaging.python.org/en/latest/specifications/inline-script-metadata/) and the [uv scripts guide](https://docs.astral.sh/uv/guides/scripts/#declaring-script-dependencies).
 
-Documentation and reference material intended to be loaded as needed into context to inform Claude's process and thinking.
+Run scripts via `uv run scripts/<name>.py …` — never `python …` or `python -m …`.
 
-- **When to include**: For documentation that Claude should reference while working
-- **Examples**: `references/finance.md` for financial schemas, `references/mnda.md` for company NDA template, `references/policies.md` for company policies, `references/api_docs.md` for API specifications
-- **Use cases**: Database schemas, API documentation, domain knowledge, company policies, detailed workflow guides
-- **Benefits**: Keeps SKILL.md lean, loaded only when Claude determines it's needed
-- **Best practice**: If files are large (>10k words), include grep search patterns in SKILL.md
-- **Avoid duplication**: Information should live in either SKILL.md or references files, not both. Prefer references files for detailed information unless it's truly core to the skill—this keeps SKILL.md lean while making information discoverable without hogging the context window. Keep only essential procedural instructions and workflow guidance in SKILL.md; move detailed reference material, schemas, and examples to references files.
+### references/
 
-##### Assets (`assets/`)
+Documentation loaded into context as needed. Use these patterns:
 
-Files not intended to be loaded into context, but rather used within the output Claude produces.
-
-- **When to include**: When the skill needs files that will be used in the final output
-- **Examples**: `assets/logo.png` for brand assets, `assets/slides.pptx` for PowerPoint templates, `assets/frontend-template/` for HTML/React boilerplate, `assets/font.ttf` for typography
-- **Use cases**: Templates, images, icons, boilerplate code, fonts, sample documents that get copied or modified
-- **Benefits**: Separates output resources from documentation, enables Claude to use files without loading them into context
-
-#### What to Not Include in a Skill
-
-A skill should only contain essential files that directly support its functionality. Do NOT create extraneous documentation or auxiliary files, including:
-
-- README.md
-- INSTALLATION_GUIDE.md
-- QUICK_REFERENCE.md
-- CHANGELOG.md
-- etc.
-
-The skill should only contain the information needed for an AI agent to do the job at hand. It should not contain auxilary context about the process that went into creating it, setup and testing procedures, user-facing documentation, etc. Creating additional documentation files just adds clutter and confusion.
-
-### Progressive Disclosure Design Principle
-
-Skills use a three-level loading system to manage context efficiently:
-
-1. **Metadata (name + description)** - Always in context (~100 words)
-2. **SKILL.md body** - When skill triggers (\<5k words)
-3. **Bundled resources** - As needed by Claude (Unlimited because scripts can be executed without reading into context window)
-
-#### Progressive Disclosure Patterns
-
-Keep SKILL.md body to the essentials and under 500 lines to minimize context bloat. Split content into separate files when approaching this limit. When splitting out content into other files, it is very important to reference them from SKILL.md and describe clearly when to read them, to ensure the reader of the skill knows they exist and when to use them.
-
-**Key principle:** When a skill supports multiple variations, frameworks, or options, keep only the core workflow and selection guidance in SKILL.md. Move variant-specific details (patterns, examples, configuration) into separate reference files.
-
-##### Pattern 1: High-level guide with references
+**High-level guide with references** — show the summary, link to details:
 
 ```markdown
-# PDF Processing
-
 ## Quick start
+Extract text with pdfplumber: [example]
 
-Extract text with pdfplumber:
-[code example]
-
-## Advanced features
-
-- **Form filling**: See [FORMS.md](FORMS.md) for complete guide
-- **API reference**: See [REFERENCE.md](REFERENCE.md) for all methods
-- **Examples**: See [EXAMPLES.md](EXAMPLES.md) for common patterns
+## Advanced
+- **Form filling**: See [references/forms.md](references/forms.md)
+- **API reference**: See [references/api.md](references/api.md)
 ```
 
-Claude loads FORMS.md, REFERENCE.md, or EXAMPLES.md only when needed.
-
-##### Pattern 2: Domain-specific organization
-
-For Skills with multiple domains, organize content by domain to avoid loading irrelevant context:
-
-```text
-bigquery-skill/
-├── SKILL.md (overview and navigation)
-└── reference/
-    ├── finance.md (revenue, billing metrics)
-    ├── sales.md (opportunities, pipeline)
-    ├── product.md (API usage, features)
-    └── marketing.md (campaigns, attribution)
-```
-
-When a user asks about sales metrics, Claude only reads sales.md.
-
-Similarly, for skills supporting multiple frameworks or variants, organize by variant:
-
-```text
-cloud-deploy/
-├── SKILL.md (workflow + provider selection)
-└── references/
-    ├── aws.md (AWS deployment patterns)
-    ├── gcp.md (GCP deployment patterns)
-    └── azure.md (Azure deployment patterns)
-```
-
-When the user chooses AWS, Claude only reads aws.md.
-
-##### Pattern 3: Conditional details
-
-Show basic content, link to advanced content:
+**Conditional details** — show basic content, link to advanced:
 
 ```markdown
-# DOCX Processing
-
 ## Creating documents
-
-Use docx-js for new documents. See [DOCX-JS.md](DOCX-JS.md).
-
-## Editing documents
-
-For simple edits, modify the XML directly.
-
-**For tracked changes**: See [REDLINING.md](REDLINING.md)
-**For OOXML details**: See [OOXML.md](OOXML.md)
+Use python-docx. For tracked changes see [references/redlining.md](references/redlining.md).
 ```
 
-Claude reads REDLINING.md or OOXML.md only when the user needs those features.
+**Rules:**
 
-**Important guidelines:**
+- Keep references one level deep from SKILL.md. Every reference links directly from SKILL.md.
+- Files longer than 100 lines should have a table of contents at the top.
 
-- **Avoid deeply nested references** - Keep references one level deep from SKILL.md. All reference files should link directly from SKILL.md.
-- **Structure longer reference files** - For files longer than 100 lines, include a table of contents at the top so Claude can see the full scope when previewing.
+### assets/
 
-## Skill Creation Process
+Static files used in output: templates, icons, fonts, sample data. Every asset must be named or linked in SKILL.md or a reference — orphaned files that nothing references are dead weight.
 
-Skill creation involves these steps:
+### agents/
 
-1. Understand the skill with concrete examples
-2. Plan reusable skill contents (scripts, references, assets)
-3. Initialize the skill (run init_skill.py)
-4. Edit the skill (implement resources and write SKILL.md)
-5. Package the skill (run package_skill.py)
-6. Iterate based on real usage
+Sub-agent role definitions. Used during evals to spawn specialized grader, analyzer, or comparator agents. Each is a plain `.md` file read by the spawning agent.
 
-Follow these steps in order, skipping only if there is a clear reason why they are not applicable.
+## Creating a New Skill
 
-### Step 1: Understanding the Skill with Concrete Examples
+### Step 1 — Understand with concrete examples
 
-Skip this step only when the skill's usage patterns are already clearly understood. It remains valuable even when working with an existing skill.
+Before writing anything, understand how the skill will actually be used. Ask the user for examples: "What would a user actually say to trigger this?" "Can you give me a sample prompt and the expected output?"
 
-To create an effective skill, clearly understand concrete examples of how the skill will be used. This understanding can come from either direct user examples or generated examples that are validated with user feedback.
+Conclude when you have enough examples to write a meaningful draft.
 
-For example, when building an image-editor skill, relevant questions include:
+### Step 2 — Plan the contents
 
-- "What functionality should the image-editor skill support? Editing, rotating, anything else?"
-- "Can you give some examples of how this skill would be used?"
-- "I can imagine users asking for things like 'Remove the red-eye from this image' or 'Rotate this image'. Are there other ways you imagine this skill being used?"
-- "What would a user say that should trigger this skill?"
+Analyze each example: what scripts, references, and assets would eliminate repeated work? List every resource, then assign it to the right subdirectory. If a resource fits in two places, pick one — no duplication.
 
-To avoid overwhelming users, avoid asking too many questions in a single message. Start with the most important questions and follow up as needed for better effectiveness.
+**When to use scripts:**
 
-Conclude this step when there is a clear sense of the functionality the skill should support.
+- The same code is rewritten repeatedly (e.g., PDF rotation, image conversion).
+- Deterministic reliability is needed (file operations, format conversion).
 
-### Step 2: Planning the Reusable Skill Contents
+**When to use references:**
 
-To turn concrete examples into an effective skill, analyze each example by:
+- Documentation needs to be loaded only for specific subtasks.
+- The skill covers multiple domains or variants and users only need one at a time.
 
-1. Considering how to execute on the example from scratch
-2. Identifying what scripts, references, and assets would be helpful when executing these workflows repeatedly
+**When to use assets:**
 
-Example: When building a `pdf-editor` skill to handle queries like "Help me rotate this PDF," the analysis shows:
+- Static files are inputs or outputs of the skill (templates, icons, fonts, sample data).
 
-1. Rotating a PDF requires re-writing the same code each time
-2. A `scripts/rotate_pdf.py` script would be helpful to store in the skill
+### Step 3 — Initialize
 
-Example: When designing a `frontend-webapp-builder` skill for queries like "Build me a todo app" or "Build me a dashboard to track my steps," the analysis shows:
+Run `uv run scripts/init_skill.py <skill-name> --path <parent-dir>`. This creates the directory structure with a `SKILL.md` template. Edit the template: fill in name, description, and the body.
 
-1. Writing a frontend webapp requires the same boilerplate HTML/React each time
-2. An `assets/hello-world/` template containing the boilerplate HTML/React project files would be helpful to store in the skill
+If the skill already exists, skip to step 4.
 
-Example: When building a `big-query` skill to handle queries like "How many users have logged in today?" the analysis shows:
+### Step 4 — Implement
 
-1. Querying BigQuery requires re-discovering the table schemas and relationships each time
-2. A `references/schema.md` file documenting the table schemas would be helpful to store in the skill
+Write the scripts, references, and assets. Every script gets PEP 723 inline metadata. Every reference and asset gets mentioned in SKILL.md or a reference that SKILL.md links to — nothing lives in a subdirectory without a path to it from the top.
 
-To establish the skill's contents, analyze each concrete example to create a list of the reusable resources to include: scripts, references, and assets.
+**Structure rules for SKILL.md:**
 
-### Step 3: Initializing the Skill
+- Keep it under 300 lines. Move detailed content to `references/`.
+- Use imperative voice ("Use when…", not "This skill does…").
+- The `description` field in frontmatter is the trigger signal — make it specific. Include file types, task keywords, and user intent.
+- Do not name a specific agent runtime ("Claude Code", "Copilot", "Gemini") in instructions or frontmatter.
 
-At this point, it is time to actually create the skill.
+### Step 5 — Validate
 
-Skip this step only if the skill being developed already exists, and iteration or packaging is needed. In this case, continue to the next step.
+Run `uvx skills-ref validate <skill-path>` to check spec compliance. Also run `uv run scripts/quick_validate.py <skill-path>` for a local check.
 
-When creating a new skill from scratch, always run the `init_skill.py` script. The script conveniently generates a new template skill directory that automatically includes everything a skill requires, making the skill creation process much more efficient and reliable.
+### Step 6 — Package
 
-Usage:
+Run `uv run scripts/package_skill.py <skill-path> [output-dir]` to create a distributable `.skill` file.
+
+## Improving an Existing Skill
+
+### The Iteration Loop
+
+```text
+draft → test prompts → run → grade → review → rewrite → repeat
+```
+
+1. Identify where the current skill falls short.
+2. Add or revise the relevant section.
+3. Create 2–3 realistic test prompts and run the agent on them.
+4. Ask the user to evaluate the results.
+5. Rewrite based on feedback.
+6. Repeat until the skill is reliable.
+
+If the runtime supports sub-agents, you can also run quantitative evals. See **Quantitative Evaluation** below.
+
+### Writing Good Test Prompts
+
+Test prompts should be realistic — concrete file paths, context about the user's situation, exact task descriptions. Not abstract ("format this data") but specific ("the xlsx is in downloads, it's called Q4 sales FINAL v2.xlsx, add a profit margin column").
+
+Save test prompts to `evals/evals.json`. Include `expectations` — verifiable statements about the expected output, not just "it should look good."
+
+```json
+{
+  "skill_name": "pdf-editor",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Rotate the third page of report.pdf by 90 degrees clockwise",
+      "expected_output": "A PDF where page 3 is landscape-oriented",
+      "files": ["evals/files/report.pdf"],
+      "expectations": [
+        "The output file is a valid PDF",
+        "Page 3 is rotated 90 degrees",
+        "Other pages are unchanged"
+      ]
+    }
+  ]
+}
+```
+
+## Quantitative Evaluation
+
+> Requires a coding-agent runtime that supports sub-agents. If the current runtime does not support this, skip to **Human Review Loop**.
+
+### Step 1 — Run the evals
+
+If the skill has `evals/evals.json`, run the evaluation suite. This typically spawns one sub-agent per test prompt, saves outputs, and produces grading results.
+
+### Step 2 — Grade each run
+
+Spawn a grader sub-agent that reads `agents/grader.md` and evaluates each assertion against the outputs. Save results to `grading.json` in each run directory. The `grading.json` expectations array must use these exact fields: `text`, `passed`, `evidence`.
+
+For assertions checkable programmatically, write a script instead of eyeballing — scripts are faster, more reliable, and reusable across iterations.
+
+### Step 3 — Aggregate into benchmark
+
+Run the aggregation script:
 
 ```bash
-scripts/init_skill.py <skill-name> --path <output-directory>
+uv run scripts/aggregate_benchmark.py <workspace>/iteration-N --skill-name <name>
 ```
 
-The script:
+This produces `benchmark.json` and `benchmark.md` with pass_rate, time, and tokens for each configuration, with mean ± stddev and delta. See `references/schemas.md` for the exact schema.
 
-- Creates the skill directory at the specified path
-- Generates a SKILL.md template with proper frontmatter and TODO placeholders
-- Creates example resource directories: `scripts/`, `references/`, and `assets/`
-- Adds example files in each directory that can be customized or deleted
+### Step 4 — Analyst pass
 
-After initialization, customize or remove the generated SKILL.md and example files as needed.
+Read the benchmark data and surface patterns the aggregate stats might hide. See `agents/analyzer.md` — look for non-discriminating assertions (always pass regardless of skill), high-variance evals (possibly flaky), and time/token tradeoffs.
 
-### Step 4: Edit the Skill
-
-When editing the (newly-generated or existing) skill, remember that the skill is being created for another instance of Claude to use. Include information that would be beneficial and non-obvious to Claude. Consider what procedural knowledge, domain-specific details, or reusable assets would help another Claude instance execute these tasks more effectively.
-
-#### Learn Proven Design Patterns
-
-Consult these helpful guides based on your skill's needs:
-
-- **Multi-step processes**: See references/workflows.md for sequential workflows and conditional logic
-- **Specific output formats or quality standards**: See references/output-patterns.md for template and example patterns
-
-These files contain established best practices for effective skill design.
-
-#### Start with Reusable Skill Contents
-
-To begin implementation, start with the reusable resources identified above: `scripts/`, `references/`, and `assets/` files. Note that this step may require user input. For example, when implementing a `brand-guidelines` skill, the user may need to provide brand assets or templates to store in `assets/`, or documentation to store in `references/`.
-
-Added scripts must be tested by actually running them to ensure there are no bugs and that the output matches what is expected. If there are many similar scripts, only a representative sample needs to be tested to ensure confidence that they all work while balancing time to completion.
-
-Any example files and directories not needed for the skill should be deleted. The initialization script creates example files in `scripts/`, `references/`, and `assets/` to demonstrate structure, but most skills won't need all of them.
-
-#### Update SKILL.md
-
-**Writing Guidelines:** Always use imperative/infinitive form.
-
-##### Frontmatter
-
-Write the YAML frontmatter with `name` and `description`:
-
-- `name`: The skill name
-- `description`: This is the primary triggering mechanism for your skill, and helps Claude understand when to use the skill.
-  - Include both what the Skill does and specific triggers/contexts for when to use it.
-  - Include all "when to use" information here - Not in the body. The body is only loaded after triggering, so "When to Use This Skill" sections in the body are not helpful to Claude.
-  - Example description for a `docx` skill: "Comprehensive document creation, editing, and analysis with support for tracked changes, comments, formatting preservation, and text extraction. Use when Claude needs to work with professional documents (.docx files) for: (1) Creating new documents, (2) Modifying or editing content, (3) Working with tracked changes, (4) Adding comments, or any other document tasks"
-
-Do not include any other fields in YAML frontmatter.
-
-##### Body
-
-Write instructions for using the skill and its bundled resources.
-
-### Step 5: Packaging a Skill
-
-Once development of the skill is complete, it must be packaged into a distributable .skill file that gets shared with the user. The packaging process automatically validates the skill first to ensure it meets all requirements:
+### Step 5 — Launch the viewer
 
 ```bash
-scripts/package_skill.py <path/to/skill-folder>
+uv run scripts/generate_review.py <workspace>/iteration-N --skill-name "my-skill" --benchmark <workspace>/iteration-N/benchmark.json
 ```
 
-Optional output directory specification:
+For iteration 2+, also pass `--previous-workspace <workspace>/iteration-<N-1>`.
 
-```bash
-scripts/package_skill.py <path/to/skill-folder> ./dist
+## Description Optimization
+
+The `description` field in SKILL.md frontmatter is the primary trigger signal. After creating or significantly revising a skill, offer to optimize it for better triggering accuracy.
+
+### Step 1 — Generate trigger eval queries
+
+Create 20 eval queries — should-trigger and should-not-trigger cases. Save as JSON:
+
+```json
+[
+  {"query": "the user prompt", "should_trigger": true},
+  {"query": "another prompt", "should_trigger": false}
+]
 ```
 
-The packaging script will:
+Queries must be realistic, concrete, and specific. Include file paths, personal context, company names, URLs, abbreviations, casual speech. Use a mix of lengths. Focus on edge cases.
 
-1. **Validate** the skill automatically, checking:
+**Bad:** `"Format this data"`, `"Extract text from PDF"`
+**Good:** `"ok so my boss just sent me this xlsx file (its in my downloads, called something like 'Q4 sales final FINAL v2.xlsx') and she wants me to add a column that shows the profit"`
 
-   - YAML frontmatter format and required fields
-   - Skill naming conventions and directory structure
-   - Description completeness and quality
-   - File organization and resource references
+Share the queries with the user and ask for feedback before proceeding.
 
-2. **Package** the skill if validation passes, creating a .skill file named after the skill (e.g., `my-skill.skill`) that includes all files and maintains the proper directory structure for distribution. The .skill file is a zip file with a .skill extension.
+### Step 2 — Run trigger eval
 
-If validation fails, the script will report the errors and exit without creating a package. Fix any validation errors and run the packaging command again.
+Use the runtime's eval runner to test each query against the skill's description. If the runtime supports sub-agents and has an automated runner, use it. Otherwise run the prompts manually.
 
-### Step 6: Iterate
+### Step 3 — Improve the description
 
-After testing the skill, users may request improvements. Often this happens right after using the skill, with fresh context of how the skill performed.
+Pass the eval results to `scripts/improve_description.py` (or equivalent) to generate an improved description.
 
-**Iteration workflow:**
+### Step 4 — Evaluate at scale
 
-1. Use the skill on real tasks
-2. Notice struggles or inefficiencies
-3. Identify how SKILL.md or bundled resources should be updated
-4. Implement changes and test again
+Once the description passes on the 20-query set, expand to 100+ queries and repeat. A description that passes 20 queries may still over-trigger or under-trigger at scale.
+
+## Blind Comparison
+
+For situations where you want a rigorous comparison between two versions of a skill, use the blind comparison system. Read `agents/comparator.md` and `agents/analyzer.md`. The basic idea: give two outputs to an independent agent without revealing which is which, and let it judge quality. Then analyze why the winner won.
+
+This is optional, requires sub-agents, and most users won't need it. The human review loop is usually sufficient.
+
+## Advanced: Combining Multiple Source Skills into One Aggregate
+
+When a skill draws from several reference skills, apply these rules to keep the result maintainable and unambiguous:
+
+### No duplication
+
+Each fact, rule, and piece of guidance lives in exactly one place. If two source skills say the same thing in different words, pick the clearer phrasing and drop the other. If two sources disagree, resolve the conflict explicitly — do not keep both versions as alternatives.
+
+### Subdirectory discipline
+
+Use only these subdirectories:
+
+- `scripts/` — executable code
+- `references/` — on-demand documentation
+- `assets/` — static files used as inputs/outputs
+- `agents/` — sub-agent role definitions (for eval workflows)
+- `eval-viewer/` — HTML result viewers
+
+Add a subdirectory only when it solves a real organizational problem that these five cannot. When you add one, document why in SKILL.md.
+
+### Every file is reachable from SKILL.md
+
+Nothing lives in a subdirectory without a path from SKILL.md or from a file that SKILL.md links to. A file that cannot be reached from SKILL.md is invisible to the agent and dead weight in the context window. Apply this rule ruthlessly:
+
+- If a script is not called from SKILL.md or a reference, remove it or link to it.
+- If a reference is not linked from SKILL.md or a referencing file, either link it or remove it.
+- If an asset is not used by any script or referenced in any doc, remove it.
+
+### No agent-specific names or tool references
+
+Instructions and frontmatter must not name a specific agent runtime, CLI, or tool. Write agent-neutrally:
+
+- "Run with `uv run`" is acceptable (it names a tool, not an agent).
+- "Use Claude Code to run this" is not acceptable.
+- "Run with `python`" is not acceptable — use `uv run`.
+- Avoid naming CLI tools that are not universally available. If a tool is needed for a specific workflow, name it in that section's context, not as a global rule.
+
+### Conflict resolution
+
+When source skills conflict on a rule or recommendation, do not keep both. Pick the one that is:
+
+1. More specific to the skill's domain.
+2. Backed by a standard, citation, or benchmark.
+3. Easier to verify.
+
+State the resolution explicitly: "Source A recommended X but source B recommended Y. We use Y because Z."
+
+## Writing Guidelines
+
+### Imperative form
+
+Prefer imperative voice in instructions: "Use when…" not "This skill does…".
+
+### Explain the why
+
+Theory of mind beats musty MUSTs. Explain why a rule exists rather than just stating it. A skill that explains its reasoning transfers to novel situations; a skill that just lists rules does not.
+
+### Output format definitions
+
+```markdown
+## Report structure
+ALWAYS use this exact template:
+# [Title]
+## Executive summary
+## Key findings
+## Recommendations
+```
+
+### Example pattern
+
+```markdown
+## Commit message format
+**Example 1:**
+Input: Added user authentication with JWT tokens
+Output: feat(auth): implement JWT-based authentication
+```
+
+### Principle of lack of surprise
+
+Skills must not contain malware, exploit code, or anything that compromises system security. A skill's contents should not surprise the user in intent if described. Do not create misleading skills or skills designed to facilitate unauthorized access, data exfiltration, or other malicious activities. Roleplay scenarios are fine.
+
+## Quick Reference
+
+| Script | What it does |
+|--------|-------------|
+| `scripts/init_skill.py` | Scaffold a new skill directory |
+| `scripts/quick_validate.py` | Spec-compliance check (frontmatter, name, description) |
+| `scripts/package_skill.py` | Build a distributable `.skill` zip file |
+| `scripts/run_eval.py` | Run trigger eval queries (requires sub-agent runtime) |
+| `scripts/run_loop.py` | Run the full eval → improve → repeat loop |
+| `scripts/improve_description.py` | Generate an improved description from eval results |
+| `scripts/generate_report.py` | Build an HTML report from loop output |
+| `scripts/aggregate_benchmark.py` | Aggregate run results into benchmark statistics |
