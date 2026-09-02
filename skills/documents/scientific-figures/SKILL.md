@@ -43,6 +43,7 @@ Run every script via `uv run scripts/<name>.py ...` — never assume matplotlib 
 - **Object-oriented API.** `fig, ax = plt.subplots(...)`, never `plt.plot` for non-trivial work. Same in matplotlib and xy.
 - **Sans-serif at print size.** 7–9 pt for axis labels, 6–8 pt for ticks, ≥8 pt for panel labels (A, B, C).
 - **No `jet`.** Use `viridis`, `plasma`, or `cividis` for sequential; `coolwarm` or `RdBu` for diverging.
+- **Heatmaps: prefer `shading="gouraud"`.** When the row count is small (e.g. 50 bark-rate bands on a log-frequency axis) `shading="nearest"`/`"flat"` draws flat rectangles and the SVG renderer leaves anti-aliasing hairlines at every boundary. Gouraud interpolation smooths across cell corners and eliminates those raster-like seams. See `references/figure-types.md` § "Heatmap".
 - **No JPEG for data.** PNG, TIFF, or vector (PDF/EPS/SVG).
 - **SVG first, PDF for journal, PNG only as compatibility fallback.** SVG is the most flexible vector format (lossless, browser-renderable, designer-friendly, edit-friendly in Inkscape/Illustrator). PDF is what most journals demand; PDF is also the format that *doesn't* drop nicely into Word/PowerPoint, which is why SVG is the better default for figures that need to flow back into office documents. PNG is bitmap and does not scale — only emit PNG when the consumer can't ingest SVG; if you must, use 300 DPI (not the matplotlib default of 100 or 200).
 - **Vector for plots, raster for images.** Plots → SVG → PDF. Photographs/microscopy → TIFF 300–600 DPI.

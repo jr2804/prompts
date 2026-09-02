@@ -94,6 +94,20 @@ ax.set_yticks(range(matrix.shape[0]))
 ax.set_xticklabels(col_labels, rotation=45, ha="right")
 ```
 
+When the axes have physical coordinates (time, frequency, etc.), prefer
+`pcolormesh` over `imshow`:
+
+```python
+im = ax.pcolormesh(times, freqs, zt, shading="gouraud", cmap="viridis",
+                   vmin=0, vmax=zt.max())
+```
+
+**Shading choice matters.** With a small number of rows (e.g. 50 bark-rate
+bands on a log-frequency axis) `shading="nearest"` or `"flat"` draws each
+cell as a flat rectangle. The SVG renderer then adds anti-aliasing hairlines at
+every boundary — visible as raster-like seams. Use `shading="gouraud"` to
+interpolate smoothly across cell corners and eliminate those artifacts.
+
 For annotated heatmaps, loop and call `ax.text(j, i, f"{matrix[i, j]:.2f}", ...)`, font size ≤ 6 pt.
 
 ## Contour / contourf
