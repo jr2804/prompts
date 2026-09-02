@@ -13,6 +13,53 @@ ax.set_ylabel("response (a.u.)")
 ax.legend(frameon=False)
 ```
 
+## Logarithmic axes — tick formatting
+
+Default log-axis ticks show powers of ten (`10²`, `10³`, `10⁴`). This is
+mathematically correct but often unreadable for domain-specific ranges
+(audio frequencies, spatial scales, etc.). Replace them with human-friendly
+labels and intermediate steps.
+
+### Audio-frequency example (20 Hz – 20 kHz)
+
+Standard audio engineering uses ISO 266 / IEC 61260 preferred values:
+20, 50, 100, 200, 500, 1k, 2k, 5k, 10k, 20k Hz.
+
+**With `xy.pyplot` / matplotlib:**
+
+```python
+_AUDIO_FREQ_TICKS = [20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000]
+_AUDIO_FREQ_LABELS = [
+    f"{t / 1000:g}k" if t >= 1000 else f"{t:g}" for t in _AUDIO_FREQ_TICKS
+]
+
+ax.set_xscale("log")
+ax.set_xticks(_AUDIO_FREQ_TICKS)
+ax.set_xticklabels(_AUDIO_FREQ_LABELS)
+# or for a y-axis:
+ax.set_yticks(_AUDIO_FREQ_TICKS)
+ax.set_yticklabels(_AUDIO_FREQ_LABELS)
+```
+
+**With `xy.chart` (declarative marks API):**
+
+```python
+xy.x_axis(
+    label="Frequency (Hz)",
+    type_="log",
+    tick_values=_AUDIO_FREQ_TICKS,
+    tick_labels=_AUDIO_FREQ_LABELS,
+)
+```
+
+### General rule
+
+- For any log axis, ask: "what are the canonical values in this field?"
+- Audio → 20, 50, 100, 200, 500, 1k, 2k, 5k, 10k, 20k.
+- Vision / spatial → 1′, 2′, 5′, 10′, 30′, 1°, 2°, 5°, 10° (arcmin/deg).
+- Time → 1 ms, 2 ms, 5 ms, 10 ms, 20 ms, 50 ms, 100 ms, 200 ms, 500 ms, 1 s.
+- Never leave the raw `10ⁿ` labels on a figure intended for domain experts.
+
 ## Scatter
 
 ```python

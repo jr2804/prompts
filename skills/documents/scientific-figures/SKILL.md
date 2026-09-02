@@ -48,6 +48,7 @@ Run every script via `uv run scripts/<name>.py ...` — never assume matplotlib 
 - **Vector for plots, raster for images.** Plots → SVG → PDF. Photographs/microscopy → TIFF 300–600 DPI.
 - **Color = redundant encoding.** Color-blind safety is mandatory; mapping hue + shape or hue + linestyle is the gold standard.
 - **No titles inside the figure.** The caption belongs in LaTeX/Word. The figure shows data.
+- **Log axes: replace `10ⁿ` with domain values.** Default log ticks show powers of ten (`10²`, `10³`). For domain-specific ranges (audio: 20, 50, 100, 200, 500, 1k, 2k, 5k, 10k, 20k Hz; time: 1 ms, 2 ms, 5 ms, 10 ms …), set manual `tick_values` and `tick_labels` so the axis reads like a professional in that field expects. See `references/figure-types.md` § "Logarithmic axes — tick formatting".
 - **Cite, don't show, matplotlib defaults.** Nothing screams "AI-generated" louder than `plt.title("My Plot")`.
 
 ## Library guidance
