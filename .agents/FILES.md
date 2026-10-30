@@ -20,6 +20,7 @@ Kept compact — agents hallucinate less when they know where definitions live.
 | AGENTS.md template | `agents-md/AGENTS.md` | `{{project-name}}` / `{{project-description}}` template |
 | Commit message format | `instructions/commit-instructions.md` | gitmoji + conventional-commit subject, body rules |
 | Toolchain (tools + tasks) | `.config/mise/config.toml` | `[tools]`, `format-md`, `lint-md`, `format` tasks |
+| Python structural-sorting config | `.config/pyreorder.toml` | `[module]`, `[strategy]`, `[class_methods]`, `[classification]`, `[transforms]`, `[cli]`, `[discovery]` |
 | Markdown lint/format config | `.config/rumdl.toml` | `line-length`, `flavor`, `exclude`, `per-file-ignores` |
 | Skill spec (external) | <https://agentskills.io/specification> | Canonical Agent Skills Specification |
 

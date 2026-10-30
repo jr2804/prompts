@@ -52,6 +52,9 @@ uvx skills-ref validate <path-to-skill>
 
 ## Available tools
 
+`pyreorder` structurally sorts Python modules; invoke it through
+`mise run format`, with settings in `.config/pyreorder.toml`.
+
 No project-specific code-search or issue-tracking tools (codegraph, grepai,
 repowise, beads) are installed in this workspace. Use standard `rg` / `find`
 for navigation.

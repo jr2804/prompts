@@ -10,7 +10,7 @@ ripgrep = "latest"
 "ruff" = "latest"
 "ty" = "latest"
 "rumdl" = "latest"
-"pipx:git+https://codeberg.org/jr2804/clean-sort.git" = "latest"
+"pypi:pyreorder" = "latest"
 
 
 "github:kreuzberg-dev/kreuzberg" = "latest"
@@ -36,7 +36,7 @@ run = "uv sync -U --dev --all-extras --all-groups"
 [tasks.format]
 description = "Format source code and markdown files"
 run = [
-    "csort run ./ --config .config/csort.toml",
+    "pyreorder run ./ --config .config/pyreorder.toml",
     "ruff check --select I --fix", # isort-equivalent sorting of imports
     "ruff format .",
 ]
