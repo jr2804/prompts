@@ -98,8 +98,9 @@ When the axes have physical coordinates (time, frequency, etc.), prefer
 `pcolormesh` over `imshow`:
 
 ```python
-im = ax.pcolormesh(times, freqs, zt, shading="gouraud", cmap="viridis",
-                   vmin=0, vmax=zt.max())
+im = ax.pcolormesh(
+    times, freqs, zt, shading="gouraud", cmap="viridis", vmin=0, vmax=zt.max()
+)
 ```
 
 **Shading choice matters.** With a small number of rows (e.g. 50 bark-rate

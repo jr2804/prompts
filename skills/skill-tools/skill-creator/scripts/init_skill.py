@@ -265,7 +265,9 @@ def init_skill(skill_name, path):
         scripts_dir = skill_dir / "scripts"
         scripts_dir.mkdir(exist_ok=True)
         example_script = scripts_dir / "example.py"
-        example_script.write_text(EXAMPLE_SCRIPT.format(skill_name=skill_name), encoding="utf-8")
+        example_script.write_text(
+            EXAMPLE_SCRIPT.format(skill_name=skill_name), encoding="utf-8"
+        )
         example_script.chmod(0o755)
         print("✅ Created scripts/example.py")
 
@@ -273,7 +275,9 @@ def init_skill(skill_name, path):
         references_dir = skill_dir / "references"
         references_dir.mkdir(exist_ok=True)
         example_reference = references_dir / "api_reference.md"
-        example_reference.write_text(EXAMPLE_REFERENCE.format(skill_title=skill_title), encoding="utf-8")
+        example_reference.write_text(
+            EXAMPLE_REFERENCE.format(skill_title=skill_title), encoding="utf-8"
+        )
         print("✅ Created references/api_reference.md")
 
         # Create assets/ directory with example asset placeholder
