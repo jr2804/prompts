@@ -388,9 +388,9 @@ def main(
 
     Examples:
 
-        python cli.py process data.txt -o result.txt
+        uv run cli.py process data.txt -o result.txt
 
-        python cli.py process data.txt --workers 8 --verbose
+        uv run cli.py process data.txt --workers 8 --verbose
     """
     ...
 ```

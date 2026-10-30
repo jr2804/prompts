@@ -232,17 +232,28 @@ ______________________________________________________________________
 
 ## 5. Constants and Enums
 
-Use UPPER_SNAKE_CASE for module-level constants:
+Use UPPER_SNAKE_CASE for module-level constants and enum member names. For a
+reusable finite domain vocabulary, define one `StrEnum` rather than a list of
+strings or repeated literals. `StrEnum` is built into Python 3.11+; for Python
+3.10 see the compatible form and detailed rules in
+[Domain Types, Enums, and Structured Data](type-design.md).
 
 ```python
-# CORRECT - UPPER_SNAKE_CASE
+from enum import StrEnum
+
+
+# CORRECT - UPPER_SNAKE_CASE constants and enum members
 MAX_RETRY_COUNT = 3
 DEFAULT_TIMEOUT_SECONDS = 30
-SUPPORTED_FORMATS = ["json", "xml", "yaml"]
 
 
-# Enum values also use UPPER_SNAKE_CASE
-class Status(Enum):
+class SupportedFormat(StrEnum):
+    JSON = "json"
+    XML = "xml"
+    YAML = "yaml"
+
+
+class Status(StrEnum):
     PENDING = "pending"
     COMPLETED = "completed"
     FAILED = "failed"
@@ -251,7 +262,7 @@ class Status(Enum):
 # WRONG
 maxRetryCount = 3
 DefaultTimeout = 30
-supported_formats = ["json", "xml"]
+supported_formats = ["json", "xml", "yaml"]  # scattered domain vocabulary
 ```
 
 ______________________________________________________________________

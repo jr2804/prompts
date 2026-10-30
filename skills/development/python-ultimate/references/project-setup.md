@@ -94,6 +94,7 @@ from .core import processors
 
 - Never use relative imports beyond a single level (prefer `from .module` over `from ..module`)
 - Avoid `import *`
+- Do not modify `sys.path` to make project modules importable; fix the package layout or installation instead
 - Sort alphabetically within each block
 
 ______________________________________________________________________

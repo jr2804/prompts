@@ -42,24 +42,45 @@ ______________________________________________________________________
 
 ## 1. Type Hints (Mandatory)
 
-Type hints are required for **all** function parameters and return values.
+Type hints are required for **all** function parameters and return values. Model
+fixed-shape internal data as a dataclass instead of an unstructured dictionary.
 
 ```python
-def process_data(item_id: str, group_id: int) -> dict[str, str]:
-    """Process a data item and return metadata."""
-    return {"id": item_id, "group": group_id}
-
-
-# Use pipe syntax for optional types
+from dataclasses import dataclass
+from enum import StrEnum
 from pathlib import Path
 
 
-def fetch_data(item_id: str, cache_dir: Path | None = None) -> dict[str, str] | None:
-    """Fetch data metadata, returns None if not found."""
-    if cache_dir is None:
-        return None
-    return {"id": item_id}
+class MetadataSource(StrEnum):
+    API = "api"
+    DATABASE = "database"
+    CACHE = "cache"
+
+
+@dataclass(frozen=True, slots=True)
+class ItemMetadata:
+    item_id: str
+    group_id: int
+    source: MetadataSource
+
+
+def process_data(item_id: str, group_id: int) -> ItemMetadata:
+    """Process a data item and return typed metadata."""
+    return ItemMetadata(item_id=item_id, group_id=group_id, source=MetadataSource.API)
+
+
+def fetch_data(
+    item_id: str,
+    source: MetadataSource,
+    cache_dir: Path | None = None,
+) -> ItemMetadata | None:
+    """Fetch typed metadata, returning None only when the item is not found."""
+    ...
 ```
+
+For reusable finite domain values, use a `StrEnum` rather than
+`Literal["..."]` or repeated raw strings. See
+[Domain Types, Enums, and Structured Data](type-design.md).
 
 **Rules:**
 
@@ -201,24 +222,25 @@ ______________________________________________________________________
 Write clear, concise docstrings using Google style.
 
 ```python
-def fetch_item_metadata(item_id: str, source: str) -> dict[str, Any] | None:
-    """Fetch data metadata from the specified source.
+def fetch_item_metadata(
+    item_id: str,
+    source: MetadataSource,
+) -> ItemMetadata | None:
+    """Fetch typed metadata from the specified source.
 
     Args:
         item_id: The unique identifier (e.g., "DOC-123456")
-        source: The metadata source ("api", "database", or "cache")
+        source: A member of MetadataSource, such as MetadataSource.API
 
     Returns:
-        Dictionary with metadata fields (title, author, timestamp, etc.),
-        or None if the item is not found.
+        ItemMetadata, or None if the item is not found.
 
     Raises:
-        ValueError: If source is not recognized
         ConnectionError: If the API endpoint is unreachable
 
     Examples:
-        >>> fetch_item_metadata("DOC-123456", "api")
-        {"id": "DOC-123456", "title": "Example document", ...}
+        >>> fetch_item_metadata("DOC-123456", MetadataSource.API)
+        ItemMetadata(item_id="DOC-123456", group_id=1, source=MetadataSource.API)
     """
 ```
 
@@ -282,7 +304,7 @@ Choose the right tool based on **what the data does**, not just what it holds.
 | Internal DTOs, geometric points, intermediate structs | `@dataclass` | Stdlib, zero deps, minimal overhead, immutable with `frozen=True` |
 | API request/response models, user input, config files | `pydantic.BaseModel` | Runtime validation, type coercion, JSON serialization, clear error messages |
 | Environment / file-based configuration | `pydantic-settings.BaseSettings` | Declarative env mapping, `.env` support, nested overrides |
-| Dictionary-like structures with fixed keys | `TypedDict` | Lightweight typing for dict interfaces where you don't need a class |
+| Dictionary-shaped wire/API contracts | `TypedDict` | Static shape for a required dict interface; it does not validate at runtime |
 
 ### Rules
 
@@ -332,12 +354,17 @@ class RenderOptions:
 from typing import TypedDict
 
 
-# CORRECT — dict-shaped data from an external JSON API you don't control
+# CORRECT — static shape for a dictionary-shaped JSON wire contract
+# (validate untrusted input separately; TypedDict does not validate at runtime)
 class GithubRepo(TypedDict):
     id: int
     name: str
     full_name: str
 ```
+
+`TypedDict` describes the expected dictionary shape to static type checkers; it
+does not validate untrusted JSON at runtime. Validate data at the boundary with
+Pydantic or an explicit parser, then use a dataclass for internal records.
 
 ### Anti-patterns
 
@@ -375,6 +402,11 @@ class UserInput(BaseModel):
     email: EmailStr
 ```
 
+For finite domain values and shared enum ownership, follow
+[type-design.md](type-design.md): prefer `StrEnum` over reusable
+`Literal["..."]` sets, centralize repeated strings, and put shared enums in a
+neutral domain module to avoid import cycles.
+
 ### Enum Associated Values (no parallel lookup structures)
 
 When an enum needs associated data (a short prefix, a label, a display
@@ -384,8 +416,8 @@ member list), scatters one concept across two constructs, and breaks the
 canonical module section order — a module-level `_X` constant sandwiched
 between a `class` and a later `class` is exactly the class–constant–class
 layout that structural sorters reject (see the
-[`clean-sort` skill](https://codeberg.org/jr2804/clean-sort/src/branch/main/skills/clean-sort/SKILL.md):
-sections must run `… constants → enums → classes …`, not interleave).
+[`pyreorder` documentation](https://github.com/jr2804/pyreorder): sections must
+run `… constants → enums → classes …`, not interleave).
 
 Use [`aenum`](https://github.com/ethanfurman/aenum) `MultiValueEnum`, which
 lets each member carry extra positional values via `__init__`. The member
@@ -608,12 +640,7 @@ def fear_to_failure_func(
 
 ```python
 # Input: accept only what you actually need
-def process_item(item_id: int) -> dict[str, Any]:
-    """Process a single item by its integer ID."""
-    ...
-
-
-# Output: use a dedicated result type instead of None-as-error
+# Output: use a dedicated result type instead of an unstructured dict or None-as-error
 @dataclass
 class ProcessResult:
     value: int
@@ -656,8 +683,9 @@ def process(data: Any) -> Any: ...
 | Scenario | Preferred pattern | Example |
 |----------|-------------------|---------|
 | Value can be one of a few known types | Union via `\|` | `str \| int \| None` |
-| Structured object with known fields | `typing.Protocol` | `class Renderable(Protocol): ...` |
-| Simple data container | `@dataclass` or `TypedDict` | `@dataclass class Point: ...` |
+| Object with required behavior | `typing.Protocol` | `class Renderable(Protocol): ...` |
+| Internal record with known fields | `@dataclass` | `@dataclass class Point: ...` |
+| Required dict-shaped interface | `TypedDict` with concrete field types | `class Payload(TypedDict): id: int` |
 | True dynamic / binary object | `Any` (rare exception) | Embedded Python binary blobs |
 
 **Protocols over ABCs:**
@@ -685,7 +713,7 @@ def persist(obj: Serializable) -> None:
 persist(my_object)  # OK if my_object has to_dict()
 ```
 
-**When `Any` is acceptable (rare):**
+**When `Any` is acceptable (exceptional and justified):**
 
 - Objects dynamically created by an embedded Python runtime (C/C++ extensions,
   embedded interpreter)

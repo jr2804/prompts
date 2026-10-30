@@ -86,10 +86,12 @@ class Order:
     def customer(self) -> User: ...
 ```
 
-**Solution:** Move shared domain types to a third module.
+**Solution:** Move the shared domain types to a neutral module that neither
+feature module imports. Put a shared enum in this module too, rather than in a
+service/consumer module that may itself need to be imported by other consumers.
 
 ```python
-# domain.py
+# domain.py — source of shared domain types
 class User: ...
 
 
@@ -97,27 +99,28 @@ class Order: ...
 ```
 
 ```python
-# user.py
+# user_service.py — feature code depends on shared types
 from .domain import Order, User
 
 
-class User(User):
-    def last_order(self) -> Order: ...
+def last_order(user: User) -> Order: ...
 ```
 
 ```python
-# order.py
+# order_service.py — this module also depends on shared types,
+# not on user_service.py
 from .domain import Order, User
 
 
-class Order(Order):
-    def customer(self) -> User: ...
+def customer(order: Order) -> User: ...
 ```
 
 **Guidelines:**
 
 - Group closely related domain entities, enums, and dataclasses in one or a few small modules.
 - Let feature modules depend on these shared domain modules instead of on each other.
+- Keep the shared module dependency-neutral: it must not import feature/service modules.
+- When converting `Literal["..."]` values or repeated strings to a shared enum, refactor the type into its owning domain module instead of making the smallest local edit in a consumer module. See [type-design.md](type-design.md) for enum and data-model rules.
 
 ______________________________________________________________________
 

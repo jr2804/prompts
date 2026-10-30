@@ -82,7 +82,7 @@ mypy src/
 mypy .
 
 # Build
-python -m build
+uv run python -m build
 uv build
 ```
 

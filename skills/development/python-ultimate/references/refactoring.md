@@ -8,7 +8,7 @@ Quick reference for bulk code refactoring and transfer operations.
 2. [Bulk Operations](#bulk-operations)
 3. [Code Transfer](#code-transfer)
 4. [Line-Based Operations](#line-based-operations)
-5. [Execution Mode (10+ Files)](#execution-mode-10-files)
+5. [Python Batch Operations (10+ Files)](#python-batch-operations-10-files)
 6. [Safety Checks](#safety-checks)
 7. [Common Patterns](#common-patterns)
 
@@ -107,65 +107,42 @@ ______________________________________________________________________
 
 ## Line-Based Operations
 
-Use `line_insert.py` script for exact line insertion:
-
-```bash
-python3 skills/code-transfer/scripts/line_insert.py <file> <line_number> <code> [--backup]
-```
-
-**Examples:**
-
-```bash
-# Insert function at line 50
-python3 skills/code-transfer/scripts/line_insert.py src/utils.py 50 "def helper():\n    pass"
-
-# Insert with backup
-python3 skills/code-transfer/scripts/line_insert.py src/utils.py 50 "code" --backup
-
-# Insert at beginning
-python3 skills/code-transfer/scripts/line_insert.py src/new.py 1 "import os"
-```
-
-**When to use:**
-
-- User specifies exact line number
-- Inserting into new/empty files
-- Inserting at beginning/end without context
+Prefer context-aware edits over fixed line numbers because earlier changes can
+shift the target. For a new file or a user-specified insertion line, use the
+available editor or a small script, then inspect the resulting diff and run
+syntax/tests. Do not rely on an external `line_insert.py` helper unless it is
+present in the current repository and its behavior has been verified.
 
 ______________________________________________________________________
 
-## Execution Mode (10+ Files)
+## Python Batch Operations (10+ Files)
 
-**Auto-switches for 90% token savings on 10+ files.**
+For a repetitive operation across many files, use one deterministic `uv`-run
+script rather than serially editing each file. Define the scope first, preview
+all intended changes, and make writing opt-in. Avoid claims of fixed token or
+speed savings; measure outcomes for the actual task.
 
-### Refactoring
+From the repository root, the companion [bulk_refactor.py](../examples/bulk_refactor.py)
+demonstrates a textual identifier rename. It previews by default and changes
+files only when passed `--apply`:
 
-```python
-from api.code_transform import rename_identifier
-
-result = rename_identifier(".", "oldName", "newName", "**/*.py")
-# Returns: {'files_modified': 50, 'total_replacements': 247}
+```bash
+uv run skills/development/python-ultimate/examples/bulk_refactor.py --root src --old old_name --new new_name
+uv run skills/development/python-ultimate/examples/bulk_refactor.py --root src --old old_name --new new_name --apply
 ```
 
-### Code Transfer
+This is a textual replacement example, not a syntax-aware Python refactor: it
+also matches comments and strings. Review the preview and diff; use an AST-aware
+or project-specific refactor when matches must be limited to Python identifiers.
 
-```python
-from api.filesystem import batch_copy
-from api.code_analysis import find_functions
+### Batch Safety Checklist
 
-functions = find_functions("app.py", pattern="handle_.*")
-operations = [
-    {
-        "source_file": "app.py",
-        "start_line": f["start_line"],
-        "end_line": f["end_line"],
-        "target_file": "handlers.py",
-        "target_line": -1,
-    }
-    for f in functions
-]
-batch_copy(operations)
-```
+1. Enumerate and count the target files before editing.
+2. Exclude generated, virtual-environment, vendored, and build directories.
+3. Preview matched locations and intended replacements; keep preview as default.
+4. Apply only after confirming the scope and preserving a recoverable diff.
+5. Run focused tests, formatters, and searches for missed or unintended matches.
+6. Report files scanned, files changed, replacement counts, and verification.
 
 ______________________________________________________________________
 
