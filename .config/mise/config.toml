@@ -19,6 +19,8 @@ ripgrep = "latest"
 
 "github:1broseidon/ketch" = "latest"
 
+"npm:skill-diet" = "latest"
+
 [settings.npm]
 package_manager = "bun"
 
@@ -37,7 +39,7 @@ run = "uv sync -U --dev --all-extras --all-groups"
 description = "Format source code and markdown files"
 run = [
     "pyreorder run ./ --config .config/pyreorder.toml",
-    "ruff check --select I --fix", # isort-equivalent sorting of imports
+    "ruff check --select I --fix",                      # isort-equivalent sorting of imports
     "ruff format .",
 ]
 
@@ -56,16 +58,14 @@ run = "rumdl check --config .config/rumdl.toml ./"
 [tasks.add-skills]
 description = "Add skills to the agent"
 run = [
-    "cls",
     # coding & tools skills
     "bun x skills add jr2804/prompts -a universal -y -s python-ultimate -s docx -s docx-svg -s docling-document-intelligence -s pdf -s pptx -s xlsx",
-    # "bun x skills add AlmogBaku/debug-skill -a universal -y",
+    "bun x skills add nicobailon/skill-diet -a universal -y",
 
     "bun x skills add https://github.com/nicobailon/visual-explainer -a universal -y",
     "bun x skills add https://github.com/hardikpandya/stop-slop -a universal -y",
 
     # document intelligence skills
-    "bun x skills add kreuzberg-dev/kreuzberg -a universal -y",
     "bun x skills add run-llama/llamaparse-agent-skills --skill liteparse -a universal -y",
 
 ]
@@ -77,6 +77,6 @@ arg "<ai_agent>" help="AI assistant: claude, gemini, copilot, opencode, ... (see
 '''
 
 run = [
-	#"clear",
-	'bun x add-mcp "ketch mcp serve" -y -a {{usage.ai_agent}} -n ketch',
+    #"clear",
+    'bun x add-mcp "ketch mcp serve" -y -a {{usage.ai_agent}} -n ketch',
 ]
