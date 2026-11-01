@@ -45,6 +45,7 @@ TODO
 | **Quality & Discipline** | `coding-discipline`, `code-deduplication`, `output-quality` | Behavioral rigor, anti-duplication, anti-slop |
 | **Agentic Coding** | `using-git-worktrees`, `dispatching-parallel-agents`, `subagent-driven-development`, `requesting-code-review` | Agent-assisted development workflows |
 | **Python Development** | `python-ultimate` | Comprehensive Python standards, tooling, bulk operations |
+| **Tools** | `beads` | beads issue-tracker workflows: consolidate/triage issues (close stale, merge duplicates, epic hierarchy) and start the most urgent release-relevant work, via `bd` CLI or beads MCP |
 
 See individual skill folders under `skills/` for full documentation.
 
