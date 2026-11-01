@@ -1,3 +1,7 @@
+# /// script
+# requires-python = ">=3.10"
+# dependencies = ["defusedxml"]
+# ///
 """Remove unreferenced files from an unpacked PPTX directory.
 
 Usage: python clean.py <unpacked_dir>
@@ -78,10 +82,9 @@ def remove_orphaned_slides(unpacked_dir: Path) -> list[str]:
             target = rel.getAttribute("Target")
             if target.startswith("slides/"):
                 slide_name = target.replace("slides/", "")
-                if slide_name not in referenced_slides:
-                    if rel.parentNode:
-                        rel.parentNode.removeChild(rel)
-                        changed = True
+                if slide_name not in referenced_slides and rel.parentNode:
+                    rel.parentNode.removeChild(rel)
+                    changed = True
 
         if changed:
             with open(pres_rels_path, "wb") as f:

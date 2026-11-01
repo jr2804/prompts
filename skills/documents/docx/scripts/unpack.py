@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # /// script
+# requires-python = ">=3.10"
 # dependencies = [
 #   "defusedxml",
 # ]
-# /
+# ///
 """Unpack Office files (DOCX, PPTX, XLSX) for editing.
 
 Extracts the ZIP archive, pretty-prints XML files, and optionally:
@@ -23,8 +24,11 @@ import argparse
 import random
 import sys
 import zipfile
+import zlib
 from pathlib import Path
+from xml.parsers.expat import ExpatError
 
+import defusedxml.common
 import defusedxml.minidom
 from helpers.merge_runs import merge_runs as do_merge_runs
 from helpers.simplify_redlines import simplify_redlines as do_simplify_redlines
@@ -85,7 +89,7 @@ def unpack(
 
     except zipfile.BadZipFile:
         return None, f"Error: {input_file} is not a valid Office file"
-    except Exception as e:
+    except (OSError, RuntimeError, NotImplementedError, zipfile.LargeZipFile, zlib.error) as e:
         return None, f"Error unpacking: {e}"
 
 
@@ -94,7 +98,7 @@ def _pretty_print_xml(xml_file: Path) -> None:
         content = xml_file.read_text(encoding="utf-8")
         dom = defusedxml.minidom.parseString(content)
         xml_file.write_bytes(dom.toprettyxml(indent="  ", encoding="utf-8"))
-    except Exception:
+    except (ExpatError, defusedxml.common.DefusedXmlException, OSError, UnicodeError):
         pass
 
 
@@ -104,7 +108,7 @@ def _escape_smart_quotes(xml_file: Path) -> None:
         for char, entity in SMART_QUOTE_REPLACEMENTS.items():
             content = content.replace(char, entity)
         xml_file.write_text(content, encoding="utf-8")
-    except Exception:
+    except (OSError, UnicodeError):
         pass
 
 

@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # /// script
+# requires-python = ">=3.10"
 # dependencies = [
 #   "defusedxml",
 # ]
-# /
+# ///
 """Pack a directory into an XLSX file.
 
 Usage:
@@ -16,7 +17,9 @@ import sys
 import tempfile
 import zipfile
 from pathlib import Path
+from xml.parsers.expat import ExpatError
 
+import defusedxml.common
 import defusedxml.minidom
 
 
@@ -61,7 +64,7 @@ def _condense_xml(xml_file: Path) -> None:
                 ) or child.nodeType == child.COMMENT_NODE:
                     element.removeChild(child)
         xml_file.write_bytes(dom.toxml(encoding="UTF-8"))
-    except Exception:
+    except (ExpatError, defusedxml.common.DefusedXmlException, OSError, UnicodeError):
         pass
 
 

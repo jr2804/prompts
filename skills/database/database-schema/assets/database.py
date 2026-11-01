@@ -1,3 +1,12 @@
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#   "motor",
+#   "odmantic",
+#   "pymongo",
+#   "sqlalchemy",
+# ]
+# ///
 """
 Database Configuration for FastAPI Applications
 
@@ -14,6 +23,7 @@ from pymongo import MongoClient
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 
 # Database URL from environment variables
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./app.db")
@@ -39,8 +49,6 @@ elif DATABASE_URL.startswith("sqlite"):
     )
 else:
     # Default to SQLite
-    from sqlalchemy.pool import StaticPool
-
     engine = create_engine(
         "sqlite:///./app.db",
         connect_args={"check_same_thread": False},

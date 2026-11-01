@@ -1,3 +1,7 @@
+# /// script
+# requires-python = ">=3.10"
+# dependencies = ["defusedxml", "lxml"]
+# ///
 """
 Base validator with common validation logic for document files.
 """
@@ -6,7 +10,10 @@ import re
 import tempfile
 import zipfile
 from pathlib import Path
+from typing import ClassVar
+from xml.parsers.expat import ExpatError
 
+import defusedxml.common
 import defusedxml.minidom
 import lxml.etree
 
@@ -17,7 +24,7 @@ class BaseSchemaValidator:
     # Elements whose 'id' attributes must be unique within their file
     # Format: element_name -> (attribute_name, scope)
     # scope can be 'file' (unique within file) or 'global' (unique across all files)
-    UNIQUE_ID_REQUIREMENTS = {
+    UNIQUE_ID_REQUIREMENTS: ClassVar[dict[str, tuple[str, str]]] = {
         # Word elements
         "comment": ("id", "file"),  # Comment IDs in comments.xml
         "commentrangestart": ("id", "file"),  # Must match comment IDs
@@ -42,10 +49,10 @@ class BaseSchemaValidator:
 
     # Mapping of element names to expected relationship types
     # Subclasses should override this with format-specific mappings
-    ELEMENT_RELATIONSHIP_TYPES = {}
+    ELEMENT_RELATIONSHIP_TYPES: ClassVar[dict[str, str]] = {}
 
     # Unified schema mappings for all Office document types
-    SCHEMA_MAPPINGS = {
+    SCHEMA_MAPPINGS: ClassVar[dict[str, str]] = {
         # Document type specific schemas
         "word": "ISO-IEC29500-4_2016/wml.xsd",  # Word documents
         "ppt": "ISO-IEC29500-4_2016/pml.xsd",  # PowerPoint presentations
@@ -85,10 +92,10 @@ class BaseSchemaValidator:
     )
 
     # Folders where we should clean ignorable namespaces
-    MAIN_CONTENT_FOLDERS = {"word", "ppt", "xl"}
+    MAIN_CONTENT_FOLDERS: ClassVar[set[str]] = {"word", "ppt", "xl"}
 
     # All allowed OOXML namespaces (superset of all document types)
-    OOXML_NAMESPACES = {
+    OOXML_NAMESPACES: ClassVar[set[str]] = {
         "http://schemas.openxmlformats.org/officeDocument/2006/math",
         "http://schemas.openxmlformats.org/officeDocument/2006/relationships",
         "http://schemas.openxmlformats.org/schemaLibrary/2006/main",
@@ -156,7 +163,7 @@ class BaseSchemaValidator:
                 if modified:
                     xml_file.write_bytes(dom.toxml(encoding="UTF-8"))
 
-            except Exception:
+            except (ExpatError, defusedxml.common.DefusedXmlException, OSError, UnicodeError):
                 pass
 
         return repairs
@@ -178,10 +185,10 @@ class BaseSchemaValidator:
                     f"  {xml_file.relative_to(self.unpacked_dir)}: "
                     f"Line {e.lineno}: {e.msg}"
                 )
-            except Exception as e:
+            except OSError as e:
                 errors.append(
                     f"  {xml_file.relative_to(self.unpacked_dir)}: "
-                    f"Unexpected error: {e!s}"
+                    f"Unable to read XML: {e!s}"
                 )
 
         if errors:
@@ -300,7 +307,7 @@ class BaseSchemaValidator:
                                 else:
                                     file_ids[key][id_value] = elem.sourceline
 
-            except (lxml.etree.XMLSyntaxError, Exception) as e:
+            except (lxml.etree.LxmlError, OSError, ValueError, KeyError) as e:
                 errors.append(
                     f"  {xml_file.relative_to(self.unpacked_dir)}: Error: {e}"
                 )
@@ -386,7 +393,7 @@ class BaseSchemaValidator:
                                 all_referenced_files.add(target_path)
                             else:
                                 broken_refs.append((target, rel.sourceline))
-                        except OSError, ValueError:
+                        except (OSError, ValueError):
                             broken_refs.append((target, rel.sourceline))
 
                 # Report broken references
@@ -397,7 +404,7 @@ class BaseSchemaValidator:
                             f"  {rel_path}: Line {line_num}: Broken reference to {broken_ref}"
                         )
 
-            except Exception as e:
+            except (lxml.etree.LxmlError, OSError, ValueError, KeyError) as e:
                 rel_path = rels_file.relative_to(self.unpacked_dir)
                 errors.append(f"  Error parsing {rel_path}: {e}")
 
@@ -508,7 +515,7 @@ class BaseSchemaValidator:
                                         f"but should point to a '{expected_type}' relationship"
                                     )
 
-            except Exception as e:
+            except (lxml.etree.LxmlError, OSError, ValueError, KeyError) as e:
                 xml_rel_path = xml_file.relative_to(self.unpacked_dir)
                 errors.append(f"  Error processing {xml_rel_path}: {e}")
 
@@ -605,8 +612,8 @@ class BaseSchemaValidator:
                             f"  {path_str}: File with <{root_name}> root not declared in [Content_Types].xml"
                         )
 
-                except Exception:
-                    continue  # Skip unparseable files
+                except (lxml.etree.LxmlError, OSError) as e:
+                    errors.append(f"  {path_str}: Unable to parse XML: {e}")
 
             # Check all non-XML files for Default extension declarations
             for file_path in all_files:
@@ -619,15 +626,17 @@ class BaseSchemaValidator:
                     continue
 
                 extension = file_path.suffix.lstrip(".").lower()
-                if extension and extension not in declared_extensions:
-                    # Check if it's a known media extension that should be declared
-                    if extension in media_extensions:
-                        relative_path = file_path.relative_to(self.unpacked_dir)
-                        errors.append(
+                if (
+                    extension
+                    and extension not in declared_extensions
+                    and extension in media_extensions
+                ):
+                    relative_path = file_path.relative_to(self.unpacked_dir)
+                    errors.append(
                             f'  {relative_path}: File with extension \'{extension}\' not declared in [Content_Types].xml - should add: <Default Extension="{extension}" ContentType="{media_extensions[extension]}"/>'
                         )
 
-        except Exception as e:
+        except (lxml.etree.LxmlError, OSError, ValueError, KeyError) as e:
             errors.append(f"  Error parsing [Content_Types].xml: {e}")
 
         if errors:
@@ -901,7 +910,7 @@ class BaseSchemaValidator:
                     errors.add(error.message)
                 return False, errors
 
-        except Exception as e:
+        except (lxml.etree.LxmlError, OSError, ValueError, TypeError) as e:
             return False, {str(e)}
 
     def _get_original_file_errors(self, xml_file):

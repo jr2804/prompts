@@ -1,3 +1,7 @@
+# /// script
+# requires-python = ">=3.10"
+# dependencies = ["defusedxml", "Pillow"]
+# ///
 """Create thumbnail grids from PowerPoint presentation slides.
 
 Creates a grid layout of slide thumbnails for quick visual analysis.
@@ -23,8 +27,8 @@ import zipfile
 from pathlib import Path
 
 import defusedxml.minidom
-from office.soffice import get_soffice_env
 from PIL import Image, ImageDraw, ImageFont
+from soffice import get_soffice_env
 
 THUMBNAIL_WIDTH = 300
 CONVERSION_DPI = 100
@@ -87,7 +91,7 @@ def main():
             for grid_file in grid_files:
                 print(f"  {grid_file}")
 
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 -- CLI boundary reports thumbnail failures
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
 
@@ -168,6 +172,7 @@ def convert_to_images(pptx_path: Path, temp_dir: Path) -> list[Path]:
             str(temp_dir),
             str(pptx_path),
         ],
+        check=False,
         capture_output=True,
         text=True,
         env=get_soffice_env(),
@@ -184,6 +189,7 @@ def convert_to_images(pptx_path: Path, temp_dir: Path) -> list[Path]:
             str(pdf_path),
             str(temp_dir / "slide"),
         ],
+        check=False,
         capture_output=True,
         text=True,
     )
@@ -243,7 +249,7 @@ def create_grid(
 
     try:
         font = ImageFont.load_default(size=font_size)
-    except Exception:
+    except TypeError:
         font = ImageFont.load_default()
 
     for i, (img_path, slide_name) in enumerate(slides):

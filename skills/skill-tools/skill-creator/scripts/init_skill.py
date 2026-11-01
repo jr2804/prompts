@@ -241,7 +241,7 @@ def init_skill(skill_name, path):
     try:
         skill_dir.mkdir(parents=True, exist_ok=False)
         print(f"✅ Created skill directory: {skill_dir}")
-    except Exception as e:
+    except OSError as e:
         print(f"❌ Error creating directory: {e}")
         return None
 
@@ -255,7 +255,7 @@ def init_skill(skill_name, path):
     try:
         skill_md_path.write_text(skill_content, encoding="utf-8")
         print("✅ Created SKILL.md")
-    except Exception as e:
+    except OSError as e:
         print(f"❌ Error creating SKILL.md: {e}")
         return None
 
@@ -286,7 +286,7 @@ def init_skill(skill_name, path):
         example_asset = assets_dir / "example_asset.txt"
         example_asset.write_text(EXAMPLE_ASSET, encoding="utf-8")
         print("✅ Created assets/example_asset.txt")
-    except Exception as e:
+    except OSError as e:
         print(f"❌ Error creating resource directories: {e}")
         return None
 

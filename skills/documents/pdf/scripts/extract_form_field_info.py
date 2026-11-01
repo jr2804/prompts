@@ -7,8 +7,21 @@
 
 import json
 import sys
+from typing import TypedDict
 
 from pypdf import PdfReader
+
+
+class RadioOption(TypedDict):
+    value: object
+    rect: object
+
+
+class RadioField(TypedDict):
+    field_id: str
+    type: str
+    page: int
+    radio_options: list[RadioOption]
 
 
 def write_field_info(pdf_path: str, json_output_path: str):
@@ -20,7 +33,7 @@ def write_field_info(pdf_path: str, json_output_path: str):
 
 
 def get_field_info(reader: PdfReader):
-    fields = reader.get_fields()
+    fields = reader.get_fields() or {}
 
     field_info_by_id = {}
     possible_radio_names = set()
@@ -32,7 +45,7 @@ def get_field_info(reader: PdfReader):
             continue
         field_info_by_id[field_id] = make_field_dict(field, field_id)
 
-    radio_fields_by_id = {}
+    radio_fields_by_id: dict[str, RadioField] = {}
 
     for page_index, page in enumerate(reader.pages):
         annotations = page.get("/Annots", [])

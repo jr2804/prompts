@@ -1,8 +1,9 @@
 # /// script
+# requires-python = ">=3.10"
 # dependencies = [
 #   "defusedxml",
 # ]
-# /
+# ///
 """Merge adjacent runs with identical formatting in DOCX.
 
 Merges adjacent <w:r> elements that have identical <w:rPr> properties.
@@ -14,7 +15,9 @@ Also:
 """
 
 from pathlib import Path
+from xml.parsers.expat import ExpatError
 
+import defusedxml.common
 import defusedxml.minidom
 
 
@@ -40,7 +43,7 @@ def merge_runs(input_dir: str) -> tuple[int, str]:
         doc_xml.write_bytes(dom.toxml(encoding="UTF-8"))
         return merge_count, f"Merged {merge_count} runs"
 
-    except Exception as e:
+    except (ExpatError, defusedxml.common.DefusedXmlException, OSError, UnicodeError) as e:
         return 0, f"Error: {e}"
 
 

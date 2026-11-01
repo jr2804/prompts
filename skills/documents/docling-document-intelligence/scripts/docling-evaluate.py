@@ -5,6 +5,7 @@
 # dependencies = [
 #   "docling>=2.81.0",
 #   "docling-core>=2.67.1",
+#   "pydantic>=2",
 # ]
 # ///
 """
@@ -29,6 +30,7 @@ from pathlib import Path
 from typing import Any
 
 from docling_core.types.doc.document import DoclingDocument
+from pydantic import ValidationError
 
 
 def main() -> None:
@@ -91,7 +93,7 @@ def load_document(path: Path):
     data = json.loads(path.read_text(encoding="utf-8"))
     try:
         return DoclingDocument.model_validate(data), data
-    except Exception:
+    except ValidationError:
         return None, data
 
 
@@ -124,7 +126,7 @@ def metrics_from_doc(doc) -> dict[str, Any]:
     md = ""
     try:
         md = doc.export_to_markdown()
-    except Exception:
+    except Exception:  # noqa: BLE001, S110 -- markdown export is optional to these metrics
         pass
 
     replacement = md.count("\ufffd") + sum(str(t).count("\ufffd") for t in samples)
@@ -139,7 +141,7 @@ def metrics_from_doc(doc) -> dict[str, Any]:
         "pictures": n_pictures,
         "markdown_chars": len(md),
         "replacement_chars": replacement,
-        "most_repeated_text_count": int(top_rep[1]) if top_rep else 0,
+        "most_repeated_text_count": int(top_rep[1]),
         "duplicate_heavy": dup_ratio > 0.15 and len(samples) > 10,
     }
 

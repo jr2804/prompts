@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.10"
+# dependencies = ["PyYAML"]
+# ///
 """
 Quick Review - Lightweight skill validation script
 
-Validates SKILL.md frontmatter without external dependencies.
+Validates SKILL.md frontmatter with PyYAML.
 Use alongside `uvx skills-ref validate` for comprehensive checking.
 
 Usage:

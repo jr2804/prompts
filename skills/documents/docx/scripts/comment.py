@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # /// script
+# requires-python = ">=3.11"
 # dependencies = [
 #   "defusedxml",
 # ]
-# /
+# ///
 """Add comments to DOCX documents.
 
 Usage:

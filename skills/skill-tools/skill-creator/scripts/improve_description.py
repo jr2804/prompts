@@ -23,7 +23,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from scripts.utils import parse_skill_md
+from utils import parse_skill_md
 
 # Make sibling scripts importable regardless of how this script is invoked
 # (uv run, python -m, etc.).
@@ -284,6 +284,7 @@ def _call_agent(prompt: str, model: str | None, timeout: int = 300) -> str:
     result = subprocess.run(
         cmd,
         input=prompt,
+        check=False,
         capture_output=True,
         text=True,
         env=env,

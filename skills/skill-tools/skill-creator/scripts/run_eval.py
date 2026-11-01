@@ -50,7 +50,7 @@ from pathlib import Path
 # Make sibling scripts importable regardless of how this script is invoked
 # (uv run, python -m, etc.).
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from utils import parse_skill_md  # noqa: E402
+from utils import parse_skill_md
 
 # Default configuration. Override via env vars (see module docstring).
 DEFAULT_AGENT_CLI = "claude"
@@ -101,7 +101,7 @@ def main():
         print(f"Error: No SKILL.md found at {skill_path}", file=sys.stderr)
         sys.exit(1)
 
-    name, original_description, content = parse_skill_md(skill_path)
+    name, original_description, _content = parse_skill_md(skill_path)
     description = args.description or original_description
     project_root = find_project_root()
 
@@ -188,7 +188,7 @@ def run_eval(
                 query_triggers[query] = []
             try:
                 query_triggers[query].append(future.result())
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001 -- isolate failed queries while evaluating the rest
                 print(f"Warning: query failed: {e}", file=sys.stderr)
                 query_triggers[query].append(False)
 
@@ -282,6 +282,9 @@ def run_single_query(
             cwd=project_root,
             env=env,
         )
+        stdout = process.stdout
+        if stdout is None:
+            raise RuntimeError("Agent process stdout pipe was not created")
 
         triggered = False
         start_time = time.time()
@@ -293,16 +296,16 @@ def run_single_query(
         try:
             while time.time() - start_time < timeout:
                 if process.poll() is not None:
-                    remaining = process.stdout.read()
+                    remaining = stdout.read()
                     if remaining:
                         buffer += remaining.decode("utf-8", errors="replace")
                     break
 
-                ready, _, _ = select.select([process.stdout], [], [], 1.0)
+                ready, _, _ = select.select([stdout], [], [], 1.0)
                 if not ready:
                     continue
 
-                chunk = os.read(process.stdout.fileno(), 8192)
+                chunk = os.read(stdout.fileno(), 8192)
                 if not chunk:
                     break
                 buffer += chunk.decode("utf-8", errors="replace")
@@ -359,9 +362,7 @@ def run_single_query(
                             tool_input = content_item.get("input", {})
                             if tool_name == cfg[
                                 "trigger_tool"
-                            ] and clean_name in tool_input.get("skill", ""):
-                                triggered = True
-                            elif tool_name == cfg[
+                            ] and clean_name in tool_input.get("skill", "") or tool_name == cfg[
                                 "trigger_read"
                             ] and clean_name in tool_input.get("file_path", ""):
                                 triggered = True

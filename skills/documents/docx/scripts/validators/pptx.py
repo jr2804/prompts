@@ -1,8 +1,13 @@
+# /// script
+# requires-python = ">=3.10"
+# dependencies = ["defusedxml", "lxml"]
+# ///
 """
 Validator for PowerPoint presentation XML files against XSD schemas.
 """
 
 import re
+from typing import ClassVar
 
 import lxml.etree
 
@@ -18,7 +23,7 @@ class PPTXSchemaValidator(BaseSchemaValidator):
     )
 
     # PowerPoint-specific element to relationship type mappings
-    ELEMENT_RELATIONSHIP_TYPES = {
+    ELEMENT_RELATIONSHIP_TYPES: ClassVar[dict[str, str]] = {
         "sldid": "slide",
         "sldmasterid": "slidemaster",
         "notesmasterid": "notesmaster",
@@ -94,17 +99,17 @@ class PPTXSchemaValidator(BaseSchemaValidator):
                     for attr, value in elem.attrib.items():
                         # Check if this is an ID attribute
                         attr_name = attr.split("}")[-1].lower()
-                        if attr_name == "id" or attr_name.endswith("id"):
-                            # Check if value looks like a UUID (has the right length and pattern structure)
-                            if self._looks_like_uuid(value):
-                                # Validate that it contains only hex characters in the right positions
-                                if not uuid_pattern.match(value):
-                                    errors.append(
+                        if (
+                            (attr_name == "id" or attr_name.endswith("id"))
+                            and self._looks_like_uuid(value)
+                            and not uuid_pattern.match(value)
+                        ):
+                            errors.append(
                                         f"  {xml_file.relative_to(self.unpacked_dir)}: "
                                         f"Line {elem.sourceline}: ID '{value}' appears to be a UUID but contains invalid hex characters"
                                     )
 
-            except (lxml.etree.XMLSyntaxError, Exception) as e:
+            except (lxml.etree.LxmlError, OSError, ValueError) as e:
                 errors.append(
                     f"  {xml_file.relative_to(self.unpacked_dir)}: Error: {e}"
                 )
@@ -175,7 +180,7 @@ class PPTXSchemaValidator(BaseSchemaValidator):
                             f"references r:id='{r_id}' which is not found in slide layout relationships"
                         )
 
-            except (lxml.etree.XMLSyntaxError, Exception) as e:
+            except (lxml.etree.LxmlError, OSError, ValueError) as e:
                 errors.append(
                     f"  {slide_master.relative_to(self.unpacked_dir)}: Error: {e}"
                 )
@@ -217,7 +222,7 @@ class PPTXSchemaValidator(BaseSchemaValidator):
                         f"  {rels_file.relative_to(self.unpacked_dir)}: has {len(layout_rels)} slideLayout references"
                     )
 
-            except Exception as e:
+            except (lxml.etree.LxmlError, OSError, ValueError) as e:
                 errors.append(
                     f"  {rels_file.relative_to(self.unpacked_dir)}: Error: {e}"
                 )
@@ -273,7 +278,7 @@ class PPTXSchemaValidator(BaseSchemaValidator):
                                 (slide_name, rels_file)
                             )
 
-            except (lxml.etree.XMLSyntaxError, Exception) as e:
+            except (lxml.etree.LxmlError, OSError, ValueError) as e:
                 errors.append(
                     f"  {rels_file.relative_to(self.unpacked_dir)}: Error: {e}"
                 )

@@ -22,10 +22,10 @@ from pathlib import Path
 # Make sibling scripts importable regardless of how this script is invoked
 # (uv run, python -m, etc.).
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from generate_report import generate_html  # noqa: E402
-from improve_description import improve_description  # noqa: E402
-from run_eval import find_project_root, run_eval  # noqa: E402
-from utils import parse_skill_md  # noqa: E402
+from generate_report import generate_html
+from improve_description import improve_description
+from run_eval import find_project_root, run_eval
+from utils import parse_skill_md
 
 
 def main():
@@ -302,7 +302,7 @@ def run_loop(
                     )
 
             print_eval_stats("Train", train_results["results"], eval_elapsed)
-            if test_summary:
+            if test_results is not None:
                 print_eval_stats("Test ", test_results["results"], 0)
 
         if train_summary["failed"] == 0:
@@ -322,7 +322,7 @@ def run_loop(
 
         # Improve the description based on train results
         if verbose:
-            print(f"\nImproving description...", file=sys.stderr)
+            print("\nImproving description...", file=sys.stderr)
 
         t0 = time.time()
         # Strip test scores from history so improvement model can't see them

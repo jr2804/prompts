@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.10"
+# dependencies = ["python-pptx"]
+# ///
 """Apply text replacements to PowerPoint presentation.
 
 Usage:
@@ -45,7 +49,7 @@ def main():
 
     try:
         apply_replacements(str(input_pptx), str(replacements_json), str(output_pptx))
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 -- CLI boundary reports replacement failures
         print(f"Error applying replacements: {e}")
 
         traceback.print_exc()
@@ -108,9 +112,9 @@ def apply_replacements(pptx_file: str, json_file: str, output_file: str):
                 continue
 
             # ShapeData already validates text_frame in __init__
-            text_frame = shape.text_frame  # type: ignore
+            text_frame = shape.text_frame
 
-            text_frame.clear()  # type: ignore
+            text_frame.clear()
             shapes_cleared += 1
 
             # Check for replacement paragraphs
@@ -123,9 +127,9 @@ def apply_replacements(pptx_file: str, json_file: str, output_file: str):
             # Add replacement paragraphs
             for i, para_data in enumerate(replacement_shape_data["paragraphs"]):
                 if i == 0:
-                    p = text_frame.paragraphs[0]  # type: ignore
+                    p = text_frame.paragraphs[0]
                 else:
-                    p = text_frame.add_paragraph()  # type: ignore
+                    p = text_frame.add_paragraph()
 
                 apply_paragraph_properties(p, para_data)
 

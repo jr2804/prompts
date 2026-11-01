@@ -1,3 +1,14 @@
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#   "fastapi",
+#   "motor",
+#   "odmantic",
+#   "pymongo",
+#   "sqlalchemy",
+#   "uvicorn",
+# ]
+# ///
 """
 Example Usage of Database Schema Generator
 
@@ -19,7 +30,10 @@ app = FastAPI(title="Database Schema Example API")
 
 # Example endpoint using generated models
 @app.post("/users/", response_model=UserResponse)
-def create_user(user: UserCreate, db: Session = Depends(get_db)):
+def create_user(
+    user: UserCreate,
+    db: Session = Depends(get_db),  # noqa: B008 -- FastAPI dependency injection
+):
     """
     Create a new user
     """
@@ -31,7 +45,11 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
 
 
 @app.get("/users/", response_model=list[UserResponse])
-def get_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def get_users(
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db),  # noqa: B008 -- FastAPI dependency injection
+):
     """
     Get all users with pagination
     """
@@ -40,7 +58,10 @@ def get_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
 
 
 @app.get("/users/{user_id}", response_model=UserResponse)
-def get_user(user_id: int, db: Session = Depends(get_db)):
+def get_user(
+    user_id: int,
+    db: Session = Depends(get_db),  # noqa: B008 -- FastAPI dependency injection
+):
     """
     Get a specific user by ID
     """
@@ -90,4 +111,4 @@ async def startup_event() -> None:
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8000)), reload=True)
+    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", "8000")), reload=True)

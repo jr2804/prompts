@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.10"
+# dependencies = []
+# ///
 """Accept all tracked changes in a DOCX file using LibreOffice.
 
 Requires LibreOffice (soffice) to be installed.
@@ -53,7 +57,7 @@ def accept_changes(
     try:
         output_path.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(input_path, output_path)
-    except Exception as e:
+    except OSError as e:
         return None, f"Error: Failed to copy input file to output location: {e}"
 
     if not _setup_libreoffice_macro():
@@ -117,7 +121,7 @@ def _setup_libreoffice_macro() -> bool:
     try:
         macro_file.write_text(ACCEPT_CHANGES_MACRO)
         return True
-    except Exception as e:
+    except OSError as e:
         logger.warning(f"Failed to setup LibreOffice macro: {e}")
         return False
 

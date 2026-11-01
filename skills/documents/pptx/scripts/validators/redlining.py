@@ -51,7 +51,7 @@ class RedliningValidator:
                     print(f"PASSED - No tracked changes by {self.author} found.")
                 return True
 
-        except Exception:
+        except (ET.ParseError, OSError):
             pass
 
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -60,7 +60,7 @@ class RedliningValidator:
             try:
                 with zipfile.ZipFile(self.original_docx, "r") as zip_ref:
                     zip_ref.extractall(temp_path)
-            except Exception as e:
+            except (zipfile.BadZipFile, zipfile.LargeZipFile, OSError, RuntimeError) as e:
                 print(f"FAILED - Error unpacking original docx: {e}")
                 return False
 
@@ -76,7 +76,7 @@ class RedliningValidator:
                 modified_root = modified_tree.getroot()
                 original_tree = ET.parse(original_file)
                 original_root = original_tree.getroot()
-            except ET.ParseError as e:
+            except (ET.ParseError, OSError) as e:
                 print(f"FAILED - Error parsing XML files: {e}")
                 return False
 
@@ -142,6 +142,7 @@ class RedliningValidator:
                         str(original_file),
                         str(modified_file),
                     ],
+                    check=False,
                     capture_output=True,
                     text=True,
                 )
@@ -170,6 +171,7 @@ class RedliningValidator:
                         str(original_file),
                         str(modified_file),
                     ],
+                    check=False,
                     capture_output=True,
                     text=True,
                 )
@@ -186,7 +188,7 @@ class RedliningValidator:
                             content_lines.append(line)
                     return "\n".join(content_lines)
 
-        except subprocess.CalledProcessError, FileNotFoundError, Exception:
+        except (OSError, UnicodeError, subprocess.SubprocessError):
             pass
 
         return None

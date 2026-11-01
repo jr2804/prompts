@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.10"
+# dependencies = ["python-pptx", "six"]
+# ///
 """
 Rearrange PowerPoint slides based on a sequence of indices.
 
@@ -67,7 +71,7 @@ Note: Slide indices are 0-based (first slide is 0, second is 1, etc.)
     except ValueError as e:
         print(f"Error: {e}")
         sys.exit(1)
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 -- CLI boundary reports processing failures
         print(f"Error processing presentation: {e}")
         sys.exit(1)
 
@@ -200,10 +204,7 @@ def duplicate_slide(pres, index):
 
     # Copy any additional image/media relationships that might be referenced elsewhere
     for rel_id, rel in image_rels.items():
-        try:
-            new_slide.part.rels.get_or_add(rel.reltype, rel._target)
-        except Exception:
-            pass  # Relationship might already exist
+        new_slide.part.rels.get_or_add(rel.reltype, rel._target)
 
     return new_slide
 

@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # /// script
+# requires-python = ">=3.10"
 # dependencies = [
 #   "defusedxml",
 # ]
-# /
+# ///
 """Unpack Office files (XLSX) for editing.
 
 Usage:
@@ -13,8 +14,11 @@ Usage:
 import argparse
 import sys
 import zipfile
+import zlib
 from pathlib import Path
+from xml.parsers.expat import ExpatError
 
+import defusedxml.common
 import defusedxml.minidom
 
 
@@ -38,14 +42,14 @@ def unpack(input_file: str, output_directory: str) -> tuple[None, str]:
                 content = xml_file.read_text(encoding="utf-8")
                 dom = defusedxml.minidom.parseString(content)
                 xml_file.write_bytes(dom.toprettyxml(indent="  ", encoding="utf-8"))
-            except Exception:
+            except (ExpatError, defusedxml.common.DefusedXmlException, OSError, UnicodeError):
                 pass
 
         return None, f"Unpacked {input_file} ({len(xml_files)} XML files)"
 
     except zipfile.BadZipFile:
         return None, f"Error: {input_file} is not a valid file"
-    except Exception as e:
+    except (OSError, RuntimeError, NotImplementedError, zipfile.LargeZipFile, zlib.error) as e:
         return None, f"Error unpacking: {e}"
 
 

@@ -1,3 +1,7 @@
+# /// script
+# requires-python = ">=3.10"
+# dependencies = ["defusedxml", "lxml"]
+# ///
 """
 Base validator with common validation logic for document files.
 """
@@ -6,18 +10,21 @@ import re
 import tempfile
 import zipfile
 from pathlib import Path
+from typing import ClassVar
+from xml.parsers.expat import ExpatError
 
+import defusedxml.common
 import defusedxml.minidom
 import lxml.etree
 
 
 class BaseSchemaValidator:
-    IGNORED_VALIDATION_ERRORS = [
+    IGNORED_VALIDATION_ERRORS: ClassVar[list[str]] = [
         "hyphenationZone",
         "purl.org/dc/terms",
     ]
 
-    UNIQUE_ID_REQUIREMENTS = {
+    UNIQUE_ID_REQUIREMENTS: ClassVar[dict[str, tuple[str, str]]] = {
         "comment": ("id", "file"),
         "commentrangestart": ("id", "file"),
         "commentrangeend": ("id", "file"),
@@ -35,13 +42,13 @@ class BaseSchemaValidator:
         "grpsp": ("id", "file"),
     }
 
-    EXCLUDED_ID_CONTAINERS = {
+    EXCLUDED_ID_CONTAINERS: ClassVar[set[str]] = {
         "sectionlst",
     }
 
-    ELEMENT_RELATIONSHIP_TYPES = {}
+    ELEMENT_RELATIONSHIP_TYPES: ClassVar[dict[str, str]] = {}
 
-    SCHEMA_MAPPINGS = {
+    SCHEMA_MAPPINGS: ClassVar[dict[str, str]] = {
         "word": "ISO-IEC29500-4_2016/wml.xsd",
         "ppt": "ISO-IEC29500-4_2016/pml.xsd",
         "xl": "ISO-IEC29500-4_2016/sml.xsd",
@@ -72,9 +79,9 @@ class BaseSchemaValidator:
         "http://schemas.openxmlformats.org/package/2006/content-types"
     )
 
-    MAIN_CONTENT_FOLDERS = {"word", "ppt", "xl"}
+    MAIN_CONTENT_FOLDERS: ClassVar[set[str]] = {"word", "ppt", "xl"}
 
-    OOXML_NAMESPACES = {
+    OOXML_NAMESPACES: ClassVar[set[str]] = {
         "http://schemas.openxmlformats.org/officeDocument/2006/math",
         "http://schemas.openxmlformats.org/officeDocument/2006/relationships",
         "http://schemas.openxmlformats.org/schemaLibrary/2006/main",
@@ -125,26 +132,30 @@ class BaseSchemaValidator:
                 for elem in dom.getElementsByTagName("*"):
                     if elem.tagName.endswith(":t") and elem.firstChild:
                         text = elem.firstChild.nodeValue
-                        if text and (
-                            text.startswith((" ", "\t")) or text.endswith((" ", "\t"))
+                        if (
+                            text
+                            and (
+                                text.startswith((" ", "\t"))
+                                or text.endswith((" ", "\t"))
+                            )
+                            and elem.getAttribute("xml:space") != "preserve"
                         ):
-                            if elem.getAttribute("xml:space") != "preserve":
-                                elem.setAttribute("xml:space", "preserve")
-                                text_preview = (
-                                    repr(text[:30]) + "..."
-                                    if len(text) > 30
-                                    else repr(text)
-                                )
-                                print(
-                                    f"  Repaired: {xml_file.name}: Added xml:space='preserve' to {elem.tagName}: {text_preview}"
-                                )
-                                repairs += 1
-                                modified = True
+                            elem.setAttribute("xml:space", "preserve")
+                            text_preview = (
+                                repr(text[:30]) + "..."
+                                if len(text) > 30
+                                else repr(text)
+                            )
+                            print(
+                                f"  Repaired: {xml_file.name}: Added xml:space='preserve' to {elem.tagName}: {text_preview}"
+                            )
+                            repairs += 1
+                            modified = True
 
                 if modified:
                     xml_file.write_bytes(dom.toxml(encoding="UTF-8"))
 
-            except Exception:
+            except (ExpatError, defusedxml.common.DefusedXmlException, OSError, UnicodeError):
                 pass
 
         return repairs
@@ -160,10 +171,10 @@ class BaseSchemaValidator:
                     f"  {xml_file.relative_to(self.unpacked_dir)}: "
                     f"Line {e.lineno}: {e.msg}"
                 )
-            except Exception as e:
+            except OSError as e:
                 errors.append(
                     f"  {xml_file.relative_to(self.unpacked_dir)}: "
-                    f"Unexpected error: {e!s}"
+                    f"Unable to read XML: {e!s}"
                 )
 
         if errors:
@@ -281,7 +292,7 @@ class BaseSchemaValidator:
                                 else:
                                     file_ids[key][id_value] = elem.sourceline
 
-            except (lxml.etree.XMLSyntaxError, Exception) as e:
+            except (lxml.etree.LxmlError, OSError, ValueError, KeyError) as e:
                 errors.append(
                     f"  {xml_file.relative_to(self.unpacked_dir)}: Error: {e}"
                 )
@@ -352,7 +363,7 @@ class BaseSchemaValidator:
                                 all_referenced_files.add(target_path)
                             else:
                                 broken_refs.append((target, rel.sourceline))
-                        except OSError, ValueError:
+                        except (OSError, ValueError):
                             broken_refs.append((target, rel.sourceline))
 
                 if broken_refs:
@@ -362,7 +373,7 @@ class BaseSchemaValidator:
                             f"  {rel_path}: Line {line_num}: Broken reference to {broken_ref}"
                         )
 
-            except Exception as e:
+            except (lxml.etree.LxmlError, OSError, ValueError, KeyError) as e:
                 rel_path = rels_file.relative_to(self.unpacked_dir)
                 errors.append(f"  Error parsing {rel_path}: {e}")
 
@@ -458,7 +469,7 @@ class BaseSchemaValidator:
                                         f"but should point to a '{expected_type}' relationship"
                                     )
 
-            except Exception as e:
+            except (lxml.etree.LxmlError, OSError, ValueError, KeyError) as e:
                 xml_rel_path = xml_file.relative_to(self.unpacked_dir)
                 errors.append(f"  Error processing {xml_rel_path}: {e}")
 
@@ -545,8 +556,8 @@ class BaseSchemaValidator:
                             f"  {path_str}: File with <{root_name}> root not declared in [Content_Types].xml"
                         )
 
-                except Exception:
-                    continue
+                except (lxml.etree.LxmlError, OSError) as e:
+                    errors.append(f"  {path_str}: Unable to parse XML: {e}")
 
             for file_path in all_files:
                 if file_path.suffix.lower() in {".xml", ".rels"}:
@@ -557,14 +568,17 @@ class BaseSchemaValidator:
                     continue
 
                 extension = file_path.suffix.lstrip(".").lower()
-                if extension and extension not in declared_extensions:
-                    if extension in media_extensions:
-                        relative_path = file_path.relative_to(self.unpacked_dir)
-                        errors.append(
+                if (
+                    extension
+                    and extension not in declared_extensions
+                    and extension in media_extensions
+                ):
+                    relative_path = file_path.relative_to(self.unpacked_dir)
+                    errors.append(
                             f'  {relative_path}: File with extension \'{extension}\' not declared in [Content_Types].xml - should add: <Default Extension="{extension}" ContentType="{media_extensions[extension]}"/>'
                         )
 
-        except Exception as e:
+        except (lxml.etree.LxmlError, OSError, ValueError, KeyError) as e:
             errors.append(f"  Error parsing [Content_Types].xml: {e}")
 
         if errors:
@@ -787,7 +801,7 @@ class BaseSchemaValidator:
                     errors.add(error.message)
                 return False, errors
 
-        except Exception as e:
+        except (lxml.etree.LxmlError, OSError, ValueError, TypeError) as e:
             return False, {str(e)}
 
     def _get_original_file_errors(self, xml_file):

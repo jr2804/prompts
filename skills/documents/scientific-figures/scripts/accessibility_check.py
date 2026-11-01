@@ -99,7 +99,7 @@ def _colorblind_summary(path: Path) -> str | None:
         sys.path.insert(0, str(here))
     try:
         result = check_image(path)
-    except Exception as e:  # ImportError, missing dep, etc.
+    except (ImportError, OSError, ValueError) as e:
         return f"CVD check skipped: {e}"
     sims = result.get("simulations", {})
     parts = []

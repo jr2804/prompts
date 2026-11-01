@@ -1,3 +1,7 @@
+# /// script
+# requires-python = ">=3.10"
+# dependencies = ["defusedxml"]
+# ///
 """Simplify tracked changes by merging adjacent w:ins or w:del elements.
 
 Merges adjacent <w:ins> elements from the same author into a single element.
@@ -13,7 +17,9 @@ Rules:
 import xml.etree.ElementTree as ET
 import zipfile
 from pathlib import Path
+from xml.parsers.expat import ExpatError
 
+import defusedxml.common
 import defusedxml.minidom
 
 WORD_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
@@ -40,7 +46,7 @@ def simplify_redlines(input_dir: str) -> tuple[int, str]:
         doc_xml.write_bytes(dom.toxml(encoding="UTF-8"))
         return merge_count, f"Simplified {merge_count} tracked changes"
 
-    except Exception as e:
+    except (ExpatError, defusedxml.common.DefusedXmlException, OSError, UnicodeError) as e:
         return 0, f"Error: {e}"
 
 
@@ -195,5 +201,5 @@ def _get_authors_from_docx(docx_path: Path) -> dict[str, int]:
                         if author:
                             authors[author] = authors.get(author, 0) + 1
                 return authors
-    except zipfile.BadZipFile, ET.ParseError:
+    except (zipfile.BadZipFile, ET.ParseError):
         return {}

@@ -1,3 +1,7 @@
+# /// script
+# requires-python = ">=3.10"
+# dependencies = ["openpyxl"]
+# ///
 """
 Excel Formula Recalculation Script
 Recalculates all formulas in an Excel file using LibreOffice
@@ -10,8 +14,8 @@ import subprocess
 import sys
 from pathlib import Path
 
-from office.soffice import get_soffice_env
 from openpyxl import load_workbook
+from soffice import get_soffice_env
 
 MACRO_DIR_MACOS = "~/Library/Application Support/LibreOffice/4/user/basic/Standard"
 MACRO_DIR_LINUX = "~/.config/libreoffice/4/user/basic/Standard"
@@ -69,7 +73,9 @@ def recalc(filename, timeout=30):
     elif platform.system() == "Darwin" and has_gtimeout():
         cmd = ["gtimeout", str(timeout)] + cmd
 
-    result = subprocess.run(cmd, capture_output=True, text=True, env=get_soffice_env())
+    result = subprocess.run(
+        cmd, check=False, capture_output=True, text=True, env=get_soffice_env()
+    )
 
     if result.returncode != 0 and result.returncode != 124:
         error_msg = result.stderr or "Unknown error during recalculation"
@@ -137,7 +143,7 @@ def recalc(filename, timeout=30):
 
         return result
 
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 -- return recalculation failures through the result API
         return {"error": str(e)}
 
 
@@ -147,7 +153,7 @@ def has_gtimeout():
             ["gtimeout", "--version"], capture_output=True, timeout=1, check=False
         )
         return True
-    except FileNotFoundError, subprocess.TimeoutExpired:
+    except (FileNotFoundError, subprocess.TimeoutExpired):
         return False
 
 
@@ -166,6 +172,7 @@ def setup_libreoffice_macro():
     if not os.path.exists(macro_dir):
         subprocess.run(
             ["soffice", "--headless", "--terminate_after_init"],
+            check=False,
             capture_output=True,
             timeout=10,
             env=get_soffice_env(),
@@ -175,7 +182,7 @@ def setup_libreoffice_macro():
     try:
         Path(macro_file).write_text(RECALCULATE_MACRO)
         return True
-    except Exception:
+    except OSError:
         return False
 
 

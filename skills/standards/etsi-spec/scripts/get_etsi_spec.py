@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # /// script
+# requires-python = ">=3.10"
 # dependencies = [
 #   "PyPDF2",
 #   "beautifulsoup4",
@@ -130,7 +131,7 @@ def main():
             try:
                 dt = datetime.strptime(pub_date, "%Y-%m-%d")
                 pub_date_formatted = dt.strftime("%b %Y").lower()
-            except:
+            except ValueError:
                 pub_date_formatted = pub_date
             print(f"Publication Date: {pub_date_formatted}")
 
@@ -152,7 +153,7 @@ def main():
     except requests.RequestException as e:
         print(f"Network error: {e}")
         sys.exit(1)
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 -- CLI boundary reports unexpected errors
         print(f"Unexpected error: {e}")
 
         traceback.print_exc()
@@ -275,7 +276,7 @@ def get_spec_directory_url(spec_info):
                     url = f"{base_url}{dir_path}"
                     return url
 
-    except Exception:
+    except requests.RequestException:
         pass
 
     # Fallback: try to determine the range based on spec number (without part)
@@ -440,9 +441,12 @@ def extract_pdf_metadata(pdf_url):
         lines = text.split("\n")
         for line in lines[:20]:  # Check first 20 lines
             line = line.strip()
-            if line and len(line) > 20:  # Reasonable title length
+            if (
+                line
+                and len(line) > 20  # Reasonable title length
+                and not re.match(r"^[^\w\s]+$", line)
+            ):
                 # Skip lines with only special characters
-                if not re.match(r"^[^\w\s]+$", line):
                     metadata["title"] = line
                     break
 

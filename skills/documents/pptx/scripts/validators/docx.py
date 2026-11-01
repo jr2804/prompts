@@ -1,3 +1,7 @@
+# /// script
+# requires-python = ">=3.10"
+# dependencies = ["defusedxml", "lxml"]
+# ///
 """
 Validator for Word document XML files against XSD schemas.
 """
@@ -6,7 +10,10 @@ import random
 import re
 import tempfile
 import zipfile
+from typing import ClassVar
+from xml.parsers.expat import ExpatError
 
+import defusedxml.common
 import defusedxml.minidom
 import lxml.etree
 
@@ -18,7 +25,7 @@ class DOCXSchemaValidator(BaseSchemaValidator):
     W14_NAMESPACE = "http://schemas.microsoft.com/office/word/2010/wordml"
     W16CID_NAMESPACE = "http://schemas.microsoft.com/office/word/2016/wordml/cid"
 
-    ELEMENT_RELATIONSHIP_TYPES = {}
+    ELEMENT_RELATIONSHIP_TYPES: ClassVar[dict[str, str]] = {}
 
     def validate(self):
         if not self.validate_xml():
@@ -93,7 +100,7 @@ class DOCXSchemaValidator(BaseSchemaValidator):
                                     f"Line {elem.sourceline}: w:t element with whitespace missing xml:space='preserve': {text_preview}"
                                 )
 
-            except (lxml.etree.XMLSyntaxError, Exception) as e:
+            except (lxml.etree.LxmlError, OSError, ValueError) as e:
                 errors.append(
                     f"  {xml_file.relative_to(self.unpacked_dir)}: Error: {e}"
                 )
@@ -144,7 +151,7 @@ class DOCXSchemaValidator(BaseSchemaValidator):
                         f"Line {instr_elem.sourceline}: <w:instrText> found within <w:del> (use <w:delInstrText>): {text_preview}"
                     )
 
-            except (lxml.etree.XMLSyntaxError, Exception) as e:
+            except (lxml.etree.LxmlError, OSError, ValueError) as e:
                 errors.append(
                     f"  {xml_file.relative_to(self.unpacked_dir)}: Error: {e}"
                 )
@@ -170,7 +177,7 @@ class DOCXSchemaValidator(BaseSchemaValidator):
                 root = lxml.etree.parse(str(xml_file)).getroot()
                 paragraphs = root.findall(f".//{{{self.WORD_2006_NAMESPACE}}}p")
                 count = len(paragraphs)
-            except Exception as e:
+            except (lxml.etree.LxmlError, OSError, ValueError) as e:
                 print(f"Error counting paragraphs in unpacked document: {e}")
 
         return count
@@ -193,7 +200,7 @@ class DOCXSchemaValidator(BaseSchemaValidator):
                 paragraphs = root.findall(f".//{{{self.WORD_2006_NAMESPACE}}}p")
                 count = len(paragraphs)
 
-        except Exception as e:
+        except (lxml.etree.LxmlError, OSError, zipfile.BadZipFile, zipfile.LargeZipFile, RuntimeError, ValueError) as e:
             print(f"Error counting paragraphs in original document: {e}")
 
         return count
@@ -224,7 +231,7 @@ class DOCXSchemaValidator(BaseSchemaValidator):
                         f"Line {elem.sourceline}: <w:delText> within <w:ins>: {text_preview}"
                     )
 
-            except (lxml.etree.XMLSyntaxError, Exception) as e:
+            except (lxml.etree.LxmlError, OSError, ValueError) as e:
                 errors.append(
                     f"  {xml_file.relative_to(self.unpacked_dir)}: Error: {e}"
                 )
@@ -255,9 +262,10 @@ class DOCXSchemaValidator(BaseSchemaValidator):
         for xml_file in self.xml_files:
             try:
                 for elem in lxml.etree.parse(str(xml_file)).iter():
-                    if val := elem.get(para_id_attr):
-                        if self._parse_id_value(val, base=16) >= 0x80000000:
-                            errors.append(
+                    if (val := elem.get(para_id_attr)) and self._parse_id_value(
+                        val, base=16
+                    ) >= 0x80000000:
+                        errors.append(
                                 f"  {xml_file.name}:{elem.sourceline}: paraId={val} >= 0x80000000"
                             )
 
@@ -280,8 +288,8 @@ class DOCXSchemaValidator(BaseSchemaValidator):
                                     f"  {xml_file.name}:{elem.sourceline}: "
                                     f"durableId={val} >= 0x7FFFFFFF"
                                 )
-            except Exception:
-                pass
+            except (lxml.etree.LxmlError, OSError, ValueError) as e:
+                errors.append(f"  {xml_file.name}: Error validating IDs: {e}")
 
         if errors:
             print(f"FAILED - {len(errors)} ID constraint violations:")
@@ -366,7 +374,7 @@ class DOCXSchemaValidator(BaseSchemaValidator):
                             f'  document.xml: marker id="{comment_id}" references non-existent comment'
                         )
 
-        except (lxml.etree.XMLSyntaxError, Exception) as e:
+        except (lxml.etree.LxmlError, OSError, ValueError) as e:
             errors.append(f"  Error parsing XML: {e}")
 
         if errors:
@@ -432,8 +440,8 @@ class DOCXSchemaValidator(BaseSchemaValidator):
                 if modified:
                     xml_file.write_bytes(dom.toxml(encoding="UTF-8"))
 
-            except Exception:
-                pass
+            except (ExpatError, defusedxml.common.DefusedXmlException, OSError, UnicodeError):
+                continue
 
         return repairs
 

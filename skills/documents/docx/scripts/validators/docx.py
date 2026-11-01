@@ -1,3 +1,7 @@
+# /// script
+# requires-python = ">=3.10"
+# dependencies = ["defusedxml", "lxml"]
+# ///
 """
 Validator for Word document XML files against XSD schemas.
 """
@@ -6,7 +10,10 @@ import random
 import re
 import tempfile
 import zipfile
+from typing import ClassVar
+from xml.parsers.expat import ExpatError
 
+import defusedxml.common
 import defusedxml.minidom
 import lxml.etree
 
@@ -20,7 +27,7 @@ class DOCXSchemaValidator(BaseSchemaValidator):
     WORD_2006_NAMESPACE = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 
     # Word-specific element to relationship type mappings
-    ELEMENT_RELATIONSHIP_TYPES = {}
+    ELEMENT_RELATIONSHIP_TYPES: ClassVar[dict[str, str]] = {}
 
     def repair(self) -> int:
         """Auto-repair common issues. Returns number of repairs made."""
@@ -75,8 +82,8 @@ class DOCXSchemaValidator(BaseSchemaValidator):
                 if modified:
                     xml_file.write_bytes(dom.toxml(encoding="UTF-8"))
 
-            except Exception:
-                pass
+            except (ExpatError, defusedxml.common.DefusedXmlException, OSError, UnicodeError):
+                continue
 
         return repairs
 
@@ -165,7 +172,7 @@ class DOCXSchemaValidator(BaseSchemaValidator):
                                     f"Line {elem.sourceline}: w:t element with whitespace missing xml:space='preserve': {text_preview}"
                                 )
 
-            except (lxml.etree.XMLSyntaxError, Exception) as e:
+            except (lxml.etree.LxmlError, OSError, ValueError) as e:
                 errors.append(
                     f"  {xml_file.relative_to(self.unpacked_dir)}: Error: {e}"
                 )
@@ -214,7 +221,7 @@ class DOCXSchemaValidator(BaseSchemaValidator):
                             f"Line {t_elem.sourceline}: <w:t> found within <w:del>: {text_preview}"
                         )
 
-            except (lxml.etree.XMLSyntaxError, Exception) as e:
+            except (lxml.etree.LxmlError, OSError, ValueError) as e:
                 errors.append(
                     f"  {xml_file.relative_to(self.unpacked_dir)}: Error: {e}"
                 )
@@ -243,7 +250,7 @@ class DOCXSchemaValidator(BaseSchemaValidator):
                 # Count all w:p elements
                 paragraphs = root.findall(f".//{{{self.WORD_2006_NAMESPACE}}}p")
                 count = len(paragraphs)
-            except Exception as e:
+            except (lxml.etree.LxmlError, OSError, ValueError) as e:
                 print(f"Error counting paragraphs in unpacked document: {e}")
 
         return count
@@ -267,7 +274,7 @@ class DOCXSchemaValidator(BaseSchemaValidator):
                 paragraphs = root.findall(f".//{{{self.WORD_2006_NAMESPACE}}}p")
                 count = len(paragraphs)
 
-        except Exception as e:
+        except (lxml.etree.LxmlError, OSError, zipfile.BadZipFile, zipfile.LargeZipFile, RuntimeError, ValueError) as e:
             print(f"Error counting paragraphs in original document: {e}")
 
         return count
@@ -303,7 +310,7 @@ class DOCXSchemaValidator(BaseSchemaValidator):
                         f"Line {elem.sourceline}: <w:delText> within <w:ins>: {text_preview}"
                     )
 
-            except (lxml.etree.XMLSyntaxError, Exception) as e:
+            except (lxml.etree.LxmlError, OSError, ValueError) as e:
                 errors.append(
                     f"  {xml_file.relative_to(self.unpacked_dir)}: Error: {e}"
                 )

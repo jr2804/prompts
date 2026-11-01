@@ -22,7 +22,7 @@ from pathlib import Path
 # Make sibling scripts importable regardless of how this script is invoked
 # (uv run, python -m, etc.).
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from quick_validate import validate_skill  # noqa: E402
+from quick_validate import validate_skill
 
 # Patterns to exclude when packaging skills.
 EXCLUDE_DIRS = {"__pycache__", "node_modules"}
@@ -122,7 +122,7 @@ def package_skill(skill_path, output_dir=None):
         print(f"\n✅ Successfully packaged skill to: {skill_filename}")
         return skill_filename
 
-    except Exception as e:
+    except (OSError, zipfile.LargeZipFile) as e:
         print(f"❌ Error creating .skill file: {e}")
         return None
 

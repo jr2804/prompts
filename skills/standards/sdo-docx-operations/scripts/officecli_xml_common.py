@@ -26,7 +26,7 @@ def load_json_spec(path: Path) -> dict[str, Any]:
     with path.open("r", encoding="utf-8") as handle:
         data = json.load(handle)
     if not isinstance(data, dict):
-        raise ValueError("Spec root must be an object")
+        raise TypeError("Spec root must be an object")
     return data
 
 

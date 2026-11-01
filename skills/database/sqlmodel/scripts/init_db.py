@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.10"
+# dependencies = ["sqlmodel", "SQLAlchemy"]
+# ///
 """
 Database initialization script for SQLModel projects.
 
@@ -11,6 +15,7 @@ This script creates all database tables based on SQLModel definitions.
 import os
 import sys
 
+from sqlalchemy.exc import SQLAlchemyError
 from sqlmodel import SQLModel, create_engine
 
 
@@ -35,7 +40,7 @@ def init_db(database_url: str | None = None) -> None:
 
         print("✅ Database tables created successfully!")
 
-    except Exception as e:
+    except SQLAlchemyError as e:
         print(f"❌ Error initializing database: {e}")
         sys.exit(1)
 
@@ -62,7 +67,7 @@ def drop_db(database_url: str | None = None) -> None:
 
         print("✅ All tables dropped successfully!")
 
-    except Exception as e:
+    except SQLAlchemyError as e:
         print(f"❌ Error dropping tables: {e}")
         sys.exit(1)
 
