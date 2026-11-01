@@ -19,7 +19,8 @@ Kept compact — agents hallucinate less when they know where definitions live.
 | AGENTS.md writing guidance | `agents-md/AGENTS-MD-GUIDELINES.md` | Authoring rules, section order |
 | AGENTS.md template | `agents-md/AGENTS.md` | `{{project-name}}` / `{{project-description}}` template |
 | Commit message format | `instructions/commit-instructions.md` | gitmoji + conventional-commit subject, body rules |
-| Toolchain (tools + tasks) | `.config/mise/config.toml` | `[tools]`, `format-md`, `lint-md`, `format` tasks |
+| Toolchain (tools + tasks) | `.config/mise/config.toml` | `[tools]`, `format`, `lint`, `typecheck`, `format-md`, `lint-md` tasks |
+| Ty type-check policy | `ty.toml` | Ignores `unresolved-import` for standalone consumer-run skill scripts; other type rules stay active |
 | Python structural-sorting config | `.config/pyreorder.toml` | `[module]`, `[strategy]`, `[class_methods]`, `[classification]`, `[transforms]`, `[cli]`, `[discovery]` |
 | Markdown lint/format config | `.config/rumdl.toml` | `line-length`, `flavor`, `exclude`, `per-file-ignores` |
 | Skill spec (external) | <https://agentskills.io/specification> | Canonical Agent Skills Specification |

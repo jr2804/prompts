@@ -96,6 +96,9 @@ hoarding rationale. Cut first; split the subtree only as a last resort.
 ## Verification
 
 ```bash
+# check Python types and apply ty fixes
+mise run typecheck
+
 # lint Python code
 ruff check <paths> --fix
 
@@ -105,6 +108,11 @@ uv run pytest <paths> -v --tb=short
 # validate a skill against the Agent Skills spec
 uvx skills-ref validate <path-to-skill>
 ```
+
+`mise run typecheck` ignores unresolved imports because this repository contains
+standalone, consumer-run skill scripts with per-script dependencies and
+execution environments. Other type rules remain enabled. Revisit this global
+rule if adding application code; it is configured in `ty.toml`.
 
 ## Response format
 

@@ -47,6 +47,11 @@ run = [
 description = "Run linter (ruff)"
 run = 'ruff check ./ --fix --unsafe-fixes'
 
+[tasks.typecheck]
+description = "Check Python types and apply fixes"
+env = { TY_CONFIG_FILE = "ty.toml" }
+run = "ty check ./ --fix"
+
 [tasks.format-md]
 description = "Format Markdown files with rumdl"
 run = "rumdl fmt --config .config/rumdl.toml ./"

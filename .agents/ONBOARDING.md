@@ -17,8 +17,11 @@ mise up
 # run Python helper scripts (ALWAYS through uv)
 uv run ./skills/skill-creator/scripts/<script>.py
 
-# lint Python code
-ruff check <paths> --fix
+# check Python types (applies ty fixes)
+mise run typecheck
+
+# lint Python code and apply fixes
+mise run lint
 
 # lint Markdown files (no writes)
 mise run lint-md
@@ -32,6 +35,11 @@ uv run pytest <paths> -v --tb=short
 # validate a skill against the Agent Skills spec
 uvx skills-ref validate <path-to-skill>
 ```
+
+Ty ignores unresolved imports because this repository contains standalone,
+consumer-run skill scripts with per-script dependencies and environments; other
+type rules remain enabled. Revisit this global rule if adding application code.
+See `ty.toml`.
 
 ## Entry points (read these first)
 

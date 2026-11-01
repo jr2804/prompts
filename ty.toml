@@ -1,0 +1,4 @@
+# Skill scripts are consumer-managed assets; their runtime dependencies and local
+# import paths vary by the consumer's execution environment.
+[rules]
+unresolved-import = "ignore"
