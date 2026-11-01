@@ -51,8 +51,7 @@ def get_bounding_box_messages(fields_json_stream) -> list[str]:
                         "Aborting further checks; fix bounding boxes and try again"
                     )
                     return messages
-        if ri.rect_type == "entry":
-            if "entry_text" in ri.field:
+        if ri.rect_type == "entry" and "entry_text" in ri.field:
                 font_size = ri.field["entry_text"].get("font_size", 14)
                 entry_height = ri.rect[3] - ri.rect[1]
                 if entry_height < font_size:
