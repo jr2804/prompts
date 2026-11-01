@@ -3,11 +3,11 @@ name: python-ultimate
 description: >-
   Comprehensive Python development skill covering coding standards, CLI development,
   linting, testing, debugging, refactoring, code review, auditing, documentation,
-  project planning, and bulk operations. Use when writing, reviewing, refactoring,
-  debugging, or documenting Python code; configuring linters; setting up CLI tools;
-  planning features; performing code audits; checking Python antipatterns, forbidden
-  methods, or bad style; or handling bulk operations (10+ files) that benefit from
-  batch workflows instead of per-file iteration.
+  project planning, uv project management, and standalone scripts. Use when writing,
+  reviewing, refactoring, debugging, or documenting Python code; configuring linters;
+  managing uv projects or standalone scripts; setting up CLI tools; planning features;
+  performing code audits; checking Python antipatterns, forbidden methods, or bad
+  style; or handling bulk operations (10+ files) that benefit from batch workflows.
 license: MIT
 ---
 
@@ -39,7 +39,7 @@ An optional topic/sub-command selects a focused review. If none is provided, per
 
 | Topic | What it covers | Canonical reference |
 | --- | --- | --- |
-| `naming` | File and directory variable naming | [naming-conventions.md](references/naming-conventions.md) |
+| `naming` | File and directory variable naming; forbidden-scan fixtures | [naming-conventions.md](references/naming-conventions.md) |
 | `type-checking` | `TYPE_CHECKING`, shared types, import cycles | [type-checking.md](references/type-checking.md) |
 | `type-design` | `StrEnum`, `Literal`, repeated strings, structured data | [type-design.md](references/type-design.md) |
 | `imports` | Required and optional dependency imports | [imports-optional-dependencies.md](references/imports-optional-dependencies.md) |
@@ -50,6 +50,12 @@ An optional topic/sub-command selects a focused review. If none is provided, per
 | `audit` | Six-dimension codebase audit | [auditing.md](references/auditing.md) |
 | `verification` | Evidence-based completion claims | [verification.md](references/verification.md) |
 | `code-review` | Evaluating and responding to review feedback | [code-review.md](references/code-review.md) |
+| `documentation` | Documentation workflow, structure, and diagrams | [documentation.md](references/documentation.md) |
+| `file-analysis` | Non-destructive file and codebase analysis | [file-analysis.md](references/file-analysis.md) |
+| `planning` | Feature planning and plan structure | [planning.md](references/planning.md) |
+| `project-setup` | Project structure, dependencies, and imports | [project-setup.md](references/project-setup.md) |
+| `cli` | Command-line framework and application patterns | [cli-development.md](references/cli-development.md) |
+| `python-versions` | Python-version selection and compatibility | [uv-python-versions.md](references/uv-python-versions.md) |
 | `uv` | Python execution through `uv run` | [uv.md](references/uv.md) |
 | `uv-scripts` | PEP 723 standalone scripts | [uv-scripts.md](references/uv-scripts.md) |
 | `uv-projects` | Project setup, dependencies, and locking | [uv-projects.md](references/uv-projects.md) |

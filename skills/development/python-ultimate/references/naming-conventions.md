@@ -117,16 +117,20 @@ file_output = Path("output.txt")  # Should be: output_file
 
 ### 1.5 Automated Validation
 
-Use the included validator script to check naming:
+From the repository root, use the included validator to check naming:
 
 ```bash
 # Check a single variable name
-uv run assets/check_path_naming.py output_file
+uv run skills/development/python-ultimate/assets/check_path_naming.py output_file
 # Output: is_file
 
 # Scan Python files for violations
-uv run assets/check_path_naming.py --check-files src/
+uv run skills/development/python-ultimate/assets/check_path_naming.py --check-files src/
+# Scan forbidden patterns; fixture counts are documented in the expected-output guide
+uv run skills/development/python-ultimate/assets/check_path_naming.py --check-forbidden skills/development/python-ultimate/assets/examples/
 ```
+
+See the [forbidden-scan fixture expectations](../assets/examples/forbidden-scan-expected.md).
 
 ______________________________________________________________________
 

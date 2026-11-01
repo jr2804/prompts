@@ -19,13 +19,13 @@ ______________________________________________________________________
 
 ### Allowed Operations
 
-| Tool | Purpose | Safe for Large Files |
+| Capability | Purpose | Safe for Large Files |
 |------|---------|---------------------|
-| `Read` | View file contents | Partial reads with offset/limit |
-| `stat` / `bash ls` | File metadata | Yes |
+| File inspection | View file contents; use bounded reads for large files | Partial reads with offsets/limits |
+| Filesystem metadata/listing | File sizes, timestamps, and directory contents | Yes |
 | `wc -l` | Line counting | Yes |
-| `Grep` | Pattern searching | Yes |
-| `Glob` | File discovery | Yes |
+| Text search (for example, `rg`) | Pattern searching | Yes |
+| File discovery (for example, `find` or `rg --files`) | Locate files by path or pattern | Yes |
 
 ### Forbidden Operations
 
@@ -103,30 +103,30 @@ ______________________________________________________________________
 
 ### Count Matches
 
-```text
-Grep(pattern="^def ", output_mode="count", path="src/")
-Grep(pattern="^class ", output_mode="count", path="src/")
-Grep(pattern="^import ", output_mode="count", path="src/")
+```bash
+rg -c '^def ' src/
+rg -c '^class ' src/
+rg -c '^import ' src/
 ```
 
 ### Find with Line Numbers
 
-```text
-Grep(pattern="TODO|FIXME|HACK", output_mode="content", -n=true)
+```bash
+rg -n 'TODO|FIXME|HACK' .
 ```
 
 ### Find Files by Pattern
 
-```text
-Glob(pattern="**/*.py")
-Glob(pattern="**/*.md", path="docs/")
+```bash
+rg --files -g '*.py'
+rg --files docs/ -g '*.md'
 ```
 
 ### Search with Inclusion Filter
 
-```text
-Grep(pattern="function", include="*.js", path="src/")
-Grep(pattern="class", include="*.ts", path=".")
+```bash
+rg -n 'function' src/ -g '*.js'
+rg -n 'class' . -g '*.ts'
 ```
 
 ### Common Patterns for Code Analysis
@@ -147,10 +147,10 @@ ______________________________________________________________________
 
 ### Analyze File Structure
 
-1. Read the file to understand structure
-2. Count functions: `Grep(pattern="^def ", output_mode="count")`
-3. Count classes: `Grep(pattern="^class ", output_mode="count")`
-4. Count imports: `Grep(pattern="^import |^from ", output_mode="count")`
+1. Inspect the file to understand its structure
+2. Count functions: `rg -c '^def ' file.py`
+3. Count classes: `rg -c '^class ' file.py`
+4. Count imports: `rg -c '^(import |from )' file.py`
 
 ### Code Quality Metrics
 
@@ -159,10 +159,10 @@ ______________________________________________________________________
 find . -name "*.py" -not -path "./venv/*" | xargs wc -l
 
 # Comment lines
-Grep(pattern="^[[:space:]]*#", output_mode="count", include="*.py")
+rg -c '^[[:space:]]*#' -g '*.py' .
 
 # Blank lines
-Grep(pattern="^$", output_mode="count", include="*.py")
+rg -c '^$' -g '*.py' .
 
 # Calculate comment ratio
 # (comment lines / total lines) * 100
@@ -181,24 +181,31 @@ ______________________________________________________________________
 
 ### Comprehensive File Analysis Workflow
 
-1. **Get metadata**: `stat -f "%z bytes, modified %Sm" file.py`
+1. **Get metadata**: use the platform's file metadata command
 2. **Count lines**: `wc -l file.py`
-3. **Read file**: `Read(file_path="file.py")`
-4. **Count functions**: `Grep(pattern="^def ", output_mode="count")`
-5. **Count classes**: `Grep(pattern="^class ", output_mode="count")`
+3. **Inspect file**: use a file viewer or editor in read-only mode
+4. **Count functions**: `rg -c '^def ' file.py`
+5. **Count classes**: `rg -c '^class ' file.py`
 
 ### Compare File Sizes
 
-1. **Find files**: `Glob(pattern="src/**/*.py")`
+1. **Find files**: `rg --files src/ -g '*.py'`
 2. **Get sizes**: `ls -lh src/**/*.py`
 3. **Total size**: `du -sh src/`
 
 ### Project-wide Analysis
 
-1. **Count all source files**: `Glob(pattern="**/*.py")` then count
+1. **Count all source files**: `rg --files -g '*.py' | wc -l`
 2. **Lines per file**: `find . -name "*.py" | xargs wc -l | sort -n`
 3. **Identify largest files**: `du -ah . | sort -rh | head -20`
 4. **Find duplicate names**: `find . -name "*.py" | xargs -I{} basename {} | sort | uniq -c | sort -rn`
+
+From the repository root, [examples/codebase_audit.py](../examples/codebase_audit.py)
+provides a runnable complexity and file-size audit example:
+
+```bash
+uv run skills/development/python-ultimate/examples/codebase_audit.py
+```
 
 ### Integration with Other Skills
 
@@ -211,8 +218,8 @@ ______________________________________________________________________
 ## Best Practices
 
 1. **Always prefer read-only**: Never modify files during analysis
-2. **Use efficient tools**: Read small files fully, use Grep for large files
+2. **Use efficient tools**: inspect small files fully and search large files by pattern
 3. **Context-aware**: Compare to project averages
-4. **Partial reads for large files**: Use `Read` with offset/limit
-5. **Chain operations**: Combine Glob + Grep for targeted analysis
+4. **Partial reads for large files**: use bounded reads with offsets and limits
+5. **Chain operations**: combine file discovery and text search for targeted analysis
 6. **Sort and filter**: Use `sort`, `head`, `tail` for useful outputs

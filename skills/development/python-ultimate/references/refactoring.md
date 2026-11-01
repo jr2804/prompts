@@ -20,98 +20,98 @@ Workflow: Find → Replace → Verify.
 
 ### 1. Find All Occurrences
 
-```text
-Grep(pattern="oldName", output_mode="files_with_matches")           # Find files
-Grep(pattern="oldName", output_mode="content", -n=true, -B=2, -A=2) # Verify with context
+```bash
+rg -l 'oldName' src/                 # Files containing the name
+rg -n -C 2 'oldName' src/            # Matches with surrounding context
 ```
 
 ### 2. Replace All Instances
 
-```text
-Edit(
-  file_path="src/api.js",
-  old_string="oldName",
-  new_string="newName",
-  replace_all=true
-)
-```
+Use an editor or a narrowly scoped script to replace the exact old text with
+its replacement. Review the resulting diff before applying additional changes.
 
 ### 3. Verify Changes
 
-```text
-Grep(pattern="oldName", output_mode="files_with_matches")  # Should return none
-Grep(pattern="newName", output_mode="content", -n=true)     # Confirm replacements
+```bash
+rg -n 'oldName' src/                 # No output means no remaining matches
+rg -n 'newName' src/                 # Confirm replacement locations
 ```
 
 ______________________________________________________________________
 
 ## Bulk Operations
 
-**Use Grep + Edit with replace_all for 1-9 files.**
+For a small number of files, search for matches, inspect each context, edit the
+intended occurrences, and verify the diff.
 
 ### Rename Function
 
-1. Find: `Grep(pattern="getUserData", output_mode="files_with_matches")`
-2. Count occurrences and inform user of scope
-3. Replace in each file with `replace_all=true`
-4. Verify: Re-run Grep for old name (should be empty)
-5. Suggest running tests
+1. Find files: `rg -l 'getUserData' src/`
+2. Inspect matches and count occurrences; establish scope before editing.
+3. Replace only intended occurrences, accounting for comments and strings.
+4. Verify: `rg -n 'getUserData' src/` should return no matches.
+5. Run relevant tests.
 
 ### Replace Deprecated Pattern
 
-1. Find: `Grep(pattern="\\bvar\\s+\\w+", output_mode="content", -n=true)`
-2. Analyze: Check if reassigned (let) or constant (const)
-3. Replace: `Edit(old_string="var count = 0", new_string="let count = 0")`
-4. Verify: `Grep` for deprecated pattern returns empty
+1. Find: `rg -n '\bvar\s+\w+' src/`
+2. Analyze whether each occurrence should be reassigned or constant.
+3. Replace only reviewed matches.
+4. Verify that no unintended deprecated patterns remain.
 
 ### Update API Calls
 
-1. Find: `Grep(pattern="/api/auth/login", output_mode="content", -n=true)`
-2. Replace: `Edit(old_string="'/api/auth/login'", new_string="'/api/v2/auth/login'", replace_all=true)`
-3. Test: Recommend integration tests
+1. Find: `rg -n '/api/auth/login' src/`
+2. Replace the intended endpoint occurrences.
+3. Run relevant integration tests.
 
 ______________________________________________________________________
 
 ## Code Transfer
 
-Workflow: Read → Extract → Insert.
+Workflow: inspect → extract → insert.
 
 ### Copy Function Between Files
 
-1. Find: `Grep(pattern="def validate_user", -n=true, -A=20)`
-2. Extract: `Read(file_path="auth.py", offset=45, limit=15)`
-3. Check target: `Read(file_path="validators.py")`
-4. Insert: Use Edit or line_insert.py
+1. Locate the definition with a search such as `rg -n -A 20 'def validate_user' src/`.
+2. Inspect the full definition, including decorators and related imports.
+3. Check the target module for naming conflicts and existing dependencies.
+4. Insert the code, update imports, and test both modules.
+
+### Extract Functions to a New File
+
+From the repository root, [examples/extract_functions.py](../examples/extract_functions.py)
+provides a typed helper that moves matching module-level `def` and `async def`
+definitions, including decorators. It creates a new target without overwriting an
+existing file and removes moved definitions from the source only after staging
+both outputs. This is a mechanical text move, not a dependency-aware refactor: it
+copies imports but does not migrate module-level helpers/constants, callers, or
+other imports. Inspect and update those references manually, then test both modules.
+
+```bash
+uv run skills/development/python-ultimate/examples/extract_functions.py \
+  path/to/source.py path/to/new_module.py '.*_util$'
+```
+
+Replace the example paths and pattern with the project-specific values. The target
+must not already exist. Review the diff and test both modules after the move.
 
 ### Extract Class to New File
 
-1. Locate: `Grep(pattern="class DatabaseConnection", -n=true, -A=50)`
-2. Extract: `Read(file_path="original.py", offset=100, limit=50)`
-3. Create: `Write(file_path="database.py", content="<extracted>")`
-4. Update imports: `Edit` in original file
-5. Remove old class: `Edit` with replacement
-
-### Insert Relative to Content
-
-Use **Edit** when insertion point is relative to existing code:
-
-```text
-Edit(
-  file_path="src/utils.py",
-  old_string="def existing():\n    pass",
-  new_string="def existing():\n    pass\n\ndef new():\n    return True"
-)
-```
+1. Locate the definition, for example `rg -n -A 50 'class DatabaseConnection' src/`.
+2. Inspect the full class and its dependencies.
+3. Create the target module, update imports in the source, then remove the old class.
+4. Check for import cycles and test both modules.
 
 ______________________________________________________________________
 
 ## Line-Based Operations
 
 Prefer context-aware edits over fixed line numbers because earlier changes can
-shift the target. For a new file or a user-specified insertion line, use the
+shift the target. For a new file or a user-specified insertion line, use an
 available editor or a small script, then inspect the resulting diff and run
-syntax/tests. Do not rely on an external `line_insert.py` helper unless it is
-present in the current repository and its behavior has been verified.
+syntax checks and tests. Do not rely on an external insertion helper unless it
+is present in the current repository and its behavior has been verified.
 
 ______________________________________________________________________
 
@@ -150,34 +150,19 @@ ______________________________________________________________________
 
 **Verify after each change.**
 
-1. **Search** → Find all instances first
-2. **Analyze** → Verify changes are appropriate
-3. **Inform** → Tell user of scope before proceeding
-4. **Execute** → Make changes
-5. **Verify** → Confirm changes applied correctly
-6. **Test** → Suggest running tests
+1. **Search** → Find all instances first.
+2. **Analyze** → Verify changes are appropriate.
+3. **Inform** → Tell user of scope before proceeding.
+4. **Execute** → Make changes.
+5. **Verify** → Confirm changes applied correctly.
+6. **Test** → Run relevant checks.
 
 ### Always Check
 
-- Strings/comments: Ask if should update
-- Exported APIs: Warn of breaking changes
-- Case sensitivity: Be explicit in patterns
-- Import statements: Update after moving code
-
-### Tool Reference
-
-**Edit with replace_all:**
-
-- `replace_all=true`: Replace all occurrences
-- `replace_all=false`: Replace only first (or fail if multiple)
-- Must match EXACTLY (whitespace, quotes)
-
-**Grep options:**
-
-- `-n=true`: Show line numbers
-- `-B=N, -A=N`: Context lines before/after
-- `-i=true`: Case-insensitive
-- `type="py"`: Filter by file type
+- Strings/comments: clarify whether they should change.
+- Exported APIs: warn of breaking changes.
+- Case sensitivity: be explicit in search patterns.
+- Import statements: update after moving code.
 
 ______________________________________________________________________
 
@@ -185,24 +170,23 @@ ______________________________________________________________________
 
 ### Planning Checklist
 
-- [ ] Find all instances first
-- [ ] Review context of each match
-- [ ] Inform user of scope
-- [ ] Consider edge cases (strings, comments)
-- [ ] Identify exact start/end of code blocks
-- [ ] Check target file structure
+- [ ] Find all instances first.
+- [ ] Review context of each match.
+- [ ] Inform user of scope.
+- [ ] Consider edge cases (strings, comments).
+- [ ] Identify exact start/end of code blocks.
+- [ ] Check target file structure.
 
 ### Preservation Checklist
 
-- [ ] Include docstrings and comments
-- [ ] Transfer related functions together
-- [ ] Update imports in both source and target
-- [ ] Maintain formatting/indentation
-- [ ] Use `--backup` for significant changes
+- [ ] Include docstrings and comments.
+- [ ] Transfer related functions together.
+- [ ] Update imports in both source and target.
+- [ ] Maintain formatting and indentation.
 
 ### Validation Checklist
 
-- [ ] Verify insertion placement
-- [ ] Check syntax after changes
-- [ ] Test imports work correctly
-- [ ] Run project tests
+- [ ] Verify insertion placement.
+- [ ] Check syntax after changes.
+- [ ] Test imports work correctly.
+- [ ] Run project tests.

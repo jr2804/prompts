@@ -62,7 +62,7 @@ ______________________________________________________________________
 Run coverage with fail-under:
 
 ```bash
-pytest --cov=src --cov-report=term-missing --cov-fail-under=90 tests/
+uv run pytest --cov=src --cov-report=term-missing --cov-fail-under=90 tests/
 ```
 
 ______________________________________________________________________
@@ -268,16 +268,16 @@ uv run pytest -k "test_process"
 
 ```bash
 # Stop on first failure
-pytest -x
+uv run pytest -x
 
 # Show local variables in tracebacks
-pytest -l
+uv run pytest -l
 
 # Run only failed tests from last run
-pytest --lf
+uv run pytest --lf
 
 # Run tests with output capture disabled
-pytest -s
+uv run pytest -s
 ```
 
 ______________________________________________________________________

@@ -35,7 +35,7 @@ ______________________________________________________________________
 
 **Problem Pattern:** Imports placed after executable code in a module.
 
-**Fix Pattern:** Move all imports to the top of the module, grouped by standard library, third-party, then local imports.
+**Fix Pattern:** Keep module-level imports at the top by default, grouped by standard library, third-party, then local imports. Follow [canonical import guidance](imports-optional-dependencies.md) for justified local imports.
 
 **Example:**
 
@@ -167,7 +167,7 @@ ______________________________________________________________________
 
 **Problem Pattern:** Imports buried within function bodies, making dependencies unclear.
 
-**Fix Pattern:** Move imports to module level with proper grouping.
+**Fix Pattern:** Prefer module-level imports; see [canonical import guidance](imports-optional-dependencies.md) for justified local imports.
 
 **Example:**
 
@@ -301,7 +301,7 @@ ______________________________________________________________________
 | **Test Code** | Use pytest fixtures (`tmp_path`) for temp files |
 | **CLI (Typer)** | Use `Annotated` pattern, do not fix B008 |
 | **Data Science** | Prefer NumPy `default_rng()` over standard `random` |
-| **Imports** | Always move to module level with proper grouping |
+| **Imports** | Module level by default; see [canonical import guidance](imports-optional-dependencies.md) for exceptions |
 
 **When in doubt:**
 

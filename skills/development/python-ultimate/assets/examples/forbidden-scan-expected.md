@@ -1,11 +1,13 @@
 # Forbidden Scan Fixtures: Expected Output
 
-Use these fixtures to validate `--check-forbidden` behavior from `assets/check_path_naming.py`.
+Use these fixtures to validate `--check-forbidden` behavior from
+`skills/development/python-ultimate/assets/check_path_naming.py`. Run the command
+below from the repository root.
 
 ## Command
 
 ```bash
-uv run assets/check_path_naming.py --check-forbidden assets/examples/
+uv run skills/development/python-ultimate/assets/check_path_naming.py --check-forbidden skills/development/python-ultimate/assets/examples/
 ```
 
 ## Expected Matches by File

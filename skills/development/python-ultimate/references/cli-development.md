@@ -309,6 +309,7 @@ import sys
 
 console = Console()
 
+
 def handle_cli_error(error, context="CLI", verbose: bool = False) -> int:
     """Handle errors with user-friendly messages, return exit code"""
     if isinstance(error, FileNotFoundError):
@@ -319,8 +320,8 @@ def handle_cli_error(error, context="CLI", verbose: bool = False) -> int:
         console.print(f"[red]✗[/red] Permission denied: {error.filename}")
         console.print("[yellow]⚠[/yellow] Try running with elevated privileges")
         return 1
-    elif isinstance(error, ValueError) as e:
-        console.print(f"[red]✗[/red] Invalid value: {str(e)}")
+    elif isinstance(error, ValueError):
+        console.print(f"[red]✗[/red] Invalid value: {str(error)}")
         return 1
     else:
         console.print(f"[red]✗[/red] {context} error: {str(error)}")
@@ -328,15 +329,18 @@ def handle_cli_error(error, context="CLI", verbose: bool = False) -> int:
             console.print_exception()
         return 1
 
+
 def suggest_similar_files(filename: str) -> None:
     """Suggest similar files when file not found"""
     import os
+
     directory = os.path.dirname(filename)
     basename = os.path.basename(filename)
     if os.path.exists(directory):
         matches = [f for f in os.listdir(directory) if basename.lower() in f.lower()]
         if matches:
             console.print(f"[cyan]Did you mean:[/cyan] {', '.join(matches)}")
+
 
 # Main entry point with error handling
 def main():

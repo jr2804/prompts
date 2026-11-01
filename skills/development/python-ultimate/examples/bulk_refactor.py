@@ -1,10 +1,12 @@
 # /// script
 # requires-python = ">=3.10"
+# dependencies = []
 # ///
 
 """Preview or apply a textual Python-identifier rename across a project."""
 
 import argparse
+import keyword
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -77,8 +79,13 @@ def plan_identifier_rename(
     new_name: str,
 ) -> list[PlannedChange]:
     """Find textual identifier matches without modifying files."""
-    if not old_name.isidentifier() or not new_name.isidentifier():
-        raise ValueError("Old and new names must be valid Python identifiers")
+    if (
+        not old_name.isidentifier()
+        or not new_name.isidentifier()
+        or keyword.iskeyword(old_name)
+        or keyword.iskeyword(new_name)
+    ):
+        raise ValueError("Old and new names must be non-keyword Python identifiers")
 
     pattern = re.compile(rf"\b{re.escape(old_name)}\b")
     changes: list[PlannedChange] = []

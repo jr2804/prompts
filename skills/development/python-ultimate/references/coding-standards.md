@@ -87,7 +87,7 @@ For reusable finite domain values, use a `StrEnum` rather than
 - Use `T | None` instead of `Optional[T]`
 - Use precise types (str, int, Path, etc.) — never default to `object` or `Any`
 - If you need a union of known types, use `|`: `str | int | Path`
-- For structured objects with known fields, define a `typing.Protocol` or `@dataclass`
+- Use `typing.Protocol` to describe required behavior; use `@dataclass` for records with known fields
 - Only use `typing.Any` for genuinely dynamic values (e.g., binary blobs from embedded Python)
 - When `Any` is truly unavoidable, prefer `typing.Any` over bare `object`
 

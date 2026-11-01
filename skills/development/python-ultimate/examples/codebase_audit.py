@@ -1,7 +1,12 @@
+# /// script
+# requires-python = ">=3.10"
+# dependencies = []
+# ///
+
 """
 Example: Comprehensive Codebase Audit
 
-Analyze code quality across entire project with minimal tokens.
+Analyze code quality across a project with an emphasis on complexity and file size.
 """
 
 import ast

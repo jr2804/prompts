@@ -70,16 +70,16 @@ ______________________________________________________________________
 
 ```bash
 # Run tests
-pytest
-pytest tests/
+uv run pytest
+uv run pytest tests/
 
 # Lint
-ruff check .
-ruff check src/
+uv run ruff check .
+uv run ruff check src/
 
 # Type check
-mypy src/
-mypy .
+uv run mypy src/
+uv run mypy .
 
 # Build
 uv run python -m build

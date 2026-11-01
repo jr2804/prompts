@@ -8,22 +8,24 @@
 This script checks if a given variable name follows the python-ultimate
 naming conventions for files, directories, and paths.
 
+Run these commands from the repository root:
+
 Usage:
-    uv run check_path_naming.py <name>
-    uv run check_path_naming.py --check-files <python-file-or-directory>
-    uv run check_path_naming.py --check-forbidden <python-file-or-directory>
+    uv run skills/development/python-ultimate/assets/check_path_naming.py <name>
+    uv run skills/development/python-ultimate/assets/check_path_naming.py --check-files <python-file-or-directory>
+    uv run skills/development/python-ultimate/assets/check_path_naming.py --check-forbidden <python-file-or-directory>
 
 Examples:
-    uv run check_path_naming.py output_file
+    uv run skills/development/python-ultimate/assets/check_path_naming.py output_file
     # Output: is_file
 
-    uv run check_path_naming.py cache_dir
+    uv run skills/development/python-ultimate/assets/check_path_naming.py cache_dir
     # Output: is_dir
 
-    uv run check_path_naming.py --check-files src/
+    uv run skills/development/python-ultimate/assets/check_path_naming.py --check-files src/
     # Output: List of violations in Python files
 
-    uv run check_path_naming.py --check-forbidden src/
+    uv run skills/development/python-ultimate/assets/check_path_naming.py --check-forbidden src/
     # Output: List of forbidden pattern matches in Python files
 """
 
@@ -48,13 +50,16 @@ FORBIDDEN_REASON: dict[str, str] = {
 }
 
 
-class PathValidity(enum.StrEnum):
+class PathValidity(str, enum.Enum):
     """Validation results for path variable naming."""
 
     FILE = "is_file"
     DIR = "is_dir"
     PATH = "is_path_exceptional"
     INVALID = "invalid"
+
+    def __str__(self) -> str:
+        return self.value
 
 
 def main() -> int:
@@ -233,7 +238,9 @@ def scan_python_file(file_path: Path) -> list[tuple[int, str, str]]:
 
     try:
         content = file_path.read_text(encoding="utf-8")
-    except Exception:
+    except OSError:
+        return violations
+    except UnicodeError:
         return violations
 
     for line_num, line in enumerate(content.splitlines(), 1):
@@ -412,7 +419,9 @@ def scan_forbidden_patterns(file_path: Path) -> list[tuple[int, str, str]]:
 
     try:
         content = file_path.read_text(encoding="utf-8")
-    except Exception:
+    except OSError:
+        return matches
+    except UnicodeError:
         return matches
 
     found: set[tuple[int, str]] = set()
@@ -423,13 +432,19 @@ def scan_forbidden_patterns(file_path: Path) -> list[tuple[int, str, str]]:
         return matches
 
     for node in ast.walk(tree):
-        if isinstance(node, ast.ImportFrom) and node.module == "typing":
-            if any(alias.name == "TYPE_CHECKING" for alias in node.names):
-                found.add((node.lineno, "TYPE_CHECKING guard"))
+        if (
+            isinstance(node, ast.ImportFrom)
+            and node.module == "typing"
+            and any(alias.name == "TYPE_CHECKING" for alias in node.names)
+        ):
+            found.add((node.lineno, "TYPE_CHECKING guard"))
 
-        if isinstance(node, ast.If):
-            if isinstance(node.test, ast.Name) and node.test.id == "TYPE_CHECKING":
-                found.add((node.lineno, "TYPE_CHECKING guard"))
+        if (
+            isinstance(node, ast.If)
+            and isinstance(node.test, ast.Name)
+            and node.test.id == "TYPE_CHECKING"
+        ):
+            found.add((node.lineno, "TYPE_CHECKING guard"))
 
         if isinstance(node, ast.Subscript):
             value = node.value
@@ -443,9 +458,10 @@ def scan_forbidden_patterns(file_path: Path) -> list[tuple[int, str, str]]:
             ):
                 found.add((node.lineno, "Optional[T]"))
 
-        if isinstance(node, ast.Import):
-            if any(alias.name == "os.path" for alias in node.names):
-                found.add((node.lineno, "os.path usage"))
+        if isinstance(node, ast.Import) and any(
+            alias.name == "os.path" for alias in node.names
+        ):
+            found.add((node.lineno, "os.path usage"))
 
         if isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name):
             if node.value.id == "os" and node.attr == "path":
@@ -453,9 +469,12 @@ def scan_forbidden_patterns(file_path: Path) -> list[tuple[int, str, str]]:
             if node.value.id == "sys" and node.attr == "path":
                 found.add((node.lineno, "sys.path manipulation"))
 
-        if isinstance(node, ast.ExceptHandler) and node.type is not None:
-            if isinstance(node.type, ast.Name) and node.type.id == "ImportError":
-                found.add((node.lineno, "defensive required import"))
+        if (
+            isinstance(node, ast.ExceptHandler)
+            and isinstance(node.type, ast.Name)
+            and node.type.id == "ImportError"
+        ):
+            found.add((node.lineno, "defensive required import"))
 
     token_stream = tokenize.generate_tokens(io.StringIO(content).readline)
     for token in token_stream:

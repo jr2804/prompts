@@ -21,9 +21,9 @@ ______________________________________________________________________
 
 Follow this process to document a codebase:
 
-1. **Explore** — Launch Explore agent for thorough codebase investigation
-2. **Map** — Use Glob to map directory structure and entry points
-3. **Read** — Analyze README, entry points, core modules, configuration
+1. **Explore** — Use available codebase search and file-inspection capabilities to investigate the project
+2. **Map** — Discover directory structure and entry points with filesystem search
+3. **Inspect** — Analyze the README, entry points, core modules, and configuration
 4. **Synthesize** — Merge findings into cohesive documentation
 
 ### Depth Levels
