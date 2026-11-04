@@ -1,6 +1,6 @@
 # /// script
 # requires-python = ">=3.10"
-# dependencies = ["ruff"]
+# dependencies = ["ruff", "pyyaml"]
 # ///
 
 """Pin the exit-code contract documented in ``references/linter-rules.md``.
@@ -27,16 +27,64 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import types
 import unittest
+from importlib.metadata import packages_distributions
+from importlib.util import module_from_spec, spec_from_file_location
 from pathlib import Path
 
 scanner_file = Path(__file__).with_name("check_antipatterns.py")
+
+
+def _load_scanner_module() -> types.ModuleType:
+    """Import the sibling scanner by path, without touching ``sys.path``.
+
+    This file runs as a standalone PEP 723 script, so there is no package to
+    import a sibling from. Loading it by path keeps the table under test and the
+    table the scanner uses the *same object* - a copy in this file would go stale
+    without anything failing.
+
+    Done this way rather than with ``sys.path.insert``: the skill's antipattern
+    index forbids ``sys.path`` manipulation, and a test that breaks the rule it
+    is testing invites a reader to assume the rule has exceptions it does not
+    have.
+    """
+    spec = spec_from_file_location("check_antipatterns_under_test", scanner_file)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"cannot load {scanner_file} for the table tests")
+    module = module_from_spec(spec)
+    # Register before executing: ``@dataclass`` resolves each class through
+    # ``sys.modules[cls.__module__]``, so an unregistered module raises
+    # ``AttributeError: 'NoneType' object has no attribute '__dict__'`` at the
+    # first dataclass in the file, far from the line that caused it.
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+_scanner = _load_scanner_module()
+_ALIAS_HINTS: dict[str, str] = _scanner._ALIAS_HINTS
+_normalize = _scanner._normalize
 
 PROJECT_WITH_REQUESTS = """\
 [project]
 name = "demo"
 version = "0.1.0"
 dependencies = ["requests"]
+"""
+
+PROJECT_WITH_PILLOW = """\
+[project]
+name = "demo"
+version = "0.1.0"
+dependencies = ["pillow"]
+"""
+
+PROJECT_WITH_PYYAML = """\
+[project]
+name = "demo"
+version = "0.1.0"
+dependencies = ["pyyaml"]
 """
 
 BUILD_SYSTEM_ONLY = """\
@@ -86,17 +134,23 @@ class ScannerContractTest(unittest.TestCase):
         return path
 
     def run_scanner(
-        self, *args: str | Path, isolated: bool = False
+        self,
+        *args: str | Path,
+        isolated: bool = False,
+        scanner: Path | None = None,
     ) -> subprocess.CompletedProcess[str]:
         """Run the scanner and return the completed process.
 
         *isolated* hides installed distributions, which is how the empty
         import-to-distribution map is reproduced without uninstalling anything.
+
+        *scanner* overrides the script under test, so a test can run a copy with
+        one fact deliberately removed and prove that the fact is load-bearing.
         """
         command = [sys.executable]
         if isolated:
             command += ["-I", "-S"]
-        command += [str(scanner_file), *[str(argument) for argument in args]]
+        command += [str(scanner or scanner_file), *[str(argument) for argument in args]]
         return subprocess.run(
             command,
             capture_output=True,
@@ -226,16 +280,103 @@ class ScannerContractTest(unittest.TestCase):
             1,
         )
 
-    def test_alias_needs_the_distribution_map_or_fails_loudly(self) -> None:
-        """Without the map an alias is *unknown*, not undeclared.
+    def test_alias_resolves_without_the_distribution_map(self) -> None:
+        """A hinted alias is decidable even when its distribution is absent.
 
-        Reporting it as undeclared would invent a finding; passing it silently
-        would hide one. Neither is acceptable, so the scan fails instead.
+        This test used to assert exit ``2`` here, on the reasoning that with no
+        map entry for ``PIL`` the alias could not be resolved. That reasoning was
+        wrong in the direction that matters: the hint table already says ``PIL``
+        is ``pillow``, and a declared ``pillow`` guarded by an ``ImportError``
+        handler is a finding. Declining the question produced an error where the
+        scan had the answer.
+
+        The undecidable case is a declaration with *no* hint, covered by
+        ``test_unhinted_absent_declaration_makes_the_verdict_undecidable``.
         """
-        self.guarded_dependency(PROJECT_WITH_REQUESTS, "PIL")
+        self.guarded_dependency(PROJECT_WITH_PILLOW, "PIL")
         process = self.run_scanner(self.root_dir / "module.py", isolated=True)
+        self.assertIn("PIL", process.stdout)
+        self.assertExit(process, 1)
+
+    def test_alias_hint_resolves_the_declaration_instead_of_bailing_out(self) -> None:
+        """A hint exists so the alias can be *resolved*, not so the scan can give up.
+
+        With ``pyyaml`` declared and absent from the environment, a guard on
+        ``yaml`` is a guard around a declared dependency - dead weight, exit
+        ``1``. The hint table is what makes that provable when
+        ``importlib.metadata`` has no entry for an uninstalled distribution.
+
+        An earlier version consulted the hints only to *raise* exit ``2``, so the
+        scan had the fact that answers the question and chose an error over it.
+        Knowledge that resolves an alias must resolve it.
+        """
+        self.guarded_dependency(PROJECT_WITH_PYYAML, "yaml")
+        process = self.run_scanner(self.root_dir / "module.py", isolated=True)
+        self.assertIn("yaml", process.stdout)
+        self.assertExit(process, 1)
+
+    def test_a_hinted_declaration_does_not_block_an_unrelated_probe(self) -> None:
+        """Only declarations with *unknown* import names may block a verdict.
+
+        ``pyyaml`` is declared, absent and hinted: nothing about it is unknown, and
+        the hint names ``yaml``, not ``orjson``. So the probe of ``orjson`` is a
+        genuine finding (exit ``1``) rather than an undecidable case.
+
+        This is the sharpening that separates the per-item rule from a
+        collection-wide one. Asking "is any declared dependency missing?" would
+        answer yes here and bail out with exit ``2``, saying nothing about
+        ``orjson``.
+        """
+        self.write("pyproject.toml", PROJECT_WITH_PYYAML)
+        self.write(
+            "module.py",
+            "try:\n    import orjson\nexcept ImportError:\n    orjson = None\n",
+        )
+        process = self.run_scanner(self.root_dir / "module.py", isolated=True)
+        self.assertIn("orjson", process.stdout)
+        self.assertExit(process, 1)
+
+    def test_unhinted_absent_declaration_makes_the_verdict_undecidable(self) -> None:
+        """An absent declaration with no hint could own any import name.
+
+        ``requests`` is declared and absent from a bare environment, and nothing
+        says which import names it provides. Guarding ``orjson`` might be an
+        honest probe of an undeclared accelerator, or it might be ``requests``
+        imported under a name only ``importlib.metadata`` could confirm - and the
+        distribution is not installed, so there is nothing to read.
+
+        Either verdict would be invented, so the scan fails (exit ``2``). In a
+        real project environment ``requests`` is installed, its import names are
+        in the map, and this same file becomes a plain finding.
+        """
+        self.guarded_dependency(PROJECT_WITH_REQUESTS, "orjson")
+        process = self.run_scanner(self.root_dir / "module.py", isolated=True)
+        self.assertIn("orjson", process.stderr)
         self.assertExit(process, 2)
-        self.assertIn("PIL", process.stderr)
+
+    def test_unrelated_missing_declaration_still_yields_a_finding(self) -> None:
+        """A decidable declaration must not turn another module's probe into noise.
+
+        Both declarations are hinted and absent, so nothing about either is
+        unknown: ``pyyaml`` is ``yaml``, ``python-dateutil`` is ``dateutil``, and
+        neither is ``orjson``. The probe is therefore a finding, exit ``1``.
+
+        The version of this scan that asked "is any declared dependency
+        missing?" answered yes, bailed out with exit ``2`` and said nothing about
+        ``orjson`` - a collection statistic standing in for a per-item question.
+        """
+        self.write(
+            "pyproject.toml",
+            '[project]\nname = "demo"\nversion = "0.1.0"\n'
+            'dependencies = ["pyyaml", "python-dateutil"]\n',
+        )
+        self.write(
+            "module.py",
+            "try:\n    import orjson\nexcept ImportError:\n    orjson = None\n",
+        )
+        process = self.run_scanner(self.root_dir / "module.py", isolated=True)
+        self.assertIn("orjson", process.stdout)
+        self.assertExit(process, 1)
 
     def test_pep723_script_never_consults_the_map(self) -> None:
         """Script dependencies come from the block, so an empty map is harmless."""
@@ -272,6 +413,39 @@ class ScannerContractTest(unittest.TestCase):
             process.returncode, (1, 2), f"guard was silently dropped:\n{combined}"
         )
 
+    def test_a_missing_alias_hint_is_loud_rather_than_a_quiet_pass(self) -> None:
+        """Omission beats a guess, and this test is what makes the ordering real.
+
+        ``pyyaml`` is declared and absent, so only the hint table can say which
+        import names it owns. Drop the entry and the names become *unknowable*,
+        which must fail the scan (exit ``2``) - in a script too, where a missing
+        hint would otherwise leave the guard looking like a legitimate probe.
+
+        A **wrong** entry is the direction that stays silent: a guard on a name
+        the table assigns to another distribution is a genuine probe by every
+        available fact, so the script exits ``0``. That asymmetry is why the
+        table's comment says prefer omission over guessing; it cannot be caught
+        by a test, only by not guessing, so only the loud half is pinned here.
+        """
+        script = self.write(
+            "hinted.py",
+            pep723_script(
+                '"pyyaml"',
+                "try:\n    import yaml\nexcept ImportError:\n    yaml = None",
+            ),
+        )
+        self.assertExit(self.run_scanner(script, isolated=True), 1)
+
+        scanner_without_hint = self.write(
+            "scanner_without_hint.py",
+            scanner_file.read_text(encoding="utf-8").replace(
+                '    "pyyaml": "yaml",\n', ""
+            ),
+        )
+        process = self.run_scanner(script, isolated=True, scanner=scanner_without_hint)
+        self.assertExit(process, 2)
+        self.assertIn("yaml", process.stderr)
+
     def test_script_with_no_declarations_needs_no_resolver(self) -> None:
         """An alias question is vacuous when there is nothing it could match.
 
@@ -287,6 +461,74 @@ class ScannerContractTest(unittest.TestCase):
             ),
         )
         self.assertExit(self.run_scanner(script, isolated=True), 0)
+
+
+class AliasHintTableTest(unittest.TestCase):
+    """The hint table is the one fact in the scanner nothing can verify.
+
+    A wrong entry is silent in the PEP 723 branch: the guard looks like an honest
+    probe and exits ``0``. No runtime check distinguishes that from a correct
+    entry whose dependency has a genuinely different import name, so the table is
+    protected only by being short, explicit and reasoned about.
+
+    These tests pin the parts that *are* checkable. They cannot prove an entry
+    correct, and saying so is the point: a test that claimed to would be the
+    circular-evidence failure again.
+    """
+
+    def test_every_installed_hint_matches_the_real_import_name(self) -> None:
+        """Verify each hint whose distribution happens to be installed here.
+
+        This is a **partial** check and must stay honest about that. ``pyyaml`` is
+        a declared dependency of this test script so at least one entry is always
+        checkable; the rest depend on the environment, and a hint whose
+        distribution is absent stays unverified rather than being assumed
+        correct. The assertion below forbids the degenerate case where the loop
+        verified nothing and reported success.
+        """
+        reverse: dict[str, set[str]] = {}
+        for module, distributions in packages_distributions().items():
+            for distribution in distributions:
+                reverse.setdefault(_normalize(distribution), set()).add(module)
+
+        checked = 0
+        for distribution, hint in _ALIAS_HINTS.items():
+            modules = reverse.get(_normalize(distribution))
+            if modules is None:
+                continue  # not installed here: unknowable, not wrong
+            checked += 1
+            self.assertIn(
+                hint,
+                modules,
+                f"hint says {distribution} provides {hint!r}, but the installed "
+                f"distribution provides {sorted(modules)}",
+            )
+
+        self.assertGreater(
+            checked,
+            0,
+            "no hinted distribution is installed, so the hints were never "
+            "verified. Run this with at least one present; a check that reads "
+            "nothing is not a pass.",
+        )
+
+    def test_hint_targets_are_not_also_distribution_names(self) -> None:
+        """A hint whose target is already a distribution name is dead weight.
+
+        ``_candidate_names`` adds the module name itself and the reverse hint
+        lookup. If the hint target equals a real distribution name, that name is
+        already a candidate and the entry cannot change any verdict - so it is
+        an entry that was added for a reason nobody can name. Cheap to check, and
+        the only structural property the table has.
+        """
+        normalized_hints = {_normalize(hint) for hint in _ALIAS_HINTS.values()}
+        overlap = normalized_hints & {_normalize(name) for name in _ALIAS_HINTS}
+        self.assertEqual(
+            overlap,
+            set(),
+            f"hint target(s) {sorted(overlap)} equal a distribution name, so the "
+            "entry cannot affect any verdict",
+        )
 
 
 if __name__ == "__main__":

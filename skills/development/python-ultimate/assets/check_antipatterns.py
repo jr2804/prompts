@@ -107,6 +107,42 @@ _STDLIB_MODULES: frozenset[str] = frozenset(getattr(sys, "stdlib_module_names", 
 #: Names that are always present regardless of interpreter build.
 _STDLIB_ALWAYS: frozenset[str] = frozenset({"__future__", "builtins"})
 
+#: Import name for a distribution whose names do not match, used only when the
+#: distribution is NOT installed and so cannot be discovered automatically.
+#:
+#: It is a guess with unverified provenance, and the two failure directions are
+#: NOT symmetric. Measured on both branches, with ``pyyaml`` declared, absent, and
+#: a guard on ``yaml``:
+#:
+#: | entry | project file | PEP 723 script |
+#: | --- | --- | --- |
+#: | correct | exit 1, finding | exit 1, finding |
+#: | **missing** | exit 2, loud | exit 2, loud |
+#: | **wrong** | exit 1, finding | exit 0, "legitimate probe" |
+#:
+#: A missing entry is loud: the declaration's import names are unknowable, so the
+#: scan refuses to guess. A wrong entry is silent in the script branch, because a
+#: guard on a name the table says belongs elsewhere is a genuine probe by every
+#: fact available. So: **prefer omitting an entry over guessing one.** The cost of
+#: omission is a failed scan a human resolves in seconds; the cost of a wrong
+#: entry is a scan that passes while the guard it should have flagged stays in.
+#:
+#: Nothing detects a wrong entry - it is indistinguishable from an honest probe
+#: without network access. Only add a distribution here when its import name is
+#: known, not when it looks plausible.
+_ALIAS_HINTS: dict[str, str] = {
+    "pillow": "PIL",
+    "beautifulsoup4": "bs4",
+    "pyyaml": "yaml",
+    "python-dateutil": "dateutil",
+    "opencv-python": "cv2",
+    "scikit-learn": "sklearn",
+    "pyzmq": "zmq",
+    "protobuf": "google",
+    "attrs": "attr",
+    "pyusb": "usb",
+}
+
 #: Asking Ruff for its rule list is a local call; a long timeout would only hide
 #: a broken install, so fail fast and treat `None` as "cannot verify".
 _RUFF_TIMEOUT_SECONDS = 30
@@ -165,55 +201,79 @@ class DependencyFacts:
         names = self._candidate_names(module)
         return bool(names & (self.required | self.optional))
 
-    def has_resolver(self) -> bool:
-        """True when installed distributions are visible, so aliases can be mapped.
-
-        With no resolver, ``import PIL`` cannot be matched against the ``Pillow``
-        distribution. That makes the dependency status of such a module
-        *unknown* rather than undeclared, and reporting it would be a false
-        positive produced by a missing fact rather than by the code under scan.
-        Literal matches still work: ``import requests`` resolves against a
-        declared ``requests`` without needing the map at all.
-        """
-        return bool(self.module_to_distribution)
-
-    def alias_is_unprovable(self, module: str, declared: frozenset[str]) -> bool:
-        """True when *module* might be the import name of a declared dependency.
-
-        ``import PIL`` is satisfied by ``Pillow``, so a module absent from the
-        import-to-distribution map can mean two opposite things: an undeclared
-        package (a legitimate probe) or a declared dependency whose import name
-        differs and whose distribution is not installed here.
-
-        The available evidence separates them. If every declared dependency is
-        present among the installed distributions, then no declared dependency
-        can be hiding behind an unmapped module name, so the guard is a genuine
-        probe. Only a declared dependency that is *missing* from the environment
-        leaves an alias unprovable. That keeps a bare environment from flagging
-        honest probes of undeclared accelerators such as ``orjson``, which a
-        blunter "is the map empty?" test did.
-        """
-        if module in self.module_to_distribution:
-            return False
-        installed: set[str] = set()
-        for distributions in self.module_to_distribution.values():
-            installed.update(_normalize(name) for name in distributions)
-        return any(_normalize(name) not in installed for name in declared)
-
     def _candidate_names(self, module: str) -> set[str]:
         """Normalized names that could identify *module* as a dependency.
 
-        ``import PIL`` must match the ``Pillow`` distribution, so the
-        module-to-distribution map contributes extra candidates.
+        ``import PIL`` must match the ``Pillow`` distribution, so three sources
+        contribute: the module's own name, the import-to-distribution map, and
+        the hint table in reverse (``yaml`` -> ``pyyaml``).
+
+        The reverse hint lookup is what keeps a resolvable alias resolvable. An
+        earlier version used the hints only inside ``alias_is_unprovable``, which
+        meant a declared ``pyyaml`` guarding an uninstalled ``yaml`` was reported
+        as unprovable instead of as the dead guard it is - the scan had the answer
+        and chose an error over it.
         """
         names = {_normalize(module)}
         for distribution_name in self.module_to_distribution.get(module, frozenset()):
             names.add(_normalize(distribution_name))
+        for distribution_name, import_name in _ALIAS_HINTS.items():
+            if import_name == module:
+                names.add(distribution_name)
         return names
 
     def declared_in_script(self, module: str, script_required: frozenset[str]) -> bool:
         """True when *module* is one of the script's own PEP 723 dependencies."""
         return bool(self._candidate_names(module) & script_required)
+
+    def alias_is_unprovable(self, module: str, declared: frozenset[str]) -> bool:
+        """True when *module* could be the import name of a declaration we cannot read.
+
+        A module absent from the import-to-distribution map has two possible
+        meanings: it is not declared (a legitimate optional probe), or it is the
+        import name of a declared dependency that is not installed here, so
+        nothing maps it.
+
+        This answers only what ``_candidate_names`` could not. A declaration the
+        hint table already links to *module* is decided there, as a finding -
+        knowledge that resolves an alias must resolve it, not decline the
+        question.
+
+        What remains is a declaration that is absent from the environment *and*
+        absent from ``_ALIAS_HINTS``. Its import names are then unknowable, and
+        the question is existential over those declarations rather than a
+        property of the whole set: one unreadable declaration is enough to block
+        a negative answer, however many readable ones accompany it.
+
+        Two earlier versions answered a property of the collection instead, and
+        each was wrong in one direction:
+
+        - "is any distribution visible?" answered *yes* in an environment with
+          one unrelated package installed, silently exempting the guard;
+        - "is any declared dependency missing?" answered *yes* when an unrelated
+          declaration such as ``requests`` was absent, failing an honest probe
+          of ``orjson`` - a collection statistic, not the per-item question.
+
+        In a project environment every declaration is installed and every
+        question is decidable, so this returns ``False``; a bare environment
+        makes it ``True`` and the caller turns that into a failed scan rather
+        than a clean verdict it never established.
+        """
+        if module in self.module_to_distribution:
+            return False  # import names known, and none of them is declared
+        installed = self._installed_distributions()
+        return any(
+            _normalize(declaration) not in installed
+            and _normalize(declaration) not in _ALIAS_HINTS
+            for declaration in declared
+        )
+
+    def _installed_distributions(self) -> frozenset[str]:
+        """Normalized names of every installed distribution."""
+        installed: set[str] = set()
+        for distributions in self.module_to_distribution.values():
+            installed.update(_normalize(name) for name in distributions)
+        return frozenset(installed)
 
 
 def _normalize(name: str) -> str:

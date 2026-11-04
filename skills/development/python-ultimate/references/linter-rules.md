@@ -11,6 +11,8 @@
   - [When zero is an honest answer](#when-zero-is-an-honest-answer)
   - [Facts from different places need different lifetimes](#facts-from-different-places-need-different-lifetimes)
     - ["Can I resolve this?" is per item, not per map](#can-i-resolve-this-is-per-item-not-per-map)
+    - [When a guard must guess, fail loudly](#when-a-guard-must-guess-fail-loudly)
+    - [A collection-wide answer cannot be scoped to one member](#a-collection-wide-answer-cannot-be-scoped-to-one-member)
   - [Prose is not enforcement](#prose-is-not-enforcement)
     - [A guard that cannot fail for the reason it names](#a-guard-that-cannot-fail-for-the-reason-it-names)
   - [Fatal at the right scope, not the earliest scope](#fatal-at-the-right-scope-not-the-earliest-scope)
@@ -87,10 +89,11 @@ the rules depend on:
   all (a workspace root is a normal shape; judging guards against it invents
   facts). An empty `dependencies = []` list is different and honest
 - a guard imports a module whose dependency status could not be established
-  because `importlib.metadata` returned no import→distribution map, so an alias
-  (`PIL` → `Pillow`) cannot be matched. Scoped per module, not per scan: literal
-  matches still work and PEP 723 scripts never need the map, so making an empty
-  map fatal everywhere would reject honest runs
+  because the declaration that could hide it is not installed, and its import
+  name is not in `_ALIAS_HINTS`, so an alias (`PIL` → `Pillow`) cannot be matched.
+  Scoped per module, not per scan: literal matches still work and PEP 723 scripts
+  never need the map, so making an empty map fatal everywhere would reject
+  honest runs
 - `--ban-noqa` names a code Ruff does not define, so the ban could never match
 
 A gate that read nothing and a gate that read everything and found nothing look
@@ -134,6 +137,28 @@ robustness while switching the rule off. Prefer these shapes, in order:
 The narrow entry point should have no failure channel at all where possible. If
 its only caller needing coverage calls the covered variant directly, the failure
 channel exists exactly once, on the one path that checks it.
+
+#### Prefer a contract the wrong value cannot satisfy
+
+Shape 1 above is stronger than exit `2` for a reason worth naming separately:
+it moves the guess-direction asymmetry from the *value* to the *type*. A required
+parameter is a **container contract** — the wrong call raises at the point of
+use. An optional parameter compared against is a **comparison contract** — the
+wrong call silently succeeds and takes the benign branch.
+
+The same distinction explains a fix in the `PIL`/`Pillow` guard. A field
+declared by more than one model needed a tuple of defaults, and the code tests
+`literal not in defaults[keyword.arg]` (membership) rather than
+`defaults[keyword.arg] == literal` (equality). Reverting the tuple to a bare
+value therefore raises `TypeError: argument of type 'int' is not a container or
+iterable` instead of quietly failing to match. That is guess-direction holding
+by construction: a container contract rejects the wrong shape, while an equality
+contract accepts it and answers `False`.
+
+Generalise it: **a contract where the wrong input cannot satisfy it beats a
+convention that the wrong input should be avoided.** Reach for the container, the
+required parameter, the `None`-for-absent sentinel — anything where the mistake
+is a crash or a type error rather than a plausible-looking result.
 
 Coverage has three faces, and each needs its own exit `2`: **input** (nothing
 was scanned), **facts** (a config or source file that grounds the rules could
@@ -234,7 +259,7 @@ shape first, then count.
 
 ### Facts from different places need different lifetimes
 
-A bug I shipped and then found twice in the same file: one optional object
+A bug I shipped and then found three times in the same file: one optional object
 holding facts with **different provenance**. `DependencyFacts` bundled project
 declarations (from `pyproject.toml`, may be absent) with the import-to-distribution
 index (from the installed environment, always available). When the project half
@@ -263,18 +288,171 @@ optional only where it genuinely can be.
 Second-order version of the same error, in the guard that replaced it.
 `has_resolver()` asked whether *any* distributions were visible. A test
 environment with `ruff` installed and `pillow` absent therefore answered "yes"
-— and `PIL` was silently exempted again, because a non-empty map was offered as
+– and `PIL` was silently exempted again, because a non-empty map was offered as
 proof that one particular name was mappable.
 
-The sharper question is whether an alias could be hiding *this* module, and the
-evidence decides it: if every declared dependency is present among the installed
-distributions, then no declared dependency can be behind an unmapped import name,
-so the guard is a genuine probe. Only a declaration that is itself missing from
-the environment leaves the alias unprovable.
+It took **two** wrong per-collection answers to get here, and each failed in the
+opposite direction:
 
-That distinction is what keeps a bare CI environment from flagging honest probes
-of undeclared accelerators such as `orjson`. A blunter "is the map empty?" test
-failed in one direction or the other on every attempt.
+| Test | Bare env with `ruff`, guard `PIL` | `requests` missing, guard `orjson` |
+| --- | --- | --- |
+| "any distribution visible?" | passes silently — **false negative** | passes silently |
+| "any declared dependency missing?" | exit 2 — correct by luck | exit 2 — **false positive** |
+| "is *this* declaration behind *this* name?" | exit 2 | script: exit 0; project: exit 1 |
+
+The last cell needs its qualifier, and leaving it out is what made a reader
+suspect the bug had returned. The two branches answer differently *by design*:
+
+| File kind | `orjson` guarded, not declared | Why |
+| --- | --- | --- |
+| PEP 723 script | exit `0` — legitimate probe | the block has no `optional-dependencies` mechanism, so an undeclared import is the only way to express an optional accelerator |
+| project file | exit `1` — finding | `[project.optional-dependencies]` exists, so the guard belongs on a declared extra |
+
+Both verified against the same declarations in a bare environment. The script
+run also emits the no-`pyproject.toml` `NOTE` to stderr, which is informational
+and does not change the verdict.
+
+The correct question is per *item*, and the evidence decides it: a declaration
+that is itself absent from the environment, and that is known to be this import
+name, leaves that name unprovable. Everything else is decidable.
+
+A collection-wide predicate is tempting because it is one call instead of a
+per-module decision. It cannot be correct: a set answers for all its members,
+and the question is about one.
+
+The per-item rule then exposes a fact that was previously hidden: the import
+name of a distribution that is **not installed** cannot be discovered, because
+`importlib.metadata` only maps names for what is present. `_ALIAS_HINTS` in the
+scanner is a ten-entry hardcoded fallback for that gap — a fact with its own
+provenance, and its own failure direction. State that direction where the table
+is defined; see [guess direction](#when-a-guard-must-guess-fail-loudly).
+
+#### When a guard must guess, fail loudly
+
+The general form: **when a guard must guess, it should guess toward failing
+loudly.** A visible false alarm gets investigated and corrected; an invisible
+false pass gets trusted indefinitely.
+
+Stated across substrates, because the same asymmetry appears at every layer and
+only the visible symptom changes:
+
+| Substrate | Fail-loud choice | Silent choice to avoid |
+| --- | --- | --- |
+| exit code | `2` — cannot establish the fact | `0` — assume the benign case |
+| fact value | the value that produces a finding | `None`/sentinel that compares false |
+| lookup table | *no* entry — the fact is unknowable | a plausible **wrong** entry |
+
+The table row is the one place the asymmetry inverts, so it is worth its own
+section below. For an exit code or a fact value, guessing "loud" costs a false
+alarm. For a lookup table the loud direction is *omission*, because a missing
+entry says "I do not know" while a wrong entry asserts something false and
+reaches a confident verdict.
+
+`_ALIAS_HINTS` is the table column, and its role had to be corrected once. An
+earlier version consulted the hints only to *raise* exit `2`, treating a
+resolvable alias as an unanswerable question. A hint is knowledge: when it says
+`yaml` is `pyyaml` and `pyyaml` is a declared dependency, the guard is a finding,
+not an error. Knowledge that resolves a question must resolve it.
+
+What remains undecidable is narrow and worth stating exactly: a declaration that
+is **absent from the environment** (so `importlib.metadata` cannot report its
+import names) **and absent from the hint table** (so nothing else can either).
+Its import names are genuinely unknown, and only that case may block a verdict.
+
+The two failure directions of the table are **not** symmetric, and the intuitive
+answer was wrong. Measured on both branches, with a declared-and-absent `pyyaml`
+and a guard on `yaml`:
+
+| entry | project file | PEP 723 script |
+| --- | --- | --- |
+| correct | exit `1`, finding | exit `1`, finding |
+| **missing** | exit `2`, loud | exit `2`, loud |
+| **wrong** | exit `1`, finding | exit `0`, "legitimate probe" |
+
+So the guess-direction rule inverts for this table: **prefer omitting an entry
+over guessing one.** A missing entry makes the declaration's import names
+unknowable, and the scan refuses to guess — loud in both branches. A wrong entry
+is silent exactly where it matters, because a guard on a name the table says
+belongs elsewhere is a genuine probe by every available fact. The cost of
+omission is a failed scan a human resolves in seconds; the cost of a wrong entry
+is a scan that passes while the guard it should flag stays in the code.
+
+Nothing detects a wrong entry. It is indistinguishable from an honest probe
+without network access, so the table is a guess whose provenance is "someone
+knew" — add to it only for names you actually know. A Pydantic default-factory
+scan is the value column of the same rule: returning the empty collection
+surfaces a re-typed default, while returning `None` drops the field silently.
+
+#### The axis is what a wrong entry does, not which way the table points
+
+A tempting generalisation is that the inversion applies to tables that *exempt*
+from a check, while tables that *enable* a check keep the usual direction: a
+wrong key in an allowlist of things to inspect "obviously" complains. It does
+not. An allowlist that enables inspection — `if cls.__name__ not in NAMES:
+continue` — is silent under a typo in exactly the same way: the misspelt entry
+matches nothing, contributes nothing, and nothing complains.
+
+So the property that predicts the failure direction is **what a wrong entry
+does**, not the table's polarity: if a wrong entry can only make the scanner
+quieter, the typo is silent regardless of which direction the table points. This
+is the container-vs-comparison rule again, one level out — a dict key that
+matches nothing is a comparison that succeeds and lies.
+
+An exempting table and an enabling table are therefore both in the silent class,
+and both need the same treatment: a test that every entry still names something
+real, because an emptiness check cannot substitute. The emptiness check asks
+"did I read anything?", which a typo in a ten-entry allowlist answers
+cheerfully.
+
+#### A change to a failure mode invalidates every description of it
+
+A measurement recorded once gets cited forever, including after the code it
+measured has changed. The reverse-hint fix above flipped the cost of a missing
+entry from "missed finding, exit `0`" to "exit `2`"; the comment describing the
+old behaviour outlived the change by several commits, asserting the opposite of
+what the code did — and that comment was the source for a reference-doc section,
+so the wrong direction was written down twice.
+
+Nothing in the toolchain can see this. The comment is not executed, not
+type-checked, not tested; doc checks measure length and duplication, not truth.
+The defence is procedural: **when a fix changes a fact's cost, re-measure the
+descriptions of that cost**, not only the fix. Grep for every place the old
+failure mode is asserted — prose is not enforcement in either direction, and a
+confident sentence is not evidence.
+
+What is constant is not the representation — it is that the wrong side of the
+guess must be the side a human sees.
+
+#### A collection-wide answer cannot be scoped to one member
+
+Generalised, because this is the same defect in the place I had already
+documented it. Rule: **a fact's provenance determines its lifetime.** A set
+answered for all its members, so no set-shaped fact can answer a question about
+one. Two of my guards asked a collection and applied the answer to a member, in
+both directions. The project facts and the resolver had *different provenance*
+and were merged into one optional value, so the available half inherited the
+absent half's absence.
+
+The same shape appears in Pydantic defaults: `info.default` bundles three
+provenances — a declared value, a callable factory, and the
+`PydanticUndefined` sentinel for `default_factory`. Treated as one fact, a
+sentinel is neither `None` nor callable, so it enters a comparison as if it were
+a value and every comparison against it is silently false. A field's default is
+itself a fact whose provenance must be read before it means anything.
+
+When you find yourself writing a predicate whose subject is a set and whose
+conclusion is about one member, stop: split the fact by provenance and ask per
+member. The same question asked of a collection is not a weaker answer, it is a
+wrong one — it was a false negative once and a false positive the next time.
+
+The corrected predicate is not a single-item lookup either, and the exact shape
+matters. What is left after the per-item checks is existential: *is there a
+declaration whose import names I cannot read?* One such declaration is enough to
+block a negative answer, however many readable ones accompany it. That is not a
+collection statistic — it is a question about one member at a time, asked of each,
+with «any» binding the quantifier rather than averaging over the set. The
+difference between `any(unknown(d) for d in declared)` and `all_missing(declared)`
+is the entire bug.
 
 ### Prose is not enforcement
 
