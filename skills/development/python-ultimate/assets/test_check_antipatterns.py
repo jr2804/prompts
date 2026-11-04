@@ -23,6 +23,7 @@ Two halves, and the second is the one usually missing:
 Run with ``uv run assets/test_check_antipatterns.py`` from the skill directory.
 """
 
+import ast
 import shutil
 import subprocess
 import sys
@@ -528,6 +529,68 @@ class AliasHintTableTest(unittest.TestCase):
             set(),
             f"hint target(s) {sorted(overlap)} equal a distribution name, so the "
             "entry cannot affect any verdict",
+        )
+
+
+class ModuleConstantTest(unittest.TestCase):
+    """A table nobody reads passes every check the other classes need.
+
+    Coverage checks, guess-direction and table verification all assume something
+    consumes the value. When the consuming function is deleted and the constant
+    stays behind with its explanatory comment, every one of them is satisfied by
+    absence - there is no narrow verdict and no wide one, there is no verdict at
+    all. This is the fourth class, and it is reachable only by asking whether
+    the name is still read.
+
+    The check is deliberately crude: a module-level assignment whose name never
+    appears in a load context anywhere in the same file. That catches the real
+    shape (orphaned constant) without needing cross-module analysis, and cannot
+    report a false positive from a value used only in a type position, because a
+    type-only use is still a load.
+    """
+
+    def test_every_module_constant_is_read_somewhere(self) -> None:
+        """No dead module-level names in either scanner.
+
+        ``__all__`` and dunder entries are skipped: re-exports are read by other
+        modules, which this single-file check cannot see, and saying so beats
+        guessing at them.
+        """
+        dead: list[str] = []
+        scanners = (
+            scanner_file,
+            scanner_file.with_name("check_path_naming.py"),
+        )
+        for scanner in scanners:
+            tree = ast.parse(scanner.read_text(encoding="utf-8"))
+            assigned: set[str] = set()
+            for node in tree.body:
+                if isinstance(node, ast.Assign):
+                    assigned.update(
+                        target.id
+                        for target in node.targets
+                        if isinstance(target, ast.Name)
+                    )
+                elif isinstance(node, ast.AnnAssign) and isinstance(
+                    node.target, ast.Name
+                ):
+                    assigned.add(node.target.id)
+            loads = {
+                node.id
+                for node in ast.walk(tree)
+                if isinstance(node, ast.Name) and isinstance(node.ctx, ast.Load)
+            }
+            for name in sorted(assigned - loads):
+                if name.startswith("__"):
+                    continue
+                dead.append(f"{scanner.name}:{name}")
+
+        self.assertEqual(
+            dead,
+            [],
+            "module-level name(s) never read in their own file, so nothing "
+            f"consumes them: {dead}. Delete the constant or its reader is "
+            "missing - either way the table is unclassified, not narrow.",
         )
 
 

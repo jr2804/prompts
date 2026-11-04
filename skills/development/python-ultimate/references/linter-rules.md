@@ -398,6 +398,54 @@ quieter, the typo is silent regardless of which direction the table points. This
 is the container-vs-comparison rule again, one level out — a dict key that
 matches nothing is a comparison that succeeds and lies.
 
+#### Which way the comparison fails: narrower or wider
+
+"`dict.get`/`in` is a comparison contract" needs one more clause, because a
+comparison can fail in two directions and only one of them is dangerous. Ask
+what a wrong key does to the output: does it only remove coverage, or only add
+output?
+
+1. **Container** — the wrong entry raises (`KeyError`, `TypeError`). Requires a
+   subscript or a required parameter. Nothing to test for silence.
+2. **Comparison that narrows** — a wrong key silently reduces the set of things
+   judged. Dangerous, and the class to hunt.
+3. **Comparison that widens** — a wrong key produces extra findings in files the
+   table was meant to leave alone. Loud, though the loudness arrives somewhere
+   unrelated with no hint that an entry drifted.
+
+| table | consumption | wrong entry |
+| --- | --- | --- |
+| `FORBIDDEN_REASON` | `REASON[name]` subscript | raises `KeyError` |
+| `_ALIAS_HINTS` | iteration, contributes | narrower → silent |
+| `_VOCAB_ENUM_NAMES` | `name not in NAMES` | narrower → silent |
+| `SKIP_DIRS` | `path.name in SKIP_DIRS` | narrower → silent |
+| a policy-file exemption set | `path in EXEMPT` | wider → loud |
+
+**`SKIP_DIRS` narrows in two modes, and only one of them is loud.** If a wrong
+entry excludes *every* matching file, the scan empties and the existing "nothing
+scanned" check exits `2` — the class-2 table accidentally protected by a
+coverage check. If it excludes *some* while the scan still finds files, that
+check passes and the verdict is a quiet `0` over a smaller population:
+
+```text
+baseline : exit 1  1 violation(s) in 1 file(s) with findings, 6 file(s) scanned
+partial  : exit 0  0 violation(s) in 0 file(s) with findings, 3 file(s) scanned
+```
+
+So the emptiness check does not make a narrowing table safe; it makes *total*
+narrowing safe. Nothing distinguishes a scan of 3 files from a scan of 3 files
+that should have been 6. That residual is why the table stays short and
+explicit, and why a wrong entry is worth a test only where it is plausible — the
+discovery constants (`SKIP_DIRS`) are conventional directory names, so a typo
+there is visible on inspection in a way an aliased import name is not.
+
+A fourth class is worth naming because neither framing above covers it: a table
+with **no reader at all**. It is not misclassified, it is unclassified — the
+function that consumed it was deleted and the constant plus its explanatory
+comment stayed behind. Emptiness checks, coverage checks and guess-direction all
+pass, because nothing reaches them. Only a search for unused module-level names
+finds it.
+
 An exempting table and an enabling table are therefore both in the silent class,
 and both need the same treatment: a test that every entry still names something
 real, because an emptiness check cannot substitute. The emptiness check asks
