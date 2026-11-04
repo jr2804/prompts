@@ -135,6 +135,12 @@ project environment, not `python -I`: the distribution map that resolves
 `PIL` → `Pillow` comes from installed packages, and without it a guard on an
 aliased import fails the scan instead of being judged.
 
+The exit contract is pinned by `assets/test_check_antipatterns.py`
+(`uv run assets/test_check_antipatterns.py`). Keep it passing when changing a
+scanner: it asserts every documented exit-2 cause, and — the half usually
+missing — that honest runs still pass, so a guard cannot drift into rejecting
+scans that established every fact they needed.
+
 ## Reference Map
 
 | Reference | Use it for |

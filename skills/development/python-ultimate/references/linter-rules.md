@@ -4,6 +4,17 @@
 
 - [Overview](#overview)
 - [Which Tool Enforces What](#which-tool-enforces-what)
+- [Gate design](#gate-design)
+  - [Make the vacuous pass unrepresentable](#make-the-vacuous-pass-unrepresentable)
+  - [A passing verdict is not evidence of a scan](#a-passing-verdict-is-not-evidence-of-a-scan)
+  - [Level 0: who decides where the facts come from](#level-0-who-decides-where-the-facts-come-from)
+  - [When zero is an honest answer](#when-zero-is-an-honest-answer)
+  - [Facts from different places need different lifetimes](#facts-from-different-places-need-different-lifetimes)
+    - ["Can I resolve this?" is per item, not per map](#can-i-resolve-this-is-per-item-not-per-map)
+  - [Prose is not enforcement](#prose-is-not-enforcement)
+    - [A guard that cannot fail for the reason it names](#a-guard-that-cannot-fail-for-the-reason-it-names)
+  - [Fatal at the right scope, not the earliest scope](#fatal-at-the-right-scope-not-the-earliest-scope)
+    - [The precondition must match the subject set](#the-precondition-must-match-the-subject-set)
 - [E402: Module Level Import Not at Top of File](#e402-module-level-import-not-at-top-of-file)
 - [B007: Loop Control Variable Not Used](#b007-loop-control-variable-not-used)
 - [B008: Function Call in Default Argument](#b008-function-call-in-default-argument)
@@ -86,7 +97,14 @@ A gate that read nothing and a gate that read everything and found nothing look
 identical in the exit code. Whenever a scanner gains an input layer, it must
 assert that the layer was actually read.
 
-## Make the vacuous pass unrepresentable
+## Gate design
+
+The rules in this section apply to any script whose exit code is a verdict: a
+validator, a scanner, a consistency check, a parity gate. Each was found the
+hard way — a gate that exited `0` while judging nothing, or exited `2` while
+rejecting honest input.
+
+### Make the vacuous pass unrepresentable
 
 Exit `2` is a runtime contract; the stronger fix is to make the mistake
 impossible to express. Empty is a *valid* value for a findings list and also the
@@ -128,6 +146,12 @@ nothing, a query that returned no rows. No exception is involved, so there is
 nothing to swallow and nothing for a grep to find. Every such gate needs
 `require_facts(count, what, remedy)` next to its `require_scanned(...)`.
 
+A fifth face is **fabricated facts**: a default substituted for an absent fact
+becomes an asserted fact, and the assertions built on it are wrong rather than
+missing. This one exits `0` with a confident report, so neither counting nor
+emptiness checks catch it. See [Facts from different places need different
+lifetimes](#facts-from-different-places-need-different-lifetimes).
+
 The optionality does not have to live in a parameter default. A silent guard is
 the same defect wearing different clothes:
 
@@ -146,7 +170,7 @@ vacuous pass caused by a migration that emptied the input, because there is no
 error to swallow. Ask instead: *what does this gate read, and can that set be
 empty in a healthy repo?*
 
-## A passing verdict is not evidence of a scan
+### A passing verdict is not evidence of a scan
 
 Three failure modes reach exit `0` while judging nothing, and all three are
 cheap to test because each is one input made empty:
@@ -173,7 +197,7 @@ comment describing an earlier vacuous pass and still have one, because the
 lesson learned was "use the public API" rather than "assert you got something".
 Fix the instance *and* add the assertion.
 
-## Level 0: who decides where the facts come from
+### Level 0: who decides where the facts come from
 
 Absence failures are testable by emptying an input. Identity failures are not:
 the gate returns something *confident and wrong*. The question is not "which
@@ -193,7 +217,7 @@ scanner from an unrelated directory and asserting that the verdict does *not*
 change for an absolute target — and that a tree with no facts still exits `2`
 rather than borrowing the caller's.
 
-## When zero is an honest answer
+### When zero is an honest answer
 
 Zero dependencies can be a legitimate result or a broken scan, and only the
 input's shape tells you which:
@@ -208,23 +232,122 @@ input's shape tells you which:
 A `require_facts` guard that only counts will reject the second case. Check the
 shape first, then count.
 
+### Facts from different places need different lifetimes
+
+A bug I shipped and then found twice in the same file: one optional object
+holding facts with **different provenance**. `DependencyFacts` bundled project
+declarations (from `pyproject.toml`, may be absent) with the import-to-distribution
+index (from the installed environment, always available). When the project half
+was absent the caller passed `facts or DependencyFacts(frozenset(), frozenset(), {})`
+— which emptied the environment half too, because `{}` was not a placeholder, it
+was a fact.
+
+The symptom was a false *negative*: with no `pyproject.toml`, `from PIL import
+Image` could not be matched to a declared `pillow`, so the guard looked like an
+undeclared optional probe and was exempted. Exit `0`, clean report, real finding
+dropped. The same empty map had already caused a false *positive* one commit
+earlier, where it was treated as fatal per file. One fabricated fact, both
+directions of wrong.
+
+The fix is not a better default — it is to stop sharing the lifetime. The
+resolver is built unconditionally and passed separately from the optional
+project facts.
+
+Generalise: if two facts have different sources, they have different failure
+modes, and combining them into one optional value makes the available fact
+inherit the absent one's absence. Pass them separately, and let each be
+optional only where it genuinely can be.
+
+#### "Can I resolve this?" is per item, not per map
+
+Second-order version of the same error, in the guard that replaced it.
+`has_resolver()` asked whether *any* distributions were visible. A test
+environment with `ruff` installed and `pillow` absent therefore answered "yes"
+— and `PIL` was silently exempted again, because a non-empty map was offered as
+proof that one particular name was mappable.
+
+The sharper question is whether an alias could be hiding *this* module, and the
+evidence decides it: if every declared dependency is present among the installed
+distributions, then no declared dependency can be behind an unmapped import name,
+so the guard is a genuine probe. Only a declaration that is itself missing from
+the environment leaves the alias unprovable.
+
+That distinction is what keeps a bare CI environment from flagging honest probes
+of undeclared accelerators such as `orjson`. A blunter "is the map empty?" test
+failed in one direction or the other on every attempt.
+
+### Prose is not enforcement
+
+The rules above are documentation, and documentation does not fail a build. A
+future edit can move a guard back to `main()`, widen a coverage parameter to
+`| None`, or let an unreadable file count as clean, and every existing check
+still passes.
+
+Pin the contract with a test that asserts both halves:
+
+- every documented exit-`2` cause really exits `2` — a cause that regresses to
+  `0` is a vacuous pass again;
+- **honest runs still pass** — this is the half that is usually missing, and it
+  is the only thing that catches over-guarding. Absence is easy to test by
+  emptying an input; the damage a fix does to correct runs is only visible by
+  asserting the complementary case for every fact your guard can declare
+  missing.
+
+A guard whose contract is checked in only one direction is half-tested, and the
+untested direction is the one where a *fix* introduces the next bug. A suite of
+only failure cases is satisfied by a gate that always fails; a suite of only
+success cases is satisfied by one that always passes. Each half is what makes
+the other mean anything.
+
+Check the guard's *coverage* in both directions too, against the call sites
+rather than against a list someone maintains:
+
+| Direction | Registers as |
+| --- | --- |
+| a case missing for an existing call site | missing |
+| a case naming a call site that no longer exists | stale |
+
+#### A guard that cannot fail for the reason it names
+
+The subtlest form, because it passes review: a coverage test asserting each
+call site is *imported* by some test. That holds when the import is used only to
+call `main()` against real facts, so the test cannot fail for emptiness — the
+very defect it was written to prevent. Before trusting a new guard, ask what
+input makes it fail, and confirm that input actually reaches it.
+
 ### Fatal at the right scope, not the earliest scope
 
 The reflex after finding an empty fact set is to guard it as early as possible,
-so the failure cannot be missed. Wrong axis: ask whether **every** judgment needs
-that fact, or only some.
+so the failure cannot be missed. Wrong axis. A guard may only be scoped to the
+set of **judgments that consume its fact** — not to the run that contains them.
 
-An empty import→distribution map is a good example. Guarding it in `main()`
-rejected scans that never needed it — literal matches (`requests` declared as
-`requests`) resolve without the map, and PEP 723 scripts are judged against
-their own `dependencies`, so they never use it either. The honest scope is the
-one judgment that actually consults it: a *single module* whose name cannot be
-matched to any declared distribution. That module is unknown, not undeclared,
-and the file fails with the module named.
+One rule, three incidents, each caught separately before the rule was named:
 
-The general shape: a missing fact should fail the judgments that depend on it,
-and a scan whose judgments never touch it should pass. An early guard is only
-safer if the fact really is global input.
+| Guard | Placed at | Subject set it wrongly covered |
+| --- | --- | --- |
+| alias map required (exit 2) | `main()` | files that resolve an import literally, and PEP 723 scripts |
+| project facts required (exit 2) | `main()` | PEP 723 scripts, which read their own `dependencies` |
+| fact-may-not-be-empty | a call site whose fact can honestly be empty | the call site itself |
+
+Guarding "the run" is tempting because `main()` is where errors are easy to
+raise, and because an empty dependency map *feels* like a global input. It is
+not: the fact's scope is a property of each rule, not of the scanner. Ask which
+judgments read the fact, and fail inside those.
+
+A missing fact should fail the judgments that depend on it, and a scan whose
+judgments never touch it should pass. Early guarding is only safer when the fact
+really is global input.
+
+#### The precondition must match the subject set
+
+The precise version, because it names the bug rather than the symptom: a guard
+attached to a subject set containing members the precondition does not apply to
+will reject those members. ``main()``'s subject set is "everything in this run",
+and a scripts-only tree contains no member for which project dependency facts
+are needed — so a guard there rejects valid input instead of protecting it.
+
+When a precondition becomes true of only *some* subjects, scope it to the
+predicate that selects them, not to the scope that happens to be convenient.
 
 ______________________________________________________________________
 

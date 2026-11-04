@@ -177,6 +177,29 @@ class DependencyFacts:
         """
         return bool(self.module_to_distribution)
 
+    def alias_is_unprovable(self, module: str, declared: frozenset[str]) -> bool:
+        """True when *module* might be the import name of a declared dependency.
+
+        ``import PIL`` is satisfied by ``Pillow``, so a module absent from the
+        import-to-distribution map can mean two opposite things: an undeclared
+        package (a legitimate probe) or a declared dependency whose import name
+        differs and whose distribution is not installed here.
+
+        The available evidence separates them. If every declared dependency is
+        present among the installed distributions, then no declared dependency
+        can be hiding behind an unmapped module name, so the guard is a genuine
+        probe. Only a declared dependency that is *missing* from the environment
+        leaves an alias unprovable. That keeps a bare environment from flagging
+        honest probes of undeclared accelerators such as ``orjson``, which a
+        blunter "is the map empty?" test did.
+        """
+        if module in self.module_to_distribution:
+            return False
+        installed: set[str] = set()
+        for distributions in self.module_to_distribution.values():
+            installed.update(_normalize(name) for name in distributions)
+        return any(_normalize(name) not in installed for name in declared)
+
     def _candidate_names(self, module: str) -> set[str]:
         """Normalized names that could identify *module* as a dependency.
 
@@ -203,17 +226,25 @@ def _requirement_name(spec: str) -> str:
     return re.split(r"[\s<>=!~;\[(@]", spec.strip(), maxsplit=1)[0]
 
 
-def _read_script_dependencies(source: str) -> tuple[frozenset[str], str | None]:
+def _read_script_dependencies(
+    source: str,
+) -> tuple[frozenset[str] | None, str | None]:
     """Return ``(declared distributions, error)`` for a PEP 723 ``dependencies`` block.
 
+    ``None`` means "this is not a PEP 723 script, so project facts apply". An
+    empty frozenset is different: a script that declares nothing. Collapsing the
+    two would make a script with ``dependencies = []`` fall through to project
+    facts it does not depend on, and would make a script-only scan demand a
+    ``pyproject.toml`` that nothing in it consults.
+
     An unreadable block is an error, not an empty set. ``frozenset()`` means "this
-    script declares nothing", which silently exempts every guarded import in the
-    file; a malformed block would therefore turn the rule off for that script
-    while still reporting a clean scan.
+    script declares nothing", which exempts every guard in the file; a malformed
+    block would therefore turn the rule off for that script while still
+    reporting a clean scan.
     """
     lines = source.splitlines()
     if not any(line.strip().startswith(_SCRIPT_MARKER) for line in lines):
-        return frozenset(), None
+        return None, None
     collected: list[str] = []
     inside = False
     for line in lines:
@@ -304,7 +335,7 @@ def _module_distribution_map() -> dict[str, frozenset[str]]:
         return {}
     try:
         mapping = packages_distributions()
-    except (PackageNotFoundError, OSError):  # pragma: no cover - broken environment
+    except PackageNotFoundError, OSError:  # pragma: no cover - broken environment
         return {}
     return {
         module: frozenset(distributions)
@@ -386,7 +417,7 @@ def scan_import_error_guards(
     path: Path,
     tree: ast.Module,
     facts: DependencyFacts,
-    script_required: frozenset[str],
+    script_required: frozenset[str] | None,
 ) -> tuple[list[Violation], list[str]]:
     """Flag ``try: import x / except ImportError`` around required dependencies.
 
@@ -418,9 +449,14 @@ def scan_import_error_guards(
         for module, line in _imported_modules(node):
             if module in _STDLIB_MODULES or module in _STDLIB_ALWAYS:
                 continue  # stdlib needs no declaration; guarding it is merely dead code
-            if script_required:
+            if script_required is not None:
                 if not facts.declared_in_script(module, script_required):
-                    continue  # script probe of an undeclared (optional) module
+                    # An undeclared module in a script is a legitimate optional
+                    # probe (accelerators such as ``orjson``), unless an alias
+                    # could be hiding a declared dependency behind this name.
+                    if facts.alias_is_unprovable(module, script_required):
+                        unresolved.append(module)
+                    continue
                 reason = (
                     "is declared as a script dependency, so `uv run` always installs it"
                 )
@@ -428,7 +464,7 @@ def scan_import_error_guards(
                 continue  # probing an optional project dependency is the legitimate use
             elif facts.is_declared(module):
                 reason = "is a required project dependency"
-            elif not facts.has_resolver():
+            elif facts.alias_is_unprovable(module, facts.required | facts.optional):
                 unresolved.append(module)
                 continue
             else:
@@ -511,9 +547,25 @@ def scan_banned_noqa(
 
 
 def scan_file(
-    path: Path, facts: DependencyFacts, banned: frozenset[str]
+    path: Path,
+    facts: DependencyFacts | None,
+    banned: frozenset[str],
+    resolver: dict[str, frozenset[str]],
 ) -> tuple[list[Violation], str | None]:
-    """Scan one file. Returns (violations, parse_error)."""
+    """Scan one file. Returns (violations, error).
+
+    *facts* may be ``None`` when no project ``pyproject.toml`` exists. That is
+    fine for a PEP 723 script, which is judged against its own ``dependencies``
+    block and never consults project facts; it is an error for a project file,
+    whose guards have nothing to be judged against.
+
+    *resolver* is passed separately from *facts* because it has different
+    provenance: project declarations come from ``pyproject.toml`` and may be
+    absent, while the import-to-distribution index comes from the installed
+    environment and is available either way. Folding the two into one optional
+    object emptied the resolver whenever the project facts were absent, which
+    silently turned ``PIL`` into an undeclared module and skipped the guard.
+    """
     try:
         source = path.read_text(encoding="utf-8", errors="replace")
     except OSError as error:
@@ -534,8 +586,19 @@ def scan_file(
     script_required, block_error = _read_script_dependencies(source)
     if block_error is not None:
         return violations, f"{path}: {block_error}"
+    if script_required is None and facts is None:
+        return violations, (
+            f"{path}: not a PEP 723 script and no pyproject.toml was found, so "
+            "`IMPORT-ERROR-GUARD` has no dependency facts to judge this file "
+            "against.\nFix: pass --project-root <dir-with-pyproject.toml>."
+        )
     guard_violations, unresolved = scan_import_error_guards(
-        path, tree, facts, script_required
+        path,
+        tree,
+        facts
+        if facts is not None
+        else DependencyFacts(frozenset(), frozenset(), resolver),
+        script_required,
     )
     violations.extend(guard_violations)
     violations.sort(
@@ -545,9 +608,10 @@ def scan_file(
         return violations, (
             f"{path}: cannot judge the guard(s) on "
             + ", ".join(f"`{module}`" for module in unresolved)
-            + ": no installed distributions are visible, so an import name that "
-            "differs from its distribution name (PIL/Pillow) cannot be matched "
-            "and reporting it as undeclared would be a false positive.\n"
+            + ": the dependency(s) declared here are not visible among the "
+            "installed distributions, so an import name that differs from its "
+            "distribution name (PIL/Pillow) cannot be matched and reporting it "
+            "as undeclared would be a false positive.\n"
             "Fix: run this in the project environment, e.g.\n"
             "  uv run assets/check_antipatterns.py <paths>\n"
             "or install the dependencies first with `uv sync`."
@@ -621,17 +685,19 @@ def main(argv: list[str] | None = None) -> int:
     else:
         detected = _project_root(targets[0])
         if detected is None:
+            # Not fatal yet: a PEP 723 script carries its own dependencies and
+            # never consults project facts, so a scripts-only scan needs no
+            # pyproject.toml. A project file without one is reported per file
+            # by scan_file, which still refuses to fall back to the working
+            # directory.
             print(
-                "ERROR: no pyproject.toml found at or above "
-                f"{targets[0]}, so the dependency facts that `IMPORT-ERROR-GUARD` "
-                "judges against do not exist.\n"
-                "Fix: pass --project-root <dir-with-pyproject.toml>. Refusing to "
-                "fall back to the working directory, which would judge these "
-                "files against an unrelated project's dependencies.",
+                "NOTE: no pyproject.toml at or above "
+                f"{targets[0]}; project files will fail unless a PEP 723 block "
+                "declares their dependencies. Pass --project-root to set the "
+                "facts explicitly.",
                 file=sys.stderr,
             )
-            return 2
-        root = detected.resolve()
+        root = detected.resolve() if detected is not None else None
 
     discovery_errors: list[str] = []
     files = discover_python_files(targets, discovery_errors, args.exclude)
@@ -650,18 +716,20 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 2
 
-    required, optional, pyproject_error = _read_pyproject(root)
-    if pyproject_error is not None:
-        print(f"ERROR: {pyproject_error}", file=sys.stderr)
-        return 2
-    # An empty distribution map is not fatal by itself: literal matches still
-    # work and PEP 723 scripts never need it. It only becomes a failed scan when
-    # a guard actually needs an alias resolved, which scan_file reports.
-    facts = DependencyFacts(
-        required=required,
-        optional=optional,
-        module_to_distribution=_module_distribution_map(),
-    )
+    # The resolver is environment-derived, so it is built whether or not a
+    # project root exists. An empty project fact set must not empty it.
+    resolver = _module_distribution_map()
+    facts: DependencyFacts | None = None
+    if root is not None:
+        required, optional, pyproject_error = _read_pyproject(root)
+        if pyproject_error is not None:
+            print(f"ERROR: {pyproject_error}", file=sys.stderr)
+            return 2
+        facts = DependencyFacts(
+            required=required,
+            optional=optional,
+            module_to_distribution=resolver,
+        )
     banned = frozenset(code.upper() for code in args.ban_noqa)
     if banned:
         known = _known_ruff_codes()
@@ -688,16 +756,21 @@ def main(argv: list[str] | None = None) -> int:
     violations: list[Violation] = []
     parse_errors: list[str] = []
     for path in files:
-        found, error = scan_file(path, facts, banned)
+        found, error = scan_file(path, facts, banned, resolver)
         violations.extend(found)
         if error is not None:
             parse_errors.append(error)
 
+    # ``root`` only decides how paths are displayed; a scripts-only scan has no
+    # project root, so fall back to the first target purely for relativization.
+    display_root = root if root is not None else targets[0]
     if args.json:
         print(
             json.dumps(
                 {
-                    "violations": [violation.as_dict(root) for violation in violations],
+                    "violations": [
+                        violation.as_dict(display_root) for violation in violations
+                    ],
                     "parse_errors": parse_errors,
                     "summary": _summarize(violations),
                     "total": len(violations),
@@ -707,7 +780,7 @@ def main(argv: list[str] | None = None) -> int:
             )
         )
     else:
-        _report(violations, parse_errors, root, files)
+        _report(violations, parse_errors, display_root, files)
     return 2 if parse_errors else (1 if violations else 0)
 
 
@@ -748,7 +821,7 @@ def _known_ruff_codes() -> frozenset[str] | None:
             timeout=_RUFF_TIMEOUT_SECONDS,
             check=False,
         )
-    except (OSError, subprocess.SubprocessError):
+    except OSError, subprocess.SubprocessError:
         return None
     if result.returncode != 0 or not (result.stdout or "").strip():
         return None
