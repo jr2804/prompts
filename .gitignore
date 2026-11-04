@@ -2,6 +2,11 @@ uv.lock
 __pycache__
 skills-lock.json
 
+# Generated MCP/coding agent configs
+/.pi/
+/opencode.jsonc
+/.mcp.json
+
 # Keep .agents/ DOX .md files tracked (override any blanket ignore)
 /.agents/*
 !/.agents/*.md
