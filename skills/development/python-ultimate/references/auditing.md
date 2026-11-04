@@ -39,6 +39,10 @@ Analyze overall structure and design decisions.
 - Unclear boundaries between layers
 - Hidden coupling through global state
 
+Also check for the mechanism behind this red flag: `global` statements and
+module-level variables mutated at runtime. See
+[module state](../references/module-state.md) for the replacement patterns.
+
 ______________________________________________________________________
 
 ### 2. Code Quality

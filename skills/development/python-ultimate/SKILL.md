@@ -20,6 +20,7 @@ A modular Python guide. This entrypoint routes tasks to concise reference files;
 - **Writing code:** [Coding Standards](references/coding-standards.md)
 - **Checking names:** [Naming Conventions](references/naming-conventions.md)
 - **Designing domain types:** [Domain Types, Enums, and Structured Data](references/type-design.md)
+- **Handling module state, globals, or constant tables:** [Module State and Globals](references/module-state.md)
 - **Building a CLI:** [CLI Development](references/cli-development.md)
 - **Fixing linter errors:** [Linter Rules](references/linter-rules.md)
 - **Writing tests:** [Testing](references/testing.md)
@@ -42,6 +43,7 @@ An optional topic/sub-command selects a focused review. If none is provided, per
 | `naming` | File and directory variable naming; forbidden-scan fixtures | [naming-conventions.md](references/naming-conventions.md) |
 | `type-checking` | `TYPE_CHECKING`, shared types, import cycles | [type-checking.md](references/type-checking.md) |
 | `type-design` | `StrEnum`, `Literal`, repeated strings, structured data | [type-design.md](references/type-design.md) |
+| `module-state` | Globals, `global`, cached getters, module constant tables | [module-state.md](references/module-state.md) |
 | `imports` | Required and optional dependency imports | [imports-optional-dependencies.md](references/imports-optional-dependencies.md) |
 | `coding-standards` | Types, formatting, paths, docstrings, data modeling | [coding-standards.md](references/coding-standards.md) |
 | `linter-rules` | Context-aware Ruff fixes | [linter-rules.md](references/linter-rules.md) |
@@ -82,6 +84,8 @@ Use this as the default broad-review checklist. Detailed rationale and examples 
 | Type hints | `Optional[T]` | `T \| None` | [Coding standards](references/coding-standards.md) |
 | Domain values | Reusable `Literal["..."]` sets or duplicated domain strings | One `StrEnum` in its owning/shared module | [Type design](references/type-design.md) |
 | Data modeling | `dict[str, Any]` / `dict[str, object]` used as records | Internal dataclass; validated wire model; precise map types | [Type design](references/type-design.md) |
+| Module state | Module-level variables mutated at runtime; the `global` statement (PLW0603) | Pass state explicitly; `@functools.cache` getter for read-only values | [Module state](references/module-state.md) |
+| Module state | Long or mutable module-level constant tables (`dict`/`list` of `str`) | Dedicated data module, `MappingProxyType`, enum keys + frozen records | [Module state](references/module-state.md) |
 | String formatting | `.format()` or `%` formatting | f-strings | [Coding standards](references/coding-standards.md) |
 | Paths | `os.path` usage | `pathlib.Path` | [Coding standards](references/coding-standards.md) |
 | Imports | `sys.path` manipulation to make project modules importable | Fix package layout or installation | [Project setup](references/project-setup.md) |
@@ -107,6 +111,7 @@ Use this as the default broad-review checklist. Detailed rationale and examples 
 - Use `uv run` for Python commands; follow `references/uv.md` for documented bootstrap or activated-environment exceptions.
 - Avoid `TYPE_CHECKING` guards; fix dependency direction or use the documented alternatives.
 - Prefer explicit domain types and precise data models; see the type-design and coding standards references.
+- Never use the `global` statement or runtime-mutated module variables; model read-only process-wide values as a `@functools.cache` getter (see module state).
 - Consult the task-specific reference for full procedures, examples, compatibility notes, and exceptions.
 
 ## Reference Map
@@ -122,6 +127,7 @@ Use this as the default broad-review checklist. Detailed rationale and examples 
 | [file-analysis.md](references/file-analysis.md) | Non-destructive file and codebase analysis |
 | [imports-optional-dependencies.md](references/imports-optional-dependencies.md) | Required vs. optional imports |
 | [linter-rules.md](references/linter-rules.md) | Ruff rules and context-aware fixes |
+| [module-state.md](references/module-state.md) | Globals, `global`/PLW0603, cached getters, constant tables |
 | [naming-conventions.md](references/naming-conventions.md) | File, directory, variable, and fixed-vocabulary naming |
 | [planning.md](references/planning.md) | Feature planning and plan structure |
 | [project-setup.md](references/project-setup.md) | Project structure, dependencies, and imports |

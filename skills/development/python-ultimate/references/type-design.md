@@ -208,6 +208,9 @@ valid. The rule is to avoid using a string-keyed dictionary as an undocumented
 record, and never to silence uncertainty with `Any` or `object` when the shape
 can be made explicit.
 
+For module-level lookup tables built from these types — where they should live,
+and how to keep them read-only — see [module-state.md](module-state.md).
+
 ## Audit checklist
 
 When writing or reviewing code, check each applicable item:

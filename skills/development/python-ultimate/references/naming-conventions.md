@@ -242,6 +242,10 @@ strings or repeated literals. `StrEnum` is built into Python 3.11+; for Python
 3.10 see the compatible form and detailed rules in
 [Domain Types, Enums, and Structured Data](type-design.md).
 
+A module-level name is only a constant if it is never rebound or mutated after
+definition. Mutable module state is forbidden; see
+[Module State and Globals](module-state.md).
+
 ```python
 from enum import StrEnum
 

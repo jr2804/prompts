@@ -30,6 +30,7 @@ description: Consolidated Python coding standards reference for type hints, stri
     - [Environment Variables](#environment-variables)
   - [11. Error Handling](#11-error-handling)
   - [12. Prohibited Patterns](#12-prohibited-patterns)
+    - [Global Variables and the global Statement](#global-variables-and-the-global-statement)
     - [TYPE_CHECKING](#type_checking)
     - [Prohibited Linter Rules](#prohibited-linter-rules)
     - [os.path](#ospath)
@@ -179,6 +180,10 @@ See [naming-conventions.md](naming-conventions.md) for comprehensive naming conv
 - Fixture naming conventions
 - Unused loop variables
 - Constants and enums
+
+Module-level constants are covered there for naming; for when a constant table
+belongs in its own module, and why mutable module state is forbidden, see
+[module-state.md](module-state.md).
 
 ______________________________________________________________________
 
@@ -554,6 +559,43 @@ ______________________________________________________________________
 
 ## 12. Prohibited Patterns
 
+### Global Variables and the global Statement
+
+Never use the `global` statement, and never mutate a module-level variable at
+runtime. Pass state as a parameter, hold it on an object, or return it from a
+function. Ruff reports the statement as **PLW0603** — treat that finding as a
+hard error and never suppress it.
+
+```python
+# WRONG
+_counter = 0
+
+
+def next_id() -> int:
+    global _counter  # PLW0603 — never
+    _counter += 1
+    return _counter
+
+
+# RIGHT — an object owns the state
+class IdGenerator:
+    def __init__(self) -> None:
+        self._next = 0
+
+    def next_id(self) -> int:
+        self._next += 1
+        return self._next
+```
+
+Global state hides coupling, makes behavior depend on import order and left-over
+values, defeats isolated tests, and is unsafe under threads or async tasks.
+
+For a value that is computed once and never changes, use a read-only
+`@functools.cache` getter instead of an assignable module variable. For long or
+mutable module-level constant tables, move them out of the module header and
+expose read-only views with precise types. Full rationale, examples, and the
+decision table live in [module-state.md](module-state.md).
+
 ### TYPE_CHECKING
 
 Never use `TYPE_CHECKING` as a permanent solution for circular imports. Refactor to eliminate circular dependencies.
@@ -582,6 +624,7 @@ Never suppress linter issues with `# noqa`. Fix the underlying issue instead.
 
 Never introduce these rules:
 
+- **PLW0603** - `global` statement (use explicit state instead)
 - **PLC0415**, **E402** - Import at top of file
 - **ANN001** - Missing type annotation for function argument
 - **E402** - Module-level import not at top of file

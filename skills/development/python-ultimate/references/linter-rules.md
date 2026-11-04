@@ -8,6 +8,7 @@
 - [B008: Function Call in Default Argument](#b008-function-call-in-default-argument)
 - [S108: Hardcoded Temp File](#s108-hardcoded-temp-file)
 - [PLC0415: Import Outside Top-Level](#plc0415-import-outside-top-level)
+- [PLW0603: Global Statement](#plw0603-global-statement)
 - [NPY002: Legacy NumPy Random Generation](#npy002-legacy-numpy-random-generation)
 - [S311: Suspicious Non-Cryptographic Random Usage](#s311-suspicious-non-cryptographic-random-usage)
 - [Typer CLI Exception for B008](#typer-cli-exception-for-b008)
@@ -206,6 +207,55 @@ from .core import processors
 
 ______________________________________________________________________
 
+## PLW0603: Global Statement
+
+**Rule Code:** PLW0603 (`global-statement`)
+
+**Description:** A function uses the `global` statement to rebind a
+module-level name.
+
+**Problem Pattern:** Treating a module-level variable as mutable shared state.
+
+**Fix Pattern:** **Never fix this by suppressing it.** `# noqa: PLW0603` and
+disabling the rule are both forbidden — the finding always indicates a design
+problem. Replace the shared variable with explicit state:
+
+- **Changing value** → return the new value, or hold it on an object that is
+  passed in (`self._next += 1`).
+- **Read-only value computed once** → a `@functools.cache` getter returning a
+  frozen value.
+- **Temporary context** → an explicit parameter or a small dataclass passed
+  through the call chain.
+
+**Example:**
+
+```python
+# WRONG
+_cache: dict[str, str] = {}
+
+
+def load(name: str) -> str:
+    global _cache  # PLW0603
+    if name not in _cache:
+        _cache[name] = name.upper()
+    return _cache[name]
+
+
+# RIGHT — module variable becomes a cached getter result
+from functools import cache
+
+
+@cache
+def load(name: str) -> str:
+    return name.upper()
+```
+
+**Related:** [Module State and Globals](module-state.md) covers the full
+rationale, mutability checks for module-level containers, and the
+module-constant-table rules.
+
+______________________________________________________________________
+
 ## NPY002: Legacy NumPy Random Generation
 
 **Rule Code:** NPY002
@@ -302,6 +352,7 @@ ______________________________________________________________________
 | **CLI (Typer)** | Use `Annotated` pattern, do not fix B008 |
 | **Data Science** | Prefer NumPy `default_rng()` over standard `random` |
 | **Imports** | Module level by default; see [canonical import guidance](imports-optional-dependencies.md) for exceptions |
+| **Global State** | Never suppress PLW0603; use explicit state or a `@cache` getter ([module state](module-state.md)) |
 
 **When in doubt:**
 
