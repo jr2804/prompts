@@ -1,0 +1,8 @@
+# These files are deliberately non-compliant fixtures.
+#
+# `mise run lint` runs `ruff check ./ --fix --unsafe-fixes` from the repository
+# root, which previously rewrote them into compliant code and silently
+# destroyed the fixtures (see commit 08ac78f, where UP045/PYI006 removed the
+# `TYPE_CHECKING` and `Optional` cases that `--check-forbidden` is meant to
+# detect). Excluding the directory keeps the fixtures intact.
+exclude = ["*"]

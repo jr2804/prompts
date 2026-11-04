@@ -255,3 +255,12 @@ ______________________________________________________________________
 - `read` — Detailed file analysis
 - `bash` — Run linters, complexity analyzers, coverage tools
 - LSP diagnostics — IDE-level issue detection
+- `uv run assets/check_antipatterns.py <paths>` — the two antipatterns Ruff cannot
+  express (`IMPORT-ERROR-GUARD`, `BANNED-NOQA`); see
+  [linter-rules.md](linter-rules.md#which-tool-enforces-what)
+- `uv run assets/check_path_naming.py --check-files <paths>` — path and variable
+  naming; see [naming-conventions.md](naming-conventions.md)
+
+Let Ruff and `ty` report everything they already cover (`PLW0603`, `PGH004`,
+`RUF100`, `PTH`, `UP045`, `PLC0415`, `TCH`) rather than re-deriving those in prose
+or in a custom script.

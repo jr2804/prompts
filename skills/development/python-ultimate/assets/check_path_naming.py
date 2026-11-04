@@ -49,6 +49,25 @@ FORBIDDEN_REASON: dict[str, str] = {
     "defensive required import": "Check whether this ImportError guard is wrapping a required dependency import.",
 }
 
+#: A real suppression directive starts the comment token, e.g. ``x = 1  # ...``.
+#: Anchored with ``match`` so prose that merely mentions the directive name is
+#: not a hit; Ruff's own parser behaves the same way.
+_NOQA_DIRECTIVE_RE = re.compile(r"#\s*noqa\b", re.IGNORECASE)
+
+#: Directories never worth walking into when collecting Python files.
+SKIP_DIRS: frozenset[str] = frozenset(
+    {
+        ".git",
+        ".tox",
+        ".venv",
+        "__pycache__",
+        "build",
+        "dist",
+        "node_modules",
+        "venv",
+    }
+)
+
 
 class PathValidity(str, enum.Enum):
     """Validation results for path variable naming."""
@@ -124,18 +143,22 @@ Examples:
             return 2
 
         if check_path.is_file():
-            violations = scan_python_file(check_path)
+            errors: list[str] = []
+            violations = scan_python_file(check_path, errors)
             if violations:
                 print(f"\nFound {len(violations)} violation(s) in {check_path}:")
                 for line_num, var_name, reason in violations:
                     print(f"  Line {line_num}: {reason}")
+                _emit_scan_errors(errors)
                 return 1
-            else:
-                print(f"No violations found in {check_path}")
-                return 0
+            if _emit_scan_errors(errors):
+                return 2
+            print(f"No violations found in {check_path}")
+            return 0
 
         elif check_path.is_dir():
-            violations = scan_directory(check_path)
+            errors: list[str] = []
+            violations = scan_directory(check_path, errors)
             total = sum(len(v) for v in violations.values())
 
             if violations:
@@ -145,10 +168,13 @@ Examples:
                     for line_num, var_name, reason in file_violations:
                         print(f"  Line {line_num}: {reason}")
                     print()
+                _emit_scan_errors(errors)
                 return 1
-            else:
-                print(f"No violations found in {check_path}")
-                return 0
+
+            if _emit_scan_errors(errors):
+                return 2
+            print(f"No violations found in {check_path}")
+            return 0
 
     # Check forbidden-style patterns
     if args.check_forbidden:
@@ -159,20 +185,24 @@ Examples:
             return 2
 
         if check_path.is_file():
-            matches = scan_forbidden_patterns(check_path)
+            errors = []
+            matches = scan_forbidden_patterns(check_path, errors)
             if matches:
                 print(
                     f"\nFound {len(matches)} forbidden pattern match(es) in {check_path}:"
                 )
                 for line_num, pattern_name, reason in matches:
                     print(f"  Line {line_num}: [{pattern_name}] {reason}")
+                _emit_scan_errors(errors)
                 return 1
-            else:
-                print(f"No forbidden pattern matches found in {check_path}")
-                return 0
+            if _emit_scan_errors(errors):
+                return 2
+            print(f"No forbidden pattern matches found in {check_path}")
+            return 0
 
         if check_path.is_dir():
-            matches = scan_directory_forbidden(check_path)
+            errors = []
+            matches = scan_directory_forbidden(check_path, errors)
             total = sum(len(v) for v in matches.values())
 
             if matches:
@@ -184,8 +214,11 @@ Examples:
                     for line_num, pattern_name, reason in file_matches:
                         print(f"  Line {line_num}: [{pattern_name}] {reason}")
                     print()
+                _emit_scan_errors(errors)
                 return 1
 
+            if _emit_scan_errors(errors):
+                return 2
             print(f"No forbidden pattern matches found in {check_path}")
             return 0
 
@@ -193,30 +226,71 @@ Examples:
     return 2
 
 
-def scan_directory(directory: Path) -> dict[Path, list[tuple[int, str, str]]]:
+def scan_directory(
+    directory: Path, errors: list[str]
+) -> dict[Path, list[tuple[int, str, str]]]:
     """Recursively scan directory for Python files with violations.
 
     Args:
         directory: Directory to scan
+        errors: List collecting read failures. Required, not optional: a
+            caller that could omit it could report a vacuous success.
 
     Returns:
         Dictionary mapping file paths to their violation lists
     """
     all_violations: dict[Path, list[tuple[int, str, str]]] = {}
+    files = discover_python_files(directory)
+    if not files:
+        errors.append(
+            f"no Python files found under {directory} - refusing to report success. "
+            "Check the path, or pass a directory that actually contains Python."
+        )
 
-    for py_file in directory.rglob("*.py"):
-        violations = scan_python_file(py_file)
+    for py_file in files:
+        violations = scan_python_file(py_file, errors)
         if violations:
             all_violations[py_file] = violations
 
     return all_violations
 
 
-def scan_python_file(file_path: Path) -> list[tuple[int, str, str]]:
+def discover_python_files(directory: Path) -> list[Path]:
+    """Python files under *directory*, skipping caches and virtualenvs."""
+    return sorted(
+        path
+        for path in directory.rglob("*.py")
+        if not SKIP_DIRS.intersection(path.parts)
+    )
+
+
+def _report_unreadable(exc: Exception, errors: list[str], file_path: Path) -> None:
+    """Record a read/parse failure so the scan cannot pass vacuously."""
+    if isinstance(exc, SyntaxError):
+        errors.append(
+            f"{file_path}:{exc.lineno}: cannot parse ({exc.msg}). "
+            "Fix the syntax first; naming rules need the AST."
+        )
+    else:
+        errors.append(
+            f"{file_path}: cannot read ({exc}). Check permissions or the path."
+        )
+
+
+def _emit_scan_errors(errors: list[str]) -> bool:
+    """Print collected scan errors; return True when the scan was unreliable."""
+    for message in errors:
+        print(f"ERROR: {message}", file=sys.stderr)
+    return bool(errors)
+
+
+def scan_python_file(file_path: Path, errors: list[str]) -> list[tuple[int, str, str]]:
     """Scan a Python file for path variable naming violations.
 
     Args:
         file_path: Path to Python file to scan
+        errors: List collecting read failures, so the caller can fail
+            instead of reporting a vacuous success. Required for that reason.
 
     Returns:
         List of (line_number, variable_name, reason) tuples for violations
@@ -238,9 +312,8 @@ def scan_python_file(file_path: Path) -> list[tuple[int, str, str]]:
 
     try:
         content = file_path.read_text(encoding="utf-8")
-    except OSError:
-        return violations
-    except UnicodeError:
+    except (OSError, UnicodeError) as exc:
+        _report_unreadable(exc, errors, file_path)
         return violations
 
     for line_num, line in enumerate(content.splitlines(), 1):
@@ -295,10 +368,14 @@ def check_path_naming(name: str | Path) -> PathValidity:
         <PathValidity.INVALID: 'invalid'>
     """
     # Convert Path to string if needed
-    var_name = str(name)
+    candidate_name = str(name)
 
     # Strip any Path parent components, get just the name
-    var_name = Path(var_name).name if "/" in var_name or "\\" in var_name else var_name
+    var_name = (
+        Path(candidate_name).name
+        if "/" in candidate_name or "\\" in candidate_name
+        else candidate_name
+    )
 
     # Anti-patterns - bare generic names for path-related variables
     # These are always invalid when representing file system paths
@@ -387,30 +464,43 @@ def get_violation_reason(name: str, validity: PathValidity) -> str | None:
     return f"'{name}' missing required suffix - use '_file' for files, '_dir' for directories"
 
 
-def scan_directory_forbidden(directory: Path) -> dict[Path, list[tuple[int, str, str]]]:
+def scan_directory_forbidden(
+    directory: Path, errors: list[str]
+) -> dict[Path, list[tuple[int, str, str]]]:
     """Recursively scan directory for forbidden-style pattern matches.
 
     Args:
         directory: Directory to scan
+        errors: List collecting read/parse failures. Required, not optional.
 
     Returns:
         Dictionary mapping file paths to their forbidden-style matches
     """
     all_matches: dict[Path, list[tuple[int, str, str]]] = {}
+    files = discover_python_files(directory)
+    if not files:
+        errors.append(
+            f"no Python files found under {directory} - refusing to report success. "
+            "Check the path, or pass a directory that actually contains Python."
+        )
 
-    for py_file in directory.rglob("*.py"):
-        file_matches = scan_forbidden_patterns(py_file)
+    for py_file in files:
+        file_matches = scan_forbidden_patterns(py_file, errors)
         if file_matches:
             all_matches[py_file] = file_matches
 
     return all_matches
 
 
-def scan_forbidden_patterns(file_path: Path) -> list[tuple[int, str, str]]:
+def scan_forbidden_patterns(
+    file_path: Path, errors: list[str]
+) -> list[tuple[int, str, str]]:
     """Scan a Python file for forbidden-style patterns.
 
     Args:
         file_path: Path to Python file to scan
+        errors: List collecting read/parse failures, so a caller can fail
+            instead of reporting a vacuous success. Required for that reason.
 
     Returns:
         List of (line_number, pattern_name, reason) tuples for matches
@@ -419,16 +509,16 @@ def scan_forbidden_patterns(file_path: Path) -> list[tuple[int, str, str]]:
 
     try:
         content = file_path.read_text(encoding="utf-8")
-    except OSError:
-        return matches
-    except UnicodeError:
+    except (OSError, UnicodeError) as exc:
+        _report_unreadable(exc, errors, file_path)
         return matches
 
     found: set[tuple[int, str]] = set()
 
     try:
         tree = ast.parse(content)
-    except SyntaxError:
+    except SyntaxError as exc:
+        _report_unreadable(exc, errors, file_path)
         return matches
 
     for node in ast.walk(tree):
@@ -478,9 +568,7 @@ def scan_forbidden_patterns(file_path: Path) -> list[tuple[int, str, str]]:
 
     token_stream = tokenize.generate_tokens(io.StringIO(content).readline)
     for token in token_stream:
-        if token.type == tokenize.COMMENT and re.search(
-            r"#\s*noqa\b", token.string, re.IGNORECASE
-        ):
+        if token.type == tokenize.COMMENT and _NOQA_DIRECTIVE_RE.match(token.string):
             found.add((token.start[0], "noqa suppression"))
 
     for line_num, pattern_name in sorted(found):

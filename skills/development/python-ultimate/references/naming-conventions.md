@@ -132,6 +132,10 @@ uv run skills/development/python-ultimate/assets/check_path_naming.py --check-fo
 
 See the [forbidden-scan fixture expectations](../assets/examples/forbidden-scan-expected.md).
 
+Both modes exit `0` clean, `1` on findings, and `2` when the scan itself was
+unreliable — an empty directory or a file that cannot be read or parsed. Never
+treat exit `2` as a pass; fix the scan root or the file first.
+
 ______________________________________________________________________
 
 ## 2. Test Naming

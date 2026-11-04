@@ -16,12 +16,17 @@ uv run skills/development/python-ultimate/assets/check_path_naming.py --check-fo
 
 Expected pattern classes:
 
-- `TYPE_CHECKING guard` (import and conditional guard)
+- `TYPE_CHECKING guard` (the import line, the `if` guard, and the inner guard)
 - `Optional[T]`
 
 Expected count:
 
-- 3 matches
+- 4 matches
+
+These fixtures are deliberately non-compliant, so `assets/examples/.ruff.toml`
+excludes them from `ruff check --fix --unsafe-fixes`. Without that exclusion the
+repository lint task rewrites `Optional[str]` to `str | None` and drops the
+`TYPE_CHECKING` block, leaving the fixture with nothing to detect.
 
 ### fixture_paths_and_noqa.py
 
@@ -47,7 +52,17 @@ Expected count:
 
 ## Expected Aggregate
 
-- Total matches: 8
+- Total matches: 9
 - Exit code: 1 (findings present)
 
 The scanner prints file paths, line numbers, pattern class labels, and a short remediation reason for each match.
+
+## Vacuous-scan safety
+
+Both scanners refuse to report success when they scanned nothing, or when a file
+could not be read or parsed. An empty directory or a syntax error exits `2`:
+
+```bash
+uv run skills/development/python-ultimate/assets/check_path_naming.py --check-forbidden /empty/dir
+# ERROR: no Python files found under /empty/dir - refusing to report success
+```

@@ -3,6 +3,7 @@
 ## Table of Contents
 
 - [Overview](#overview)
+- [Which Tool Enforces What](#which-tool-enforces-what)
 - [E402: Module Level Import Not at Top of File](#e402-module-level-import-not-at-top-of-file)
 - [B007: Loop Control Variable Not Used](#b007-loop-control-variable-not-used)
 - [B008: Function Call in Default Argument](#b008-function-call-in-default-argument)
@@ -25,6 +26,205 @@ When fixing linter errors:
 1. Identify the rule code from the linter output
 2. Select the appropriate fix pattern based on your code's context
 3. Apply the fix and verify it resolves the issue without introducing new problems
+
+______________________________________________________________________
+
+## Which Tool Enforces What
+
+Do not write a custom checker for something a configured linter already
+reports. Every rule below has a native owner; enable that rule instead of adding
+a script that re-implements it.
+
+| Rule | Enforced by | Configure instead of scanning |
+| --- | --- | --- |
+| `global` statement | `PLW0603` | Yes |
+| Blanket `# noqa` | `PGH004` | Yes |
+| Unused `# noqa` | `RUF100` | Yes |
+| `os.path` usage | `PTH` | Yes |
+| `Optional[T]` | `UP045` | Yes |
+| Inline / function-level imports | `PLC0415` | Yes |
+| `TYPE_CHECKING` guards | `TCH` (flake8-type-checking) | Yes |
+| Bare `python` invocations | `S603`/`S607` partially; review manually | No |
+| `sys.path` manipulation | — | Manual review |
+
+Two rules have no honest linter equivalent and live in a shipped scanner instead:
+
+| Rule | Why a linter cannot express it | Scanner |
+| --- | --- | --- |
+| `IMPORT-ERROR-GUARD` | Needs the dependency declaration (PEP 723 block or `pyproject.toml`) to decide whether the guard is dead weight or a legitimate optional probe | `assets/check_antipatterns.py` |
+| `BANNED-NOQA` | A project may ban specific suppression codes (`# noqa: PLW0603`) while allowing others; Ruff only reports unused or blanket noqa | `assets/check_antipatterns.py --ban-noqa CODE` |
+
+```bash
+# Everything a linter covers: let the linter do it.
+uvx ruff check --select PLW0603,PGH004,RUF100,PTH,UP045,PLC0415,TCH .
+
+# Only the two rules a linter cannot express:
+uv run assets/check_antipatterns.py src --ban-noqa PLW0603
+```
+
+The scanner exits `0` clean, `1` on findings, and `2` when the scan itself was
+invalid. Exit `2` is not a pass — it means the tool could not establish the facts
+the rules depend on:
+
+- no Python files were discovered under the given paths
+- a path argument does not exist, or `--project-root` names a directory with no
+  `pyproject.toml` — skipping either would silently narrow the scan
+- a file could not be read, parsed, or tokenized
+- a PEP 723 `dependencies` block, or the project's `pyproject.toml`, could not be
+  parsed (an unreadable block would silently exempt every guard in that file)
+- a `pyproject.toml` has no `[project]` table, so it declares no dependencies at
+  all (a workspace root is a normal shape; judging guards against it invents
+  facts). An empty `dependencies = []` list is different and honest
+- a guard imports a module whose dependency status could not be established
+  because `importlib.metadata` returned no import→distribution map, so an alias
+  (`PIL` → `Pillow`) cannot be matched. Scoped per module, not per scan: literal
+  matches still work and PEP 723 scripts never need the map, so making an empty
+  map fatal everywhere would reject honest runs
+- `--ban-noqa` names a code Ruff does not define, so the ban could never match
+
+A gate that read nothing and a gate that read everything and found nothing look
+identical in the exit code. Whenever a scanner gains an input layer, it must
+assert that the layer was actually read.
+
+## Make the vacuous pass unrepresentable
+
+Exit `2` is a runtime contract; the stronger fix is to make the mistake
+impossible to express. Empty is a *valid* value for a findings list and also the
+value a failure path wants to return, so `except ...: return []` reads like
+robustness while switching the rule off. Prefer these shapes, in order:
+
+1. **Required coverage sink.** `scan_file(path, errors: list[str])` — no default
+   for the parameter that carries failures. A caller who forgets it gets a type
+   error (`missing-argument`), not a vacuous pass. An `errors: list[str] | None
+   = None` default is the bug: it is the option to drop coverage, and some call
+   site will take it.
+2. **One implementation, plain accessor delegates.** When a gate needs both a
+   result and a result-with-coverage, `scan(x)` should be
+   `return scan_with_coverage(x).violations`. Never let the two be siblings —
+   duplicated coverage plumbing is exactly what rots. Prefer this over widening
+   the old return type, because existing assertions written as `== []` compare a
+   dataclass to a list, evaluate to `False`, and go on passing silently.
+3. **Explicit failure value.** Return `tuple[list[Violation], str | None]` and
+   let the caller turn a non-`None` error into exit `2`, rather than raising
+   through a loop that also collects real findings. This is a concession, not an
+   equal option: the caller can still ignore the error, so it only holds while
+   you can point at the `if error is not None: return 2` at every call site.
+   Prefer an exception where it fits — the type checker then does the work — and
+   reach for this shape only when partial results must be yielded before a
+   failure, which a raised exception cannot express.
+
+The narrow entry point should have no failure channel at all where possible. If
+its only caller needing coverage calls the covered variant directly, the failure
+channel exists exactly once, on the one path that checks it.
+
+Coverage has three faces, and each needs its own exit `2`: **input** (nothing
+was scanned), **facts** (a config or source file that grounds the rules could
+not be read), **errors** (a file failed mid-scan).
+
+There is a fourth face that is easier to miss: **derived facts**. The input files
+read fine, but what the gate *derived* from them came back empty — a dependency
+set from a `pyproject.toml` with no `[project]` table, a glob that matched
+nothing, a query that returned no rows. No exception is involved, so there is
+nothing to swallow and nothing for a grep to find. Every such gate needs
+`require_facts(count, what, remedy)` next to its `require_scanned(...)`.
+
+The optionality does not have to live in a parameter default. A silent guard is
+the same defect wearing different clothes:
+
+```python
+if not root.is_dir():
+    continue        # a typo in one --src silently narrows the scan
+```
+
+Anything that reduces coverage without raising is the bug, whether that is a
+keyword argument that defaults to `None` or an `if` that quietly skips a path.
+Grep for `errors.*\| None` finds the first kind; the second needs the question
+below.
+
+A grep audit finds only the first shape — swallowed errors. It cannot find a
+vacuous pass caused by a migration that emptied the input, because there is no
+error to swallow. Ask instead: *what does this gate read, and can that set be
+empty in a healthy repo?*
+
+## A passing verdict is not evidence of a scan
+
+Three failure modes reach exit `0` while judging nothing, and all three are
+cheap to test because each is one input made empty:
+
+| Empty this | And the gate concludes |
+| --- | --- |
+| the file set | everything it found is clean |
+| the derived facts | every rule has nothing to contradict |
+| the comparison set | parity, completeness, no gaps |
+
+The third is the quietest. A parity check that compares an empty CLI surface
+against an empty tool list prints **"Full Parity achieved!"** — a phrase that
+reads as a result rather than as the absence of one. And the counts that would
+betray it are usually printed: `0 config defaults`, `0 enum(s) reachable`. A
+summary line is part of the gate's contract, so if a count can legitimately be
+zero, the gate must decide what zero *means* instead of leaving that to the
+reader. `0 violation(s) in 0 file(s), 91 scanned` makes a clean run look like a
+scan that read nothing, because two different zeros sit side by side without
+saying which is which — name them (`0 file(s) with findings, 91 file(s)
+scanned`).
+
+A documented post-mortem does not close the class. A parity gate can carry a
+comment describing an earlier vacuous pass and still have one, because the
+lesson learned was "use the public API" rather than "assert you got something".
+Fix the instance *and* add the assertion.
+
+## Level 0: who decides where the facts come from
+
+Absence failures are testable by emptying an input. Identity failures are not:
+the gate returns something *confident and wrong*. The question is not "which
+project am I looking at" but **who decides** — the caller (`cwd`, environment
+variables, a config path) or the scanner itself (its own `__file__`, its own
+package).
+
+- A **caller-derived** fact source needs a `None`-and-exit. A fallback such as
+  `return Path.cwd()` in a project-root lookup converts "I do not know" into a
+  confident wrong answer, and the verdict then changes depending on where you
+  ran it from.
+- A **self-derived** source is safe by construction, because `cd` cannot relocate
+  it.
+
+So prefer identity derived from what the scanner owns. Test it by running the
+scanner from an unrelated directory and asserting that the verdict does *not*
+change for an absolute target — and that a tree with no facts still exits `2`
+rather than borrowing the caller's.
+
+## When zero is an honest answer
+
+Zero dependencies can be a legitimate result or a broken scan, and only the
+input's shape tells you which:
+
+- `[project]` with `dependencies = []` — honest: the project really declares
+  none, so a guard around a third-party module is genuinely undeclared.
+- `[build-system]` only, no `[project]` table — a normal *virtual* workspace root
+  (`[tool.uv.workspace]` with members, no package of its own) that declares no
+  dependencies because the question does not apply there. Treating this as
+  "zero facts established" is wrong in the other direction.
+
+A `require_facts` guard that only counts will reject the second case. Check the
+shape first, then count.
+
+### Fatal at the right scope, not the earliest scope
+
+The reflex after finding an empty fact set is to guard it as early as possible,
+so the failure cannot be missed. Wrong axis: ask whether **every** judgment needs
+that fact, or only some.
+
+An empty import→distribution map is a good example. Guarding it in `main()`
+rejected scans that never needed it — literal matches (`requests` declared as
+`requests`) resolve without the map, and PEP 723 scripts are judged against
+their own `dependencies`, so they never use it either. The honest scope is the
+one judgment that actually consults it: a *single module* whose name cannot be
+matched to any declared distribution. That module is unknown, not undeclared,
+and the file fails with the module named.
+
+The general shape: a missing fact should fail the judgments that depend on it,
+and a scan whose judgments never touch it should pass. An early guard is only
+safer if the fact really is global input.
 
 ______________________________________________________________________
 

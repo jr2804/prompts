@@ -33,6 +33,7 @@ A modular Python guide. This entrypoint routes tasks to concise reference files;
 - **Running Python:** [uv Execution](references/uv.md)
 - **Writing standalone scripts:** [uv Scripts](references/uv-scripts.md)
 - **Managing a project:** [uv Projects](references/uv-projects.md)
+- **Scanning for antipatterns a linter cannot catch:** `uv run assets/check_antipatterns.py <paths>`; see [Linter Rules](references/linter-rules.md#which-tool-enforces-what)
 
 ## Routing and Commands
 
@@ -46,7 +47,7 @@ An optional topic/sub-command selects a focused review. If none is provided, per
 | `module-state` | Globals, `global`, cached getters, module constant tables | [module-state.md](references/module-state.md) |
 | `imports` | Required and optional dependency imports | [imports-optional-dependencies.md](references/imports-optional-dependencies.md) |
 | `coding-standards` | Types, formatting, paths, docstrings, data modeling | [coding-standards.md](references/coding-standards.md) |
-| `linter-rules` | Context-aware Ruff fixes | [linter-rules.md](references/linter-rules.md) |
+| `linter-rules` | Context-aware Ruff fixes; which tool enforces which rule | [linter-rules.md](references/linter-rules.md) |
 | `debugging` | Root-cause-first, four-phase debugging | [debugging.md](references/debugging.md) |
 | `testing` | Tests, fixtures, mocks, TDD, coverage | [testing.md](references/testing.md) |
 | `audit` | Six-dimension codebase audit | [auditing.md](references/auditing.md) |
@@ -113,6 +114,26 @@ Use this as the default broad-review checklist. Detailed rationale and examples 
 - Prefer explicit domain types and precise data models; see the type-design and coding standards references.
 - Never use the `global` statement or runtime-mutated module variables; model read-only process-wide values as a `@functools.cache` getter (see module state).
 - Consult the task-specific reference for full procedures, examples, compatibility notes, and exceptions.
+
+## Bundled Scanners
+
+Ruff owns most mechanical rules. Only two checks need the project context Ruff
+cannot see, and both live in one script:
+
+```bash
+uv run assets/check_antipatterns.py src --ban-noqa PLW0603
+uv run assets/check_antipatterns.py . --exclude examples   # skip deliberate fixtures
+```
+
+`IMPORT-ERROR-GUARD` and `BANNED-NOQA` are documented in
+[Linter Rules](references/linter-rules.md). Naming checks use
+`assets/check_path_naming.py` (see [Naming](references/naming-conventions.md)).
+Both scanners exit `0` clean, `1` on findings, and `2` when the scan itself was
+unreliable (nothing scanned, an unparseable file, or a fact the rules need could
+not be derived) — never treat `2` as a pass. Run them through `uv run` in the
+project environment, not `python -I`: the distribution map that resolves
+`PIL` → `Pillow` comes from installed packages, and without it a guard on an
+aliased import fails the scan instead of being judged.
 
 ## Reference Map
 
