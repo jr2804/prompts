@@ -43,15 +43,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from style_presets import apply_style
 
-try:
-    # Pillow's Ghostscript backend is needed for vector→raster of PDF/EPS captions.
-    from PIL import Image  # noqa: F401  (presence check; used in raster exporters)
-
-    HAS_PIL = True
-except ImportError:
-    HAS_PIL = False
-
-
 # Per-format defaults: dpi is the raster DPI; rest are format-specific safety knobs.
 _FORMAT_DEFAULT_KWARGS = {
     "pdf": {"metadata": {"Creator": "scientific-figures skill", "Title": ""}},
