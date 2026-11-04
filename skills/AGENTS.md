@@ -114,6 +114,22 @@ uvx skills-ref validate <path-to-skill>
 ruff check <path-to-skill> --fix
 ```
 
+### Verdict-producing scripts
+
+A helper script whose exit code is a verdict (a scanner, gate, or validator)
+carries a contract beyond "prints findings". Follow the rules in
+`skills/development/python-ultimate/references/linter-rules.md` whenever you add
+or change one:
+
+- Exit `2` means the scan could not establish the facts its rules depend on; it
+  is never a pass. Exit `0` with an empty result must mean "scanned and clean",
+  not "scanned nothing".
+- Keep the two halves tested — every documented exit-`2` cause, and the honest
+  runs that must still pass. A suite of only failure cases is satisfied by a gate
+  that always fails.
+- A wrong entry in a lookup table can silently narrow the scan. Do not assume a
+  coverage guard covers partial narrowing; measure what a wrong value does.
+
 ## Child DOX Index
 
 | Path | Covers |
