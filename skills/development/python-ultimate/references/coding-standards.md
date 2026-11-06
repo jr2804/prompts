@@ -317,7 +317,7 @@ Choose the right tool based on **what the data does**, not just what it holds.
 
 2. **Use `pydantic` at trust boundaries.** Any time data comes from outside the program (HTTP request, CLI args parsed to a model, config file, database row), use `pydantic.BaseModel` so invalid data fails loudly and early with a descriptive error.
 
-3. **Don't mix the two for the same concept.** If a type starts as `@dataclass` and later needs validation, convert it to `pydantic.BaseModel` rather than bolting on manual `__post_init__` validation in a dataclass.
+3. **Don't mix the two for the same concept.** If a type starts as `@dataclass` and later needs validation, convert it to `pydantic.BaseModel` rather than bolting on manual `__post_init__` validation in a dataclass. (Distinct case: external data crossing a real boundary may warrant separate wire/parse/domain layers for one concept — see [TypedDict: runtime and typing boundaries / Layering wire, parse, and domain](type-design.md#typeddict-runtime-and-typing-boundaries).)
 
 ### Examples
 

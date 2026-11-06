@@ -211,6 +211,74 @@ can be made explicit.
 For module-level lookup tables built from these types — where they should live,
 and how to keep them read-only — see [module-state.md](module-state.md).
 
+## TypedDict: runtime and typing boundaries
+
+`TypedDict` is a **structural, type-checker-only** contract over a plain `dict`.
+The value remains the original dict: no constructor runs, no copy is made, and
+nothing exists at runtime beyond the dict. `isinstance(x, SomeTypedDict)` raises
+`TypeError` (there is no runtime class to check against). Do not treat `cast()`
+as validation: `cast(Payload, response.json())` only informs the type checker
+and proves nothing about the bytes that arrived.
+
+### When `TypedDict` fits
+
+- **Key presence matters (partial updates).** Use `NotRequired` (or `total=False`
+  on the whole type, used deliberately) to preserve the distinction between "key
+  omitted" and "value is `None`". Branch on `"key" in payload"` rather than on
+  attribute defaults that collapse both cases.
+- **You already have the dict** and only need the checker to know its shape,
+  with no copy or runtime overhead (e.g., a `requests.json()` result or a DB
+  row kept dict-shaped).
+- **Wire contract vs. parser.** A `TypedDict` can document what the network
+  sends; it does not replace runtime validation of untrusted input.
+
+```python
+from typing import NotRequired, TypedDict
+
+
+class UpdateProfile(TypedDict):
+    email: NotRequired[str | None]
+    phone: NotRequired[str | None]
+
+
+def apply_update(patch: UpdateProfile) -> None:
+    if "email" in patch:
+        user.email = patch["email"]  # present and possibly None = explicit clear
+    # absent key => leave existing value unchanged
+```
+
+### Sharp edges
+
+- **Structural, not nominal.** Unrelated `TypedDict`s with compatible keys/types
+  are interchangeable to the checker; the type is the shape, not a brand.
+- **Requiredness composition.** Fields are required by default; subclasses add
+  required fields unless marked `NotRequired`. Prefer per-field `NotRequired`
+  for clarity; use `total=False` only when most fields are optional and that
+  intent is obvious.
+- **No runtime validation.** Annotations, including `TypedDict` and `StrEnum`
+  annotations, do not validate arbitrary external values. Convert/parse once at
+  the trust boundary (Pydantic or an explicit parser) before relying on the
+  shape.
+
+## Layering wire, parse, and domain (when mixing is warranted)
+
+When external data enters the program, the three modeling tools can play
+different roles for the *same* concept without fighting each other:
+
+1. **Wire (contract):** `TypedDict` describes the expected dict shape (static
+   only) when keeping the payload dict-shaped is useful.
+2. **Parse (trust boundary):** a runtime validator (typically Pydantic) parses
+   and validates/coerces untrusted input once, failing loudly on bad data.
+3. **Domain (internal):** a `@dataclass` (often `frozen=True, slots=True`) holds
+   the values the rest of the program constructs and passes around.
+
+Convert at the boundary (`parse(raw: Wire) -> Domain` via the validator). Build
+`Domain` directly in tests and internal code; do not re-run boundary validation
+on values your own code just constructed. Keep this layering only where a real
+boundary exists—do not add ceremony for purely internal data (see "Don't mix the
+two for the same concept" in [coding-standards.md](coding-standards.md) for the
+evolution case where a type should simply become a validated model).
+
 ## Audit checklist
 
 When writing or reviewing code, check each applicable item:
